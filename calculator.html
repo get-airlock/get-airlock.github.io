@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Inference Cost Calculator — Airlock Labs</title>
+<meta name="description" content="See how much you could save with behavioral AI routing. Enter your current AI spend and model. Get your savings estimate in 10 seconds.">
+<meta property="og:title" content="How Much Are You Overpaying for AI Inference?">
+<meta property="og:description" content="Our routing architecture saves up to 90% on inference costs. Enter your numbers. See the math.">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --otto: #7C5CFC; --accent: #00D1FF; --base: #06080C; --raised: #0C0F16;
+  --overlay: #12161F; --border: #1A1F2E; --text: #E2E8F0; --text2: #94A3B8;
+  --text3: #64748B; --success: #22C55E; --warning: #EAB308; --error: #EF4444;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--base); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 15px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+body::before { content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.025; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size:256px 256px; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+a { color: var(--accent); text-decoration: none; }
+
+nav { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(6,8,12,0.85); backdrop-filter:blur(24px); border-bottom:1px solid rgba(26,31,46,0.6); padding:12px 0; }
+nav .container { display:flex; align-items:center; gap:10px; max-width:960px; margin:0 auto; padding:0 24px; }
+.nav-logo { width:28px; height:28px; background:linear-gradient(135deg, var(--otto), var(--accent)); border-radius:6px; }
+
+.page { max-width: 720px; margin: 0 auto; padding: 120px 24px 80px; }
+
+h1 { font-size: clamp(28px, 4vw, 42px); font-weight: 900; letter-spacing: -2px; line-height: 1.1; margin-bottom: 12px; background: linear-gradient(135deg, #fff, var(--otto)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.subtitle { font-size: 16px; color: var(--text2); margin-bottom: 40px; }
+
+/* Calculator */
+.calc-box { background: var(--raised); border: 1px solid var(--border); border-radius: 20px; padding: 40px; position: relative; }
+.calc-box::before { content:''; position:absolute; inset:-1px; border-radius:20px; padding:1px; z-index:-1; background:linear-gradient(135deg, rgba(124,92,252,0.2), transparent 50%, rgba(0,209,255,0.1)); -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
+
+.field { margin-bottom: 24px; }
+.field label { display: block; font-size: 12px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+.field select, .field input {
+  width: 100%; background: var(--base); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px 16px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 15px;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+.field select:focus, .field input:focus { outline: none; border-color: var(--otto); box-shadow: 0 0 0 3px rgba(124,92,252,0.15); }
+.field select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%2364748B' stroke-width='2'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; }
+.field .hint { font-size: 11px; color: var(--text3); margin-top: 6px; }
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.btn-calc {
+  width: 100%; padding: 16px; border: none; border-radius: 12px; cursor: pointer;
+  background: linear-gradient(135deg, var(--otto), #6B4AEB); color: #fff;
+  font-size: 16px; font-weight: 700; font-family: 'Inter', sans-serif;
+  transition: all 0.3s; margin-top: 8px;
+  box-shadow: 0 4px 24px rgba(124,92,252,0.25);
+}
+.btn-calc:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(124,92,252,0.35); }
+
+/* Results */
+.results { display: none; margin-top: 32px; }
+.results.active { display: block; animation: fadeUp 0.5s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+.savings-hero {
+  background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(0,209,255,0.04));
+  border: 1px solid rgba(34,197,94,0.2); border-radius: 20px;
+  padding: 40px; text-align: center; margin-bottom: 24px;
+}
+.savings-amount { font-family: 'JetBrains Mono', monospace; font-size: 56px; font-weight: 700; color: var(--success); letter-spacing: -3px; }
+.savings-label { font-size: 14px; color: var(--text2); margin-top: 4px; }
+.savings-pct { font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 700; color: var(--accent); margin-top: 8px; }
+
+.breakdown { background: var(--raised); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+.breakdown-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(26,31,46,0.4); font-size: 14px; }
+.breakdown-row:last-child { border-bottom: none; }
+.breakdown-row .label { color: var(--text2); }
+.breakdown-row .value { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+.breakdown-row.highlight .value { color: var(--success); font-size: 16px; }
+
+.cta-strip {
+  background: var(--raised); border: 1px solid var(--border); border-radius: 16px;
+  padding: 32px; text-align: center;
+}
+.cta-strip h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+.cta-strip p { font-size: 13px; color: var(--text2); margin-bottom: 16px; }
+.btn-cta {
+  display: inline-block; padding: 14px 32px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--otto), #6B4AEB); color: #fff;
+  font-weight: 700; font-size: 14px; text-decoration: none;
+  box-shadow: 0 4px 24px rgba(124,92,252,0.25); transition: all 0.3s;
+}
+.btn-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(124,92,252,0.35); color: #fff; }
+
+.back-link { display: block; text-align: center; margin-top: 32px; font-size: 13px; color: var(--text3); }
+
+footer { max-width:720px; margin:0 auto; padding:40px 24px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--text3); }
+
+@media (max-width: 768px) {
+  .field-row { grid-template-columns: 1fr; }
+  .savings-amount { font-size: 40px; }
+}
+</style>
+</head>
+<body>
+
+<nav><div class="container"><a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;"><div class="nav-logo"></div><span style="font-weight:800;font-size:15px;color:var(--text);">Airlock Labs</span></a></div></nav>
+
+<div class="page">
+  <h1>How much are you overpaying for AI inference?</h1>
+  <p class="subtitle">Our behavioral routing architecture uses cheap models for persona and reserves frontier for reasoning. Enter your numbers. See the math.</p>
+
+  <div class="calc-box">
+    <div class="field">
+      <label>What model are you currently using?</label>
+      <select id="model">
+        <option value="opus-4.7" data-input="5.00" data-output="25.00">Claude Opus 4.7 ($5.00 / $25.00 per M tokens)</option>
+        <option value="gpt-5.4" data-input="2.50" data-output="15.00">GPT-5.4 ($2.50 / $15.00 per M tokens)</option>
+        <option value="sonnet-4.6" data-input="3.00" data-output="15.00">Claude Sonnet 4.6 ($3.00 / $15.00 per M tokens)</option>
+        <option value="gpt-4o" data-input="2.50" data-output="10.00">GPT-4o ($2.50 / $10.00 per M tokens)</option>
+        <option value="opus-4.6" data-input="15.00" data-output="75.00">Claude Opus 4.6 ($15.00 / $75.00 per M tokens)</option>
+        <option value="gemini-pro" data-input="1.25" data-output="10.00">Gemini 2.5 Pro ($1.25 / $10.00 per M tokens)</option>
+        <option value="custom" data-input="0" data-output="0">Custom (enter your own pricing)</option>
+      </select>
+    </div>
+
+    <div id="custom-pricing" style="display:none;">
+      <div class="field-row">
+        <div class="field">
+          <label>Input price ($ per M tokens)</label>
+          <input type="number" id="custom-input" step="0.01" placeholder="e.g. 3.00">
+        </div>
+        <div class="field">
+          <label>Output price ($ per M tokens)</label>
+          <input type="number" id="custom-output" step="0.01" placeholder="e.g. 15.00">
+        </div>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Monthly API spend ($)</label>
+        <input type="number" id="spend" placeholder="e.g. 5000" value="5000">
+        <div class="hint">Your current monthly inference bill</div>
+      </div>
+      <div class="field">
+        <label>Approx. calls per month</label>
+        <input type="number" id="calls" placeholder="e.g. 100000" value="100000">
+        <div class="hint">Total API calls across all endpoints</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>What % of your calls need persona / behavioral consistency?</label>
+      <select id="persona-pct">
+        <option value="0.9">Most of them (~90%) — chatbots, agents, assistants</option>
+        <option value="0.7">A lot (~70%) — mixed workload</option>
+        <option value="0.5" selected>About half (~50%)</option>
+        <option value="0.3">Some (~30%) — mostly reasoning/coding</option>
+        <option value="0.1">Very few (~10%) — almost all reasoning</option>
+      </select>
+    </div>
+
+    <button class="btn-calc" onclick="calculate()">Calculate My Savings</button>
+  </div>
+
+  <div class="results" id="results">
+    <div class="savings-hero">
+      <div class="savings-amount" id="savings-amount">$0</div>
+      <div class="savings-label">estimated monthly savings</div>
+      <div class="savings-pct" id="savings-pct">0% reduction</div>
+    </div>
+
+    <div class="breakdown">
+      <div class="breakdown-row"><span class="label">Your current monthly spend</span><span class="value" id="r-current">$0</span></div>
+      <div class="breakdown-row"><span class="label">Persona calls routed to budget models</span><span class="value" id="r-persona-calls">0</span></div>
+      <div class="breakdown-row"><span class="label">Persona call cost (via behavioral routing)</span><span class="value" id="r-persona-cost">$0</span></div>
+      <div class="breakdown-row"><span class="label">Reasoning calls kept on frontier</span><span class="value" id="r-reasoning-calls">0</span></div>
+      <div class="breakdown-row"><span class="label">Reasoning call cost (unchanged)</span><span class="value" id="r-reasoning-cost">$0</span></div>
+      <div class="breakdown-row highlight"><span class="label"><strong>New monthly total</strong></span><span class="value" id="r-new-total">$0</span></div>
+    </div>
+
+    <div class="breakdown" style="margin-bottom: 24px;">
+      <div style="font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:12px;">How it works</div>
+      <p style="font-size:13px; color:var(--text2); line-height:1.7;">Our benchmark proves that budget models (grok-3-mini at $0.001/call, gemma-4 at $0.0005/call) outperform frontier models on behavioral persona fidelity by ~20%. We route persona-dependent calls to these models and keep your frontier model for reasoning-heavy tasks where it actually matters. Same quality. Fraction of the cost.</p>
+      <p style="font-size:12px; color:var(--text3); margin-top:8px;">Based on ConstellationBench data: 22 models, 22,200+ evaluations. <a href="https://huggingface.co/datasets/AirlockLabs/constellation-bench">View the data</a>.</p>
+    </div>
+
+    <div class="cta-strip">
+      <h3>Want to see this in action?</h3>
+      <p>We'll walk you through the routing architecture and show you exactly how it works with your stack.</p>
+      <a href="mailto:admin@airlocklabs.com?subject=Inference%20Cost%20Savings%20—%20Let%27s%20Talk&body=Hi%20Airlock%20Labs%2C%0A%0AI%27m%20currently%20spending%20approximately%20%24_____%2Fmo%20on%20AI%20inference%20and%20I%27m%20interested%20in%20learning%20more%20about%20your%20behavioral%20routing%20architecture.%0A%0ACurrent%20model%3A%20%0AMonthly%20calls%3A%20%0AUse%20case%3A%20%0A%0ALooking%20forward%20to%20hearing%20from%20you." class="btn-cta">Schedule a Conversation</a>
+    </div>
+  </div>
+
+  <a href="index.html" class="back-link">Back to Airlock Labs</a>
+</div>
+
+<footer>Airlock Labs &middot; Detroit, MI &middot; 2026</footer>
+
+<script>
+const modelSelect = document.getElementById('model');
+modelSelect.addEventListener('change', () => {
+  document.getElementById('custom-pricing').style.display =
+    modelSelect.value === 'custom' ? 'block' : 'none';
+});
+
+function calculate() {
+  const opt = modelSelect.options[modelSelect.selectedIndex];
+  let inputPrice, outputPrice;
+
+  if (modelSelect.value === 'custom') {
+    inputPrice = parseFloat(document.getElementById('custom-input').value) || 0;
+    outputPrice = parseFloat(document.getElementById('custom-output').value) || 0;
+  } else {
+    inputPrice = parseFloat(opt.dataset.input);
+    outputPrice = parseFloat(opt.dataset.output);
+  }
+
+  const spend = parseFloat(document.getElementById('spend').value) || 0;
+  const calls = parseInt(document.getElementById('calls').value) || 0;
+  const personaPct = parseFloat(document.getElementById('persona-pct').value);
+
+  // Budget model pricing (weighted avg of top performers)
+  // grok-3-mini: $0.30/$0.50, gemma-4: $0.13/$0.38, qwen3.6: $0.07/$0.10
+  const budgetInputPrice = 0.15;  // weighted avg
+  const budgetOutputPrice = 0.30; // weighted avg
+
+  // Cost per call estimation
+  const avgTokensIn = 800;
+  const avgTokensOut = 400;
+  const currentCostPerCall = (avgTokensIn / 1e6 * inputPrice) + (avgTokensOut / 1e6 * outputPrice);
+  const budgetCostPerCall = (avgTokensIn / 1e6 * budgetInputPrice) + (avgTokensOut / 1e6 * budgetOutputPrice);
+
+  const personaCalls = Math.round(calls * personaPct);
+  const reasoningCalls = calls - personaCalls;
+
+  const personaCost = personaCalls * budgetCostPerCall;
+  const reasoningCost = reasoningCalls * currentCostPerCall;
+  const newTotal = personaCost + reasoningCost;
+  const savings = spend - newTotal;
+  const pct = spend > 0 ? Math.round((savings / spend) * 100) : 0;
+
+  // Update UI
+  document.getElementById('savings-amount').textContent = '$' + Math.round(savings).toLocaleString();
+  document.getElementById('savings-pct').textContent = pct + '% reduction';
+  document.getElementById('r-current').textContent = '$' + spend.toLocaleString();
+  document.getElementById('r-persona-calls').textContent = personaCalls.toLocaleString();
+  document.getElementById('r-persona-cost').textContent = '$' + Math.round(personaCost).toLocaleString();
+  document.getElementById('r-reasoning-calls').textContent = reasoningCalls.toLocaleString();
+  document.getElementById('r-reasoning-cost').textContent = '$' + Math.round(reasoningCost).toLocaleString();
+  document.getElementById('r-new-total').textContent = '$' + Math.round(newTotal).toLocaleString();
+
+  document.getElementById('results').classList.add('active');
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
