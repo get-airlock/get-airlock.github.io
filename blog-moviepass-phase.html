@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The MoviePass Phase of AI — Airlock Labs</title>
+<meta name="description" content="A streamer with 4.5 million subscribers noticed AI got worse. A construction worker on a $15 billion data center confirmed why. We have 22,000 data points that prove it.">
+<meta property="og:title" content="The MoviePass Phase of AI — Airlock Labs">
+<meta property="og:description" content="Everything in AI is priced under its cost. We tested 15 models with 22,200+ calls and $115. The cheap ones won.">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The MoviePass Phase of AI">
+<meta name="twitter:description" content="A $15B data center is cutting costs. Claude and ChatGPT are routing to weaker models. We tested 15 models for $115. The cheap ones won by 20%.">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --otto: #7C5CFC;
+  --accent: #00D1FF;
+  --base: #0B0E14;
+  --raised: #0F1219;
+  --overlay: #151923;
+  --border: #1E2330;
+  --text: #E2E8F0;
+  --text2: #94A3B8;
+  --text3: #64748B;
+  --success: #22C55E;
+  --warning: #EAB308;
+  --error: #EF4444;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--base); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 16px; line-height: 1.8; overflow-x: hidden; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Nav */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(11, 14, 20, 0.92); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border); padding: 14px 0;
+}
+nav .container { display: flex; align-items: center; justify-content: space-between; }
+.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo { width: 28px; height: 28px; background: linear-gradient(135deg, var(--otto), var(--accent)); border-radius: 6px; }
+.nav-title { font-weight: 800; font-size: 15px; letter-spacing: -0.5px; color: var(--text); }
+.nav-links { display: flex; gap: 20px; }
+.nav-links a { color: var(--text2); font-size: 13px; font-weight: 500; text-decoration: none; }
+.nav-links a:hover { color: var(--text); }
+
+/* Article layout */
+.container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+.article-container { max-width: 680px; margin: 0 auto; padding: 0 24px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Article header */
+.article-header {
+  padding: 140px 0 60px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 48px;
+}
+.article-kicker {
+  display: inline-block; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--otto); margin-bottom: 20px;
+}
+.article-header h1 {
+  font-size: 42px; font-weight: 900; letter-spacing: -2px; line-height: 1.12;
+  color: var(--text); margin-bottom: 20px;
+}
+.article-header .subtitle {
+  font-size: 18px; color: var(--text2); line-height: 1.6; max-width: 560px;
+}
+.article-meta {
+  margin-top: 24px; font-size: 13px; color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Article body */
+.article-body h2 {
+  font-size: 24px; font-weight: 800; letter-spacing: -1px;
+  margin: 48px 0 16px; color: var(--text);
+}
+.article-body h3 {
+  font-size: 18px; font-weight: 700; letter-spacing: -0.5px;
+  margin: 36px 0 12px; color: var(--text);
+}
+.article-body p {
+  margin-bottom: 20px; color: var(--text2); font-size: 16px; line-height: 1.8;
+}
+.article-body strong { color: var(--text); font-weight: 600; }
+.article-body em { color: var(--text2); }
+
+/* Blockquote */
+.article-body blockquote {
+  border-left: 3px solid var(--otto);
+  padding: 16px 24px;
+  margin: 32px 0;
+  background: rgba(124, 92, 252, 0.04);
+  border-radius: 0 8px 8px 0;
+}
+.article-body blockquote p {
+  color: var(--text); font-size: 17px; line-height: 1.7;
+  margin-bottom: 8px; font-style: italic;
+}
+.article-body blockquote p:last-child { margin-bottom: 0; }
+.article-body blockquote cite {
+  display: block; margin-top: 8px;
+  font-size: 13px; color: var(--text3); font-style: normal;
+}
+
+/* Data callout */
+.data-callout {
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin: 36px 0;
+}
+.data-callout .callout-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--otto); margin-bottom: 16px;
+}
+.data-callout .callout-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+}
+.data-callout .callout-stat {
+  display: flex; flex-direction: column;
+}
+.data-callout .callout-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px; font-weight: 700; color: var(--text);
+}
+.data-callout .callout-desc {
+  font-size: 12px; color: var(--text3); margin-top: 2px;
+}
+
+/* Separator */
+.section-break {
+  border: none; border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+
+/* CTA */
+.article-cta {
+  background: linear-gradient(135deg, rgba(124,92,252,0.06), rgba(0,209,255,0.03));
+  border: 1px solid rgba(124,92,252,0.15);
+  border-radius: 16px;
+  padding: 40px; text-align: center;
+  margin: 48px 0;
+}
+.article-cta h3 {
+  font-size: 22px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; color: var(--text);
+}
+.article-cta p { font-size: 14px; color: var(--text2); max-width: 460px; margin: 0 auto 20px; }
+.article-cta .cta-btn {
+  display: inline-block; background: var(--otto); color: #fff;
+  padding: 12px 28px; border-radius: 8px;
+  font-weight: 700; font-size: 14px; text-decoration: none;
+}
+.article-cta .cta-btn:hover { background: #6B4FE0; text-decoration: none; }
+
+/* Footer */
+footer {
+  padding: 40px 0; border-top: 1px solid var(--border); text-align: center;
+}
+.footer-line { font-size: 12px; color: var(--text3); }
+
+@media (max-width: 768px) {
+  .article-header h1 { font-size: 28px; }
+  .data-callout .callout-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-logo"></div>
+      <span class="nav-title">Airlock Labs</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#proof">The Proof</a>
+      <a href="index.html#papers">Research</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<article>
+  <header class="article-header">
+    <div class="article-container">
+      <div class="article-kicker">Research Note</div>
+      <h1>The MoviePass Phase of AI</h1>
+      <p class="subtitle">A streamer with 4.5 million subscribers noticed AI got worse. A construction worker on a $15 billion data center confirmed why. We have 22,000 data points that prove both of them right.</p>
+      <div class="article-meta">Airlock Labs &middot; April 2026 &middot; 6 min read</div>
+    </div>
+  </header>
+
+  <div class="article-body article-container">
+
+    <h2>The tell</h2>
+
+    <p>Last week, a construction engineer posted a comment on a livestream. He said he's boots-on-the-ground at a $15 billion data center build for OpenAI and Oracle, and the money is running out. Scope is getting slashed. Costs are getting cut. They cheaped out on the basketball hoop for the construction trailer.</p>
+
+    <p>The host — Atroc, a streamer with 4.5 million subscribers — didn't need the confirmation. He'd already noticed it from the product side.</p>
+
+    <blockquote>
+      <p>If you use Claude, and I think this happens with OpenAI too, they have been rate limiting. In recent weeks, even they've been giving you less quality for the same dollar. The thing thinks less.</p>
+      <p>And it's because the bill is coming due.</p>
+      <cite>— Atroc, April 2026</cite>
+    </blockquote>
+
+    <p>He described the mechanism plainly: you ask a question, and the model tries to guess whether it can get away with not thinking at all. Ninety percent of the time, it routes to a weaker model and hopes you don't notice. What's left is something that behaves exactly like the distracted human employee it was supposed to replace.</p>
+
+    <p>This isn't a bug. It's the business model collapsing in real time.</p>
+
+    <hr class="section-break">
+
+    <h2>Every AI product you use is a loss leader</h2>
+
+    <p>Atroc compared it to MoviePass — 15 tickets for the price of one. Early Uber, when a ride anywhere in the city cost five bucks. Early Netflix, when every movie and show was available for six dollars. Early food delivery, when a startup called Sprig would bring freshly baked cookies to your door for four.</p>
+
+    <p>All of those ran on VC money, not revenue. All of them felt like magic. And all of them either raised prices, degraded quality, or died.</p>
+
+    <p>AI is the largest VC subsidy in history. The companies are competing to keep prices artificially low while spending billions on infrastructure they can't yet power. America is building data centers faster than it can generate the electricity to turn them on.</p>
+
+    <p>The result is that <strong>no one knows what AI actually costs</strong>, because no one is charging what it costs. Subscriptions are priced to acquire users, not to sustain a business. When Atroc says "everything is priced under its cost right now," he's describing an entire industry operating without a real price signal.</p>
+
+    <p>That's not an innovation problem. That's a valuation problem. And it's about to correct.</p>
+
+    <hr class="section-break">
+
+    <h2>We tested 15 models for $115. Here's what the data says.</h2>
+
+    <p>While the industry was building $15 billion data centers, we ran an experiment. We took 15 large language models — from GPT-4o to Claude Opus to open-source models running on commodity hardware — and tested them on something no benchmark measures: can this model hold a behavioral persona under pressure?</p>
+
+    <p>Not "can it solve a math problem." Not "can it write code." Can it be a consistent, psychologically coherent someone across 22,200+ interactions?</p>
+
+    <div class="data-callout">
+      <div class="callout-label">ConstellationBench Results</div>
+      <div class="callout-grid">
+        <div class="callout-stat">
+          <span class="callout-num" style="color: var(--otto);">20%</span>
+          <span class="callout-desc">Budget models outperformed frontier on behavioral fidelity</span>
+        </div>
+        <div class="callout-stat">
+          <span class="callout-num" style="color: var(--success);">0</span>
+          <span class="callout-desc">Hallucinations across 635 adversarial probes</span>
+        </div>
+        <div class="callout-stat">
+          <span class="callout-num" style="color: var(--accent);">$0.001</span>
+          <span class="callout-desc">Cost per complete task lifecycle</span>
+        </div>
+        <div class="callout-stat">
+          <span class="callout-num" style="color: var(--warning);">769x</span>
+          <span class="callout-desc">Cheaper than Devin for equivalent task completion</span>
+        </div>
+      </div>
+    </div>
+
+    <p>The most expensive model we tested was the worst at staying in character. The models that cost a fraction of a cent per call outperformed it by 20%. Not on a technicality. On every dimension we measured — drive fidelity, stress resilience, persona consistency, behavioral range.</p>
+
+    <p>This isn't a fluke. It's a structural finding. The safety training (RLHF) that makes frontier models expensive also makes them rigid. They've been optimized to be helpful, harmless, and honest — which turns out to be the opposite of being a convincing, consistent personality. The guardrails that cost billions to build are actively fighting the use case.</p>
+
+    <p>We're not alone in finding this. Last month, researchers at USC published a paper called <a href="https://arxiv.org/abs/2603.18507">PRISM</a> that proved the same mechanism from a different angle: telling a model "you are an expert" improves writing and roleplay but <strong>damages factual accuracy</strong>. On MMLU benchmarks, accuracy dropped from 71.6% to 68.0% just by adding a persona prefix. <a href="https://www.theregister.com/2026/03/24/ai_models_persona_prompting/">The Register</a>, <a href="https://techxplore.com/news/2026-03-ai-expert-reliable.html">TechXplore</a>, and others covered it. The finding got attention because it's counterintuitive: the thing that makes a model sound more human makes it measurably dumber.</p>
+
+    <p>Their solution was a gated LoRA adapter that routes persona behavior on and off per task — within a single model. Our data independently confirmed the same finding across 15 models, under adversarial conditions, with a behavioral psychology framework they didn't have. And our solution routes <em>across</em> models at inference time, with no fine-tuning required, at commodity prices.</p>
+
+    <p>Same conclusion, different scale. They proved it in a lab. We proved it in production.</p>
+
+    <hr class="section-break">
+
+    <h2>The wrong metric at the wrong price</h2>
+
+    <p>The AI industry has a single theory of progress: make the model bigger, make it reason harder, charge more. Every generation is sold on benchmark scores that measure raw capability — math, coding, factual recall.</p>
+
+    <p>But capability isn't the bottleneck anymore. The bottleneck is behavior.</p>
+
+    <p>When a company deploys an AI agent to handle customer conversations, they don't need it to solve differential equations. They need it to sound like their brand, stay consistent across a hundred interactions, and not randomly break character when a user asks something unexpected. That's a behavioral problem, not a compute problem.</p>
+
+    <p>And behavioral problems don't scale with model size. Our data shows they scale <em>inversely</em>. The bigger the model, the more safety training it carries, and the narrower its behavioral range. You're paying for a Ferrari engine bolted to a golf cart frame.</p>
+
+    <p>Meanwhile, the companies selling you that Ferrari engine are quietly routing your requests to the golf cart anyway — and hoping you don't notice.</p>
+
+    <hr class="section-break">
+
+    <h2>What sustainable AI actually looks like</h2>
+
+    <p>When the subsidy ends — and it will — two things happen. Consumer AI gets expensive or gets worse. And businesses that built on the assumption of cheap, unlimited tokens discover they have a cost problem they never planned for.</p>
+
+    <p>We built for the post-subsidy world from day one.</p>
+
+    <p>Our dynamic router doesn't pick the biggest model and hope for the best. It routes each subtask to the cheapest model that can actually do it well. On our Pareto Frontier Bench — 10 composite tasks across 9 domains — the router scores 100% at $1.00 total cost. Opus alone scores 60% at $6.66. Six times the spend. Forty percent less capability.</p>
+
+    <p>That's not an optimization trick. That's a different theory of how AI should work. Instead of one massive model doing everything poorly at enormous cost, you assemble a team of specialists that each do one thing well at commodity prices.</p>
+
+    <p>Atroc said something that stuck: "You can't get a true idea of whether there's a viable business at the current market dynamic, because everything is priced under its cost." He's right. But we can tell you what a viable business looks like at real prices, because we've been operating at real prices from the start. $115 for 22,200 calls. No subsidy. No loss leader. Just math that works.</p>
+
+    <hr class="section-break">
+
+    <h2>The bill is coming</h2>
+
+    <p>The construction engineer on that data center saw it from the ground level. Atroc saw it from the product level. Millions of users are seeing it from the quality level — the model that used to think for them is now guessing whether it can get away with not thinking at all.</p>
+
+    <p>Everyone is arriving at the same conclusion from different angles. The current economics of AI don't work. The subsidy is ending. The models are getting worse on purpose to save money.</p>
+
+    <p>What nobody is asking is: <strong>what if the expensive model was never the right answer?</strong></p>
+
+    <p>We tested that question across 15 models, 17 behavioral personas, 44 experimental layers, 12 IO-psychology mechanisms, and 22,200+ calls. The answer is in the data. It's public. It cost us $115.</p>
+
+    <p>The MoviePass phase of AI is ending. What comes after is what was real all along.</p>
+
+    <!-- CTA -->
+    <div class="article-cta">
+      <h3>See the data yourself</h3>
+      <p>ConstellationBench is open. The dataset, scoring engine, and leaderboard are public on HuggingFace. Run any model against it for ~$0.10.</p>
+      <a href="https://huggingface.co/datasets/airlock-labs/constellation-bench" class="cta-btn">View the Dataset</a>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <div class="container">
+    <p class="footer-line">Airlock Labs &middot; Detroit, MI &middot; 2026</p>
+    <p class="footer-line" style="margin-top: 8px;">
+      <a href="https://huggingface.co/datasets/airlock-labs/constellation-bench" style="color: var(--text3); margin: 0 12px;">HuggingFace</a>
+      <a href="https://github.com/airlock-labs" style="color: var(--text3); margin: 0 12px;">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
