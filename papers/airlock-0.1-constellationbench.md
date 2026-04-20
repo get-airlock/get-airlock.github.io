@@ -238,9 +238,13 @@ We hypothesize that RLHF alignment training compresses the output distribution, 
 
 The alignment training that makes models "helpful, harmless, honest" simultaneously constrains the behavioral range needed for persona differentiation. We term this the *alignment mass* effect: the accumulated weight of safety training creates a gravitational pull toward a single behavioral mode.
 
-### 5.3 Caveats
+### 5.3 Independent Validation
 
-The RLHF paradox is a hypothesis supported by consistent correlational evidence across 22 models, not an experimentally isolated causal mechanism. Architecture differences, training data composition, model size, and other confounds may contribute. We invite controlled experiments that isolate the RLHF variable specifically.
+Hu, Rostami, and Thomason (2026) independently confirmed a complementary mechanism in the PRISM paper [20]. They found that expert persona prompting improves generative alignment tasks but degrades discriminative accuracy (MMLU: 71.6% to 68.0%). Their finding operates at the prompting level within single models; ours operates at the multi-model comparison level across 22 models. Both converge on the same structural conclusion: the training and prompting strategies designed to make models more aligned simultaneously constrain the behavioral range needed for persona differentiation.
+
+### 5.4 Caveats
+
+The RLHF paradox is a hypothesis supported by consistent correlational evidence across 22 models and independently confirmed directional evidence from PRISM [20], but causal attribution to RLHF specifically is not experimentally isolated. Architecture differences, training data composition, model size, and other confounds may contribute. We invite controlled experiments that isolate the RLHF variable specifically, including abliteration studies that remove refusal directions from model weights while preserving all other training.
 
 ---
 
@@ -347,6 +351,8 @@ The RLHF paradox â€” budget models outperforming frontier on persona fidelity â€
 
 Architecture determines the ceiling. Routing exploits the split. A colony of cheap, well-routed models outperforms a single expensive model on behavioral tasks while costing 97% less.
 
+This finding has theoretical grounding in the Lottery Ticket Hypothesis [19]. Frankle & Carbin (2019) proved that dense, randomly-initialized networks contain sparse subnetworks (10-20% of the original size) that, when trained in isolation with their original initialization, match the full network's accuracy. Budget models in our evaluation function as behavioral lottery tickets: they are the sparse, well-initialized subnetworks that the frontier model contains but cannot access because its RLHF alignment training has overwritten the initialization conditions that would allow behavioral range. The POMR router's function is analogous to the pruning mask: it identifies which model (subnetwork) is the winning ticket for each behavioral task, discarding the expensive parameters that contribute nothing to persona fidelity.
+
 ConstellationBench is an open benchmark. The data, scoring engine, signal word dictionaries, and results are publicly available at https://huggingface.co/datasets/AirlockLabs/constellation-bench. Total cost to reproduce: approximately $23 for the core 7-benchmark suite.
 
 ---
@@ -388,6 +394,10 @@ ConstellationBench is an open benchmark. The data, scoring engine, signal word d
 [17] Sharma, M., et al. "Towards Understanding Sycophancy in Language Models." ICLR 2024.
 
 [18] Shazeer, N., et al. "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer." ICLR 2017.
+
+[19] Frankle, J. and Carbin, M. "The Lottery Ticket Hypothesis: Finding Sparse, Trainable Neural Networks." ICLR 2019.
+
+[20] Hu, Z., Rostami, M., and Thomason, J. "Expert Personas Improve LLM Alignment but Damage Accuracy: Bootstrapping Intent-Based Persona Routing with PRISM." arXiv:2603.18507, 2026.
 
 ---
 
