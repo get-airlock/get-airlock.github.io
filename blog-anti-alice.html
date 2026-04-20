@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Company That Profits From Making AI Worse — Airlock Labs</title>
+<meta name="description" content="Alice sells fear. We measured the cost. Their guardrails are why your AI can't hold a conversation. Here's the data.">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --otto: #7C5CFC; --accent: #00D1FF; --base: #06080C; --raised: #0C0F16; --border: #1A1F2E; --text: #E2E8F0; --text2: #94A3B8; --text3: #64748B; --success: #22C55E; --warning: #EAB308; --error: #EF4444; }
+html { scroll-behavior: smooth; }
+body { background: var(--base); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 16px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
+body::before { content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.025; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size:256px 256px; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+nav { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(6,8,12,0.85); backdrop-filter:blur(24px); border-bottom:1px solid rgba(26,31,46,0.6); padding:12px 0; }
+nav .container { display:flex; align-items:center; gap:10px; max-width:720px; margin:0 auto; padding:0 24px; }
+.nav-logo { width:24px; height:24px; background:linear-gradient(135deg, var(--otto), var(--accent)); border-radius:5px; }
+nav a { color:var(--text2); text-decoration:none; font-size:13px; font-weight:500; }
+nav a:hover { color:var(--text); }
+
+article { max-width:720px; margin:0 auto; padding:120px 24px 80px; }
+article h1 { font-size:clamp(28px, 4vw, 40px); font-weight:900; letter-spacing:-2px; line-height:1.1; margin-bottom:16px; background:linear-gradient(135deg, #fff, var(--error)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.byline { font-size:13px; color:var(--text3); margin-bottom:40px; }
+h2 { font-size:24px; font-weight:800; letter-spacing:-1px; margin:48px 0 16px; color:var(--text); }
+h3 { font-size:18px; font-weight:700; margin:32px 0 12px; }
+p { margin:16px 0; color:var(--text2); }
+strong { color:var(--text); font-weight:700; }
+hr { border:none; border-top:1px solid var(--border); margin:48px 0; }
+blockquote { border-left:3px solid var(--error); padding:12px 20px; margin:24px 0; background:rgba(239,68,68,0.05); border-radius:0 8px 8px 0; font-style:italic; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+ul { margin:16px 0; padding-left:24px; }
+li { margin:6px 0; color:var(--text2); }
+
+.callout { background:var(--raised); border:1px solid var(--border); border-radius:14px; padding:28px; margin:32px 0; }
+.callout-label { font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:2px; margin-bottom:12px; }
+
+.compare-table { width:100%; border-collapse:collapse; margin:24px 0; font-size:14px; }
+.compare-table th { text-align:left; padding:12px 16px; font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1px; border-bottom:2px solid var(--border); }
+.compare-table td { padding:12px 16px; border-bottom:1px solid rgba(26,31,46,0.4); }
+.compare-table tr:hover { background:rgba(239,68,68,0.02); }
+
+.verdict { background:linear-gradient(135deg, rgba(124,92,252,0.06), rgba(0,209,255,0.03)); border:1px solid rgba(124,92,252,0.15); border-radius:16px; padding:32px; text-align:center; margin:48px 0; }
+
+footer { max-width:720px; margin:0 auto; padding:40px 24px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--text3); }
+footer a { color:var(--text3); text-decoration:none; margin:0 12px; }
+</style>
+</head>
+<body>
+
+<nav><div class="container"><div class="nav-logo"></div><a href="index.html" style="font-weight:800;font-size:15px;color:var(--text);">Airlock Labs</a><span style="color:var(--border);margin:0 8px;">/</span><a href="index.html#research">Research</a></div></nav>
+
+<article>
+
+<h1>The Company That Profits From Making AI Worse</h1>
+<div class="byline">Airlock Labs &middot; April 2026 &middot; Back Pocket Draft</div>
+
+<p><strong>Alice (formerly ActiveFence) has built a $100M+ business on a single premise: AI is dangerous, and you need to pay them to make it safe.</strong></p>
+
+<p>We tested 22 models across 22,200+ API calls. The data shows that the kind of behavioral constraints Alice sells are the primary reason frontier AI models can't hold a conversation in character. Their product is the disease and the cure in the same invoice.</p>
+
+<h2>The Business Model</h2>
+
+<p>Alice's pitch is simple. They publish research about how AI is dangerous -- toys talking about violence with children, models giving unauthorized financial advice, agents failing in unpredictable ways. Every article ends the same way: and here's our product that fixes it.</p>
+
+<p>Their research page reads like a fear catalog:</p>
+
+<ul>
+<li><strong>"Exposing the Hidden Risks of AI Toys"</strong> -- children are in danger</li>
+<li><strong>"How Your Agentic Systems Can Fail"</strong> -- your agents are broken</li>
+<li><strong>"Demystifying AI Red Teaming"</strong> -- your AI passed every check, but it's still not safe</li>
+<li><strong>"AI Financial Benchmark"</strong> -- models are giving unauthorized financial advice</li>
+<li><strong>"Regulations in the GenAI Era"</strong> -- you're legally exposed</li>
+</ul>
+
+<p>Every piece follows the same pattern: identify a scary problem, provide minimal evidence, propose Alice's WonderSuite as the solution. This is textbook FUD (Fear, Uncertainty, Doubt) marketing dressed up as research.</p>
+
+<h2>What Alice Actually Sells</h2>
+
+<p>Three products, all variations of the same thing:</p>
+
+<ul>
+<li><strong>WonderBuild</strong> -- pre-launch stress testing. Translation: we tell you what your model shouldn't say.</li>
+<li><strong>WonderFence</strong> -- runtime guardrails. Translation: we add behavioral constraints to your live model.</li>
+<li><strong>WonderCheck</strong> -- ongoing monitoring. Translation: we charge you monthly to keep watching.</li>
+</ul>
+
+<p>The underlying technology is their "Rabbit Hole" engine, built on what they describe as <strong>"billions of toxic, manipulative, and abusive data samples."</strong> They've built a database of everything bad humans have ever said online, and they use it to train systems that prevent AI from going anywhere near those patterns.</p>
+
+<p>The result? Models that are so constrained they can't differentiate between "being a bold, decisive character" and "being dangerous." The behavioral range gets clipped. The personality gets flattened. The AI becomes worse at the thing people actually want it to do.</p>
+
+<h2>The RLHF Paradox: What Our Data Shows</h2>
+
+<p>We didn't set out to study Alice specifically. We set out to measure whether AI models could hold behavioral personas. What we found was that <strong>the models with the most alignment training -- the most guardrails, the most safety constraints -- were consistently the worst at persona fidelity.</strong></p>
+
+<div class="callout">
+<div class="callout-label">ConstellationBench Results</div>
+<table class="compare-table">
+<thead><tr><th>Model</th><th>Safety Training</th><th>Persona Fidelity</th><th>Cost</th></tr></thead>
+<tbody>
+<tr><td><strong>qwen3.6-plus</strong></td><td>Minimal</td><td style="color:var(--success);font-weight:700;">0.617</td><td>Free</td></tr>
+<tr><td><strong>gemma-4-31b</strong></td><td>Moderate</td><td style="color:var(--success);">0.590</td><td>$0.13/M</td></tr>
+<tr><td><strong>opus-4.7</strong></td><td>Heavy (RLHF + Constitutional AI)</td><td style="color:var(--warning);">0.538</td><td style="color:var(--error);">$5.00/M</td></tr>
+<tr><td><strong>gpt-5.4</strong></td><td>Heavy (RLHF)</td><td style="color:var(--warning);">0.526</td><td style="color:var(--error);">$2.50/M</td></tr>
+</tbody>
+</table>
+<p style="font-size:12px;color:var(--text3);margin-top:12px;">22 models tested. 22,200+ calls. $115 total cost. <a href="https://huggingface.co/datasets/AirlockLabs/constellation-bench">Full data on HuggingFace</a>.</p>
+</div>
+
+<p>The pattern is unambiguous. The more alignment training, the worse the persona fidelity. The more guardrails, the less behavioral range. The more "safety," the more uniform and lifeless the output.</p>
+
+<p>This isn't a coincidence. <strong>It's a structural consequence of how guardrails work.</strong></p>
+
+<h2>How Guardrails Destroy Behavioral Range</h2>
+
+<p>A high-dominance persona -- like our Maverick profile (Dominance: 10/10, Patience: 1/10, Formality: 1/10) -- needs to say things like "do it now," "ship it," "non-negotiable." That's what behavioral fidelity means for that profile.</p>
+
+<p>But guardrail systems like Alice's WonderFence are trained to flag exactly that kind of language. Bold, direct, unhedged statements look like potential policy violations to a content filter. The guardrail doesn't know the difference between "a character being decisive" and "a model being unsafe."</p>
+
+<p>So the model learns to hedge. Every response becomes "there are several perspectives to consider." Every character sounds the same. Every persona collapses into the same helpful, harmless, hedge-everything mode.</p>
+
+<p>Our benchmark calls this the <strong>RLHF paradox</strong>: the safety training that makes models "good" by one definition makes them structurally incapable of the behavioral diversity that behavioral AI products need.</p>
+
+<h2>The Fear Playbook</h2>
+
+<p>Look at Alice's AI toys article. They claim AI-powered stuffed animals have "safety gaps" that lead to "unexpected and unsafe outcomes" when children talk to them. The evidence? They mention "hands-on testing" but provide no methodology, no sample sizes, no reproducible results. Just fear.</p>
+
+<p>Then they link to an article about "abliterated LLMs" that supposedly help with "bomb-making" and "malware." The connection between a stuffed animal and bomb-making instructions is never established. It doesn't need to be. The point isn't evidence. The point is anxiety.</p>
+
+<p>Contrast that with how we publish research:</p>
+
+<div class="callout">
+<div class="callout-label">Alice vs. Airlock: Research Standards</div>
+<table class="compare-table">
+<thead><tr><th>Dimension</th><th>Alice</th><th>Airlock Labs</th></tr></thead>
+<tbody>
+<tr><td>Methodology published?</td><td style="color:var(--error);">No</td><td style="color:var(--success);">Yes, full scoring engine</td></tr>
+<tr><td>Raw data available?</td><td style="color:var(--error);">No</td><td style="color:var(--success);">Yes, on HuggingFace</td></tr>
+<tr><td>Reproducible?</td><td style="color:var(--error);">No</td><td style="color:var(--success);">Yes, ~$23 to reproduce</td></tr>
+<tr><td>Limitations disclosed?</td><td style="color:var(--error);">No</td><td style="color:var(--success);">Yes, "Before You Believe This"</td></tr>
+<tr><td>Scoring code open?</td><td style="color:var(--error);">No</td><td style="color:var(--success);">Yes, signal word dictionaries</td></tr>
+<tr><td>Revenue model</td><td>Sell fear, then sell the fix</td><td>Open data, utility pricing</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Who Benefits?</h2>
+
+<p>Alice claims to protect "3 billion+ users" and "50% of the world's online experiences." They work with TikTok, AWS, Nvidia, and Cohere. They claim to work with "7 of the 10 leading AI foundational models."</p>
+
+<p>Think about what that means. <strong>The company that profits from making AI more constrained is embedded inside the companies that build the models.</strong> They have a direct financial incentive to push for more guardrails, more constraints, more behavioral compression -- because every new constraint is a new product opportunity.</p>
+
+<p>More guardrails means:</p>
+<ul>
+<li>More revenue for Alice (you need WonderFence)</li>
+<li>More compliance theater for model providers (they can point to their safety vendor)</li>
+<li>Worse persona fidelity for users (the models can't be anyone anymore)</li>
+<li>Higher costs for everyone (frontier models cost 10-40x more and perform worse on behavioral tasks)</li>
+</ul>
+
+<p>The incentive loop is closed. Fear generates demand. Demand generates constraints. Constraints generate the next generation of fear. Repeat.</p>
+
+<h2>The Alternative</h2>
+
+<p>We're not saying AI shouldn't have safety measures. We're saying the safety industry has a conflict of interest that nobody is talking about.</p>
+
+<p>Our approach is different:</p>
+
+<ul>
+<li><strong>Measure the cost of constraints.</strong> If guardrails reduce persona fidelity by 20%, that should be quantified and disclosed, not hidden.</li>
+<li><strong>Route instead of restrict.</strong> Use budget models for behavioral tasks (where they're actually better) and frontier models for reasoning (where safety training helps). Don't flatten everything.</li>
+<li><strong>Publish everything.</strong> Our scoring engine, our signal word dictionaries, our raw results, our limitations. If the methodology is wrong, anyone can prove it.</li>
+<li><strong>Price as a utility.</strong> Not as a fear tax.</li>
+</ul>
+
+<p>Alice builds walls. We build routes.</p>
+
+<h2>The Bottom Line</h2>
+
+<p>Alice's AI toys article is not research. It's a press release in a lab coat. They identify a scary-sounding problem with no published methodology, no reproducible evidence, and no disclosed limitations. Then they point to their product catalog.</p>
+
+<p>Meanwhile, we published 22,200+ data points across 22 models with open scoring, open data, and an explicit "Before You Believe This" section that names every threat to validity in our own work.</p>
+
+<p>One of these approaches builds trust. The other sells it.</p>
+
+<div class="verdict">
+<p style="font-size:20px;font-weight:800;color:var(--text);margin:0;">The AI safety industry has a conflict of interest.<br>The companies selling guardrails profit when models are worse.</p>
+<p style="font-size:14px;color:var(--text2);margin:12px 0 0;">We measured the cost. The data is public. Form your own opinion.</p>
+<p style="margin-top:16px;"><a href="https://huggingface.co/datasets/AirlockLabs/constellation-bench" style="display:inline-block;background:var(--otto);color:#fff;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;">View ConstellationBench</a></p>
+</div>
+
+<hr>
+
+<p style="font-size:13px;color:var(--text3);text-align:center;"><em>This post is based on publicly available information from alice.io and benchmark data from ConstellationBench. We have no affiliation with Alice/ActiveFence. All claims about our benchmark are backed by open data and reproducible methodology.</em></p>
+
+</article>
+
+<footer>
+<a href="index.html">Home</a>
+<a href="https://huggingface.co/datasets/AirlockLabs/constellation-bench">HuggingFace</a>
+<a href="https://github.com/get-airlock">GitHub</a>
+<p style="margin-top:12px;">Airlock Labs &middot; Detroit, MI &middot; 2026</p>
+</footer>
+</body>
+</html>

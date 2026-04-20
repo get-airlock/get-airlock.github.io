@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Save on AI Inference — Airlock Labs</title>
+<meta name="description" content="Find out how much you're overpaying on AI inference. Free assessment. We charge 20% of what we save you. If we don't save you money, you pay nothing.">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --otto: #7C5CFC; --accent: #00D1FF; --base: #06080C; --raised: #0C0F16; --border: #1A1F2E; --text: #E2E8F0; --text2: #94A3B8; --text3: #64748B; --success: #22C55E; --error: #EF4444; }
+body { background: var(--base); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 16px; line-height: 1.7; -webkit-font-smoothing: antialiased; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.container { max-width: 560px; width: 100%; }
+.logo { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
+.logo-mark { width: 28px; height: 28px; background: linear-gradient(135deg, var(--otto), var(--accent)); border-radius: 6px; }
+.logo-text { font-weight: 800; font-size: 16px; letter-spacing: -0.5px; }
+h1 { font-size: 32px; font-weight: 900; letter-spacing: -1.5px; line-height: 1.15; margin-bottom: 12px; }
+.sub { color: var(--text2); margin-bottom: 36px; font-size: 15px; }
+.form-group { margin-bottom: 20px; }
+label { display: block; font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+input, select, textarea { width: 100%; background: var(--raised); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 12px 14px; font-size: 15px; font-family: inherit; outline: none; transition: border-color 0.2s; }
+input:focus, select:focus, textarea:focus { border-color: var(--otto); }
+select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%2394A3B8'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; cursor: pointer; }
+textarea { resize: vertical; min-height: 80px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+button { width: 100%; background: var(--otto); color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; transition: background 0.2s; }
+button:hover { background: #6B4FE0; }
+.note { font-size: 12px; color: var(--text3); text-align: center; margin-top: 16px; }
+.promise { background: var(--raised); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin-bottom: 32px; font-size: 14px; color: var(--text2); }
+.promise strong { color: var(--success); }
+.thank-you { display: none; text-align: center; padding: 60px 0; }
+.thank-you h2 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+.thank-you p { color: var(--text2); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="logo">
+    <div class="logo-mark"></div>
+    <span class="logo-text">Airlock Labs</span>
+  </div>
+
+  <div id="form-section">
+    <h1>Find out how much you're overpaying on AI.</h1>
+    <p class="sub">Free assessment. Takes 60 seconds. We'll show you the math.</p>
+
+    <div class="promise">
+      <strong>Our deal:</strong> We charge 20% of what we save you. If we don't save you money, you pay nothing. Zero downside.
+    </div>
+
+    <form id="intake-form" action="https://formspree.io/p/2984132817933303648/f/intake" method="POST">
+      <div class="row">
+        <div class="form-group">
+          <label>Your name</label>
+          <input type="text" name="name" required placeholder="Jane Smith">
+        </div>
+        <div class="form-group">
+          <label>Company</label>
+          <input type="text" name="company" required placeholder="Acme Corp">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Work email</label>
+        <input type="email" name="email" required placeholder="jane@acme.com">
+      </div>
+
+      <div class="form-group">
+        <label>What models are you using?</label>
+        <select name="models" required>
+          <option value="" disabled selected>Select primary model</option>
+          <option value="gpt-4o">GPT-4o / GPT-5</option>
+          <option value="claude-opus">Claude Opus</option>
+          <option value="claude-sonnet">Claude Sonnet</option>
+          <option value="gemini-pro">Gemini Pro</option>
+          <option value="mixed">Mixed / multiple models</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label>Monthly inference spend (estimate)</label>
+          <select name="spend" required>
+            <option value="" disabled selected>Select range</option>
+            <option value="under-1k">Under $1K</option>
+            <option value="1k-5k">$1K - $5K</option>
+            <option value="5k-25k">$5K - $25K</option>
+            <option value="25k-100k">$25K - $100K</option>
+            <option value="100k-plus">$100K+</option>
+            <option value="unsure">Not sure</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Primary use case</label>
+          <select name="usecase" required>
+            <option value="" disabled selected>Select use case</option>
+            <option value="agents">AI agents / assistants</option>
+            <option value="customer-service">Customer service</option>
+            <option value="coding">Code generation</option>
+            <option value="content">Content / writing</option>
+            <option value="analysis">Data analysis</option>
+            <option value="internal">Internal tools</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Anything else we should know? (optional)</label>
+        <textarea name="notes" placeholder="Current pain points, what you've tried, etc."></textarea>
+      </div>
+
+      <button type="submit">Get my free assessment</button>
+      <p class="note">We'll respond within 24 hours with your savings estimate.</p>
+    </form>
+  </div>
+
+  <div class="thank-you" id="thank-you">
+    <h2>Got it.</h2>
+    <p>We'll run your numbers and get back to you within 24 hours with a savings estimate.</p>
+    <p style="margin-top: 24px; font-size: 13px; color: var(--text3);">While you wait: <a href="https://huggingface.co/datasets/AirlockLabs/constellation-bench" style="color: var(--accent);">see the research</a></p>
+  </div>
+</div>
+
+<script>
+document.getElementById('intake-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const form = this;
+  const data = new FormData(form);
+  fetch(form.action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } })
+    .then(r => {
+      document.getElementById('form-section').style.display = 'none';
+      document.getElementById('thank-you').style.display = 'block';
+    })
+    .catch(() => {
+      document.getElementById('form-section').style.display = 'none';
+      document.getElementById('thank-you').style.display = 'block';
+    });
+});
+</script>
+</body>
+</html>
