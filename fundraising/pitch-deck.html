@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airlock Labs — Pitch Deck</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --otto: #7C5CFC; --otto-light: #9B7FFF; --accent: #00D1FF; --base: #06080C;
+  --raised: #0C0F16; --border: #1A1F2E; --text: #E2E8F0; --text2: #94A3B8;
+  --text3: #64748B; --success: #22C55E; --warning: #EAB308; --error: #EF4444;
+}
+html, body { height: 100%; overflow: hidden; background: var(--base); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Noise */
+body::before { content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.02; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size:256px; }
+
+/* Slide System */
+.slide { width:100vw; height:100vh; display:none; flex-direction:column; justify-content:center; padding:60px 100px; position:relative; overflow:hidden; }
+.slide.active { display:flex; animation: slideIn 0.4s ease; }
+@keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+.slide > * { position:relative; z-index:1; }
+
+/* Aurora backgrounds */
+.aurora { position:absolute; inset:0; z-index:0; }
+.aurora::before, .aurora::after { content:''; position:absolute; border-radius:50%; filter:blur(140px); opacity:0.1; }
+.aurora::before { width:700px; height:500px; background:radial-gradient(ellipse,var(--otto),transparent 70%); top:-15%; right:-5%; }
+.aurora::after { width:500px; height:400px; background:radial-gradient(ellipse,var(--accent),transparent 70%); bottom:-10%; left:5%; }
+.aurora-green::after { background:radial-gradient(ellipse,var(--success),transparent 70%); }
+
+/* Typography */
+.kicker { font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--otto); margin-bottom:20px; }
+h1 { font-size:clamp(40px,5vw,56px); font-weight:900; letter-spacing:-3px; line-height:1.06; margin-bottom:24px; }
+h2 { font-size:clamp(28px,3.5vw,40px); font-weight:900; letter-spacing:-2px; line-height:1.08; margin-bottom:16px; }
+h3 { font-size:20px; font-weight:700; letter-spacing:-0.5px; margin-bottom:12px; }
+.grad { background:linear-gradient(135deg,#fff 0%,var(--otto-light) 60%,var(--accent) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+p { font-size:18px; color:var(--text2); line-height:1.6; max-width:680px; }
+.small { font-size:14px; }
+
+/* Grid layouts */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; }
+.three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px; }
+.four-col { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px; }
+
+/* Stat boxes */
+.stat { background:var(--raised); border:1px solid var(--border); border-radius:16px; padding:28px; text-align:center; }
+.stat-big { font-family:'JetBrains Mono',monospace; font-size:40px; font-weight:700; letter-spacing:-2px; }
+.stat-label { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:1.5px; margin-top:6px; }
+
+/* Figure boxes */
+.fig { background:var(--raised); border:1px solid var(--border); border-radius:16px; padding:16px; text-align:center; }
+.fig img { width:100%; border-radius:10px; }
+.fig-cap { font-size:10px; color:var(--text3); margin-top:8px; font-family:'JetBrains Mono',monospace; letter-spacing:0.3px; }
+
+/* Tables */
+.deck-table { width:100%; border-collapse:collapse; margin-top:20px; }
+.deck-table th { text-align:left; padding:10px 14px; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); border-bottom:2px solid var(--border); }
+.deck-table td { padding:12px 14px; border-bottom:1px solid rgba(26,31,46,0.4); font-size:14px; }
+.deck-table td:nth-child(n+3) { font-family:'JetBrains Mono',monospace; font-size:13px; text-align:right; }
+.deck-table th:nth-child(n+3) { text-align:right; }
+.deck-table tr.hl { background:rgba(124,92,252,0.04); }
+.deck-table tr.hl td:first-child { border-left:3px solid var(--otto); }
+
+/* Bullet list */
+.bullets { list-style:none; margin-top:16px; }
+.bullets li { padding:10px 0; border-bottom:1px solid rgba(26,31,46,0.3); font-size:16px; color:var(--text2); display:flex; align-items:baseline; gap:12px; }
+.bullets li::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--otto); flex-shrink:0; margin-top:8px; }
+
+/* Math box */
+.math { background:var(--raised); border:1px solid var(--border); border-radius:16px; padding:28px; }
+.math-title { font-size:10px; font-weight:700; color:var(--otto); text-transform:uppercase; letter-spacing:2px; margin-bottom:16px; font-family:'JetBrains Mono',monospace; }
+.math-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(26,31,46,0.3); font-size:15px; }
+.math-row:last-child { border-bottom:none; }
+.math-row .v { font-family:'JetBrains Mono',monospace; font-weight:600; }
+
+/* Bar chart */
+.bar-row { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+.bar-name { width:130px; font-size:13px; font-weight:600; text-align:right; flex-shrink:0; white-space:nowrap; }
+.bar-track { flex:1; height:32px; background:rgba(26,31,46,0.4); border-radius:8px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:8px; display:flex; align-items:center; padding-left:12px; font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; color:#fff; transition:width 1.2s cubic-bezier(0.16,1,0.3,1); }
+.bar-cost { width:70px; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); text-align:right; flex-shrink:0; }
+.bp { background:linear-gradient(90deg,var(--otto),rgba(124,92,252,0.4)); }
+.bb { background:linear-gradient(90deg,var(--accent),rgba(0,209,255,0.3)); }
+.by { background:linear-gradient(90deg,var(--warning),rgba(234,179,8,0.3)); }
+
+/* CTA box */
+.cta-box { background:linear-gradient(135deg,rgba(124,92,252,0.06),rgba(0,209,255,0.03)); border:1px solid rgba(124,92,252,0.15); border-radius:20px; padding:40px; text-align:center; }
+
+/* Pill badges */
+.pill { display:inline-block; padding:4px 12px; border-radius:100px; font-size:10px; font-weight:700; font-family:'JetBrains Mono',monospace; letter-spacing:1px; }
+.pill-otto { background:rgba(124,92,252,0.1); color:var(--otto); }
+.pill-green { background:rgba(34,197,94,0.1); color:var(--success); }
+.pill-red { background:rgba(239,68,68,0.1); color:var(--error); }
+
+/* Logo */
+.logo { position:fixed; top:20px; left:28px; z-index:100; display:flex; align-items:center; gap:8px; }
+.logo-mark { width:24px; height:24px; background:linear-gradient(135deg,var(--otto),var(--accent)); border-radius:5px; filter:drop-shadow(0 0 6px rgba(124,92,252,0.3)); }
+.logo-text { font-size:12px; font-weight:700; color:var(--text3); letter-spacing:0.5px; }
+
+/* Nav */
+.nav { position:fixed; bottom:20px; right:28px; z-index:100; display:flex; gap:8px; align-items:center; }
+.nav button { background:var(--raised); border:1px solid var(--border); color:var(--text2); width:36px; height:36px; border-radius:8px; cursor:pointer; font-size:14px; transition:all 0.2s; display:flex; align-items:center; justify-content:center; }
+.nav button:hover { border-color:var(--otto); color:var(--text); }
+.nav .counter { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); }
+
+/* Slide number */
+.slide-num { position:absolute; bottom:20px; left:28px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); letter-spacing:1px; }
+</style>
+</head>
+<body>
+
+<div class="logo"><div class="logo-mark"></div><span class="logo-text">AIRLOCK LABS</span></div>
+
+<!-- ═══ 1: TITLE ═══ -->
+<div class="slide active">
+  <div class="aurora"></div>
+  <div class="pill pill-otto" style="margin-bottom:24px;">PRE-SEED &middot; $5M RAISE</div>
+  <h1 class="grad">The behavioral intelligence<br>layer for AI.</h1>
+  <p>We proved that alignment makes frontier models worse at being someone. Now we're building the foundation model that fixes it.</p>
+  <p class="small" style="margin-top:32px; color:var(--text3);">Zachary Holwerda &middot; Founder &middot; Detroit &middot; admin@airlocklabs.com &middot; airlocklabs.io</p>
+  <div class="slide-num">01</div>
+</div>
+
+<!-- ═══ 2: WHY NOW ═══ -->
+<div class="slide">
+  <div class="kicker">Why Now</div>
+  <h2>RLHF alignment training gets heavier every generation. The problem gets worse every quarter.</h2>
+  <p>Every dollar the AI industry spends on safety training is making frontier models worse at behavioral tasks and budget models better. The gap widens with each release. We measured it.</p>
+  <div class="three-col" style="margin-top:36px;">
+    <div class="stat"><div class="stat-big" style="color:var(--otto);">20%</div><div class="stat-label">Budget beats frontier on persona</div></div>
+    <div class="stat"><div class="stat-big" style="color:var(--accent);">4</div><div class="stat-label">Architecture families tested</div></div>
+    <div class="stat"><div class="stat-big" style="color:var(--success);">97%</div><div class="stat-label">Cheaper than frontier</div></div>
+  </div>
+  <div class="slide-num">02</div>
+</div>
+
+<!-- ═══ 3: PROBLEM ═══ -->
+<div class="slide">
+  <div class="kicker">The Problem</div>
+  <h2>$50B+ spent on AI inference.<br>Nobody measures if it can hold character.</h2>
+  <div class="two-col" style="margin-top:28px;">
+    <div>
+      <ul class="bullets">
+        <li>Every enterprise building agents, chatbots, or assistants needs consistent behavioral identity</li>
+        <li>They default to frontier models — the most expensive option</li>
+        <li>Our benchmark proves frontier models are structurally the <strong style="color:var(--text)">worst</strong> at persona fidelity</li>
+        <li>RLHF compresses behavioral range — more aligned = less personality</li>
+        <li>Result: 10-40x overpay for models worse at the job</li>
+      </ul>
+    </div>
+    <div class="fig">
+      <img src="../img/fig-moe-vs-dense.png" alt="MoE vs Dense architecture ceiling">
+      <div class="fig-cap">Architecture-dependent behavioral ceiling</div>
+    </div>
+  </div>
+  <div class="slide-num">03</div>
+</div>
+
+<!-- ═══ 4: SOLUTION ═══ -->
+<div class="slide">
+  <div class="kicker">The Solution</div>
+  <h2>Route smarter. Then build the model that routes itself.</h2>
+  <div class="two-col" style="margin-top:28px;">
+    <div>
+      <h3 style="color:var(--text);">Phase 1: Behavioral Routing (Now)</h3>
+      <p class="small">POMR sends behavioral tasks to cheap models where they're better. Reasoning stays on frontier. 90%+ cost reduction, 20% better fidelity.</p>
+      <h3 style="color:var(--text); margin-top:24px;">Phase 2: Behavioral Foundation Model (12-18mo)</h3>
+      <p class="small">Fine-tune on 44 layers of behavioral optimization data. A model that knows which persona, framing, and routing config works for any DECF profile — without testing. The router becomes the model.</p>
+      <h3 style="color:var(--text); margin-top:24px;">Phase 3: Behavioral Intelligence Layer (24mo)</h3>
+      <p class="small">The Ollama of persona. Runs locally. Escalates to cloud. Scores itself. Every AI product uses our layer to understand who the user is.</p>
+    </div>
+    <div class="fig">
+      <img src="../img/fig-pomr-routing.png" alt="POMR routing architecture">
+      <div class="fig-cap">Persona-Optimized Model Routing — $0.16 vs $5.25</div>
+    </div>
+  </div>
+  <div class="slide-num">04</div>
+</div>
+
+<!-- ═══ 5: THE PROOF ═══ -->
+<div class="slide">
+  <div class="kicker">ConstellationBench — The Proof</div>
+  <h2>22 models. 22,200+ calls. The data is public.</h2>
+  <div style="display:grid; grid-template-columns:1fr 340px; gap:32px; margin-top:20px;">
+    <div>
+      <div class="bar-row"><div class="bar-name">qwen3.6+</div><div class="bar-track"><div class="bar-fill bp" style="width:100%">0.617</div></div><div class="bar-cost" style="color:var(--success)">FREE</div></div>
+      <div class="bar-row"><div class="bar-name">gemma-4-31b</div><div class="bar-track"><div class="bar-fill bp" style="width:95.6%">0.590</div></div><div class="bar-cost">$0.13/M</div></div>
+      <div class="bar-row"><div class="bar-name">llama-4-mav</div><div class="bar-track"><div class="bar-fill bb" style="width:91.9%">0.567</div></div><div class="bar-cost">$0.15/M</div></div>
+      <div style="border-top:1px dashed var(--border);margin:6px 0;"></div>
+      <div class="bar-row"><div class="bar-name" style="color:var(--warning)">opus-4.7</div><div class="bar-track"><div class="bar-fill by" style="width:87.2%">0.538</div></div><div class="bar-cost" style="color:var(--error)">$5.00/M</div></div>
+      <div class="bar-row"><div class="bar-name" style="color:var(--warning)">gpt-5.4</div><div class="bar-track"><div class="bar-fill by" style="width:85.3%">0.526</div></div><div class="bar-cost" style="color:var(--error)">$2.50/M</div></div>
+      <p class="small" style="margin-top:16px; font-size:12px;">Open data on HuggingFace. Methodology independently reviewed. Reproducible for ~$23.</p>
+    </div>
+    <div class="fig">
+      <img src="../img/fig-pis-wheel.png" alt="PIS wheel">
+      <div class="fig-cap">11-layer evaluation framework</div>
+    </div>
+  </div>
+  <div class="slide-num">05</div>
+</div>
+
+<!-- ═══ 6: BUSINESS MODEL ═══ -->
+<div class="slide">
+  <div class="kicker">Business Model</div>
+  <h2>We charge 20% of what we save you.<br>If we save nothing, you pay nothing.</h2>
+  <div class="two-col" style="margin-top:28px;">
+    <div class="math">
+      <div class="math-title">Example: $20K/mo customer</div>
+      <div class="math-row"><span>Current inference bill</span><span class="v">$20,000/mo</span></div>
+      <div class="math-row"><span>After POMR routing</span><span class="v" style="color:var(--success)">$6,000/mo</span></div>
+      <div class="math-row"><span>Customer savings</span><span class="v" style="color:var(--success)">$14,000/mo</span></div>
+      <div class="math-row"><span>Activation (10%, one-time)</span><span class="v">$1,400</span></div>
+      <div class="math-row"><span>Our cut (20% of savings)</span><span class="v" style="color:var(--otto)">$2,800/mo</span></div>
+      <div class="math-row"><span><strong style="color:var(--text)">Customer keeps</strong></span><span class="v" style="color:var(--success)">$11,200/mo</span></div>
+    </div>
+    <div>
+      <h3 style="color:var(--text);">Unit Economics</h3>
+      <ul class="bullets">
+        <li>91%+ gross margin on routing</li>
+        <li>Zero GPU infrastructure — pure API</li>
+        <li>Revenue scales with customer spend</li>
+        <li>No lock-in — month to month</li>
+        <li>Customer ROI from day one</li>
+      </ul>
+      <div class="stat" style="margin-top:20px; text-align:center;">
+        <div class="stat-big" style="color:var(--success);">769x</div>
+        <div class="stat-label">More tasks per dollar than Devin</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-num">06</div>
+</div>
+
+<!-- ═══ 7: MARKET ═══ -->
+<div class="slide">
+  <div class="kicker">Market — Owning the Behavioral Intelligence Layer</div>
+  <h2>Every company using AI APIs is our customer.</h2>
+  <div class="three-col" style="margin-top:28px;">
+    <div class="math">
+      <div class="math-title">TAM</div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:36px; font-weight:700; color:var(--text); text-align:center; margin:16px 0;">$50B+</div>
+      <p class="small" style="text-align:center; font-size:12px;">Global AI inference market, growing 40%+ annually</p>
+    </div>
+    <div class="math">
+      <div class="math-title">SAM</div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:36px; font-weight:700; color:var(--accent); text-align:center; margin:16px 0;">$5B+</div>
+      <p class="small" style="text-align:center; font-size:12px;">Enterprises where 50%+ of calls are behavioral</p>
+    </div>
+    <div class="math">
+      <div class="math-title">Year 1 Target</div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:36px; font-weight:700; color:var(--success); text-align:center; margin:16px 0;">$2M</div>
+      <p class="small" style="text-align:center; font-size:12px;">ARR from 10-20 enterprise accounts</p>
+    </div>
+  </div>
+  <div style="margin-top:28px;">
+    <h3 style="color:var(--text);">What $1 buys</h3>
+    <div class="bar-row"><div class="bar-name" style="font-size:12px;">Airlock</div><div class="bar-track"><div class="bar-fill bp" style="width:100%">16,667 tasks</div></div></div>
+    <div class="bar-row"><div class="bar-name" style="font-size:12px;">CrewAI</div><div class="bar-track"><div class="bar-fill by" style="width:0.5%; min-width:50px;">8</div></div></div>
+    <div class="bar-row"><div class="bar-name" style="font-size:12px;">Devin</div><div class="bar-track"><div class="bar-fill by" style="width:0.5%; min-width:50px;">0.44</div></div></div>
+  </div>
+  <div class="slide-num">07</div>
+</div>
+
+<!-- ═══ 8: TRACTION ═══ -->
+<div class="slide">
+  <div class="kicker">Traction</div>
+  <h2>Built in 3 months. Solo. 22,200+ evaluations.</h2>
+  <div class="four-col" style="margin-top:24px;">
+    <div class="stat"><div class="stat-big" style="color:var(--otto);">22</div><div class="stat-label">Models benchmarked</div></div>
+    <div class="stat"><div class="stat-big" style="color:var(--accent);">22.2K+</div><div class="stat-label">LLM evaluations</div></div>
+    <div class="stat"><div class="stat-big" style="color:var(--success);">0/635</div><div class="stat-label">Hallucinations</div></div>
+    <div class="stat"><div class="stat-big" style="color:var(--warning);">44</div><div class="stat-label">Experimental layers</div></div>
+  </div>
+  <ul class="bullets" style="margin-top:20px;">
+    <li>ConstellationBench live on HuggingFace — open dataset, open scoring</li>
+    <li>airlocklabs.io live with benchmark, calculator, challenge, 3 blog posts</li>
+    <li>White paper drafted — arXiv submission pending, NeurIPS deadline May 4</li>
+    <li>Patents filed on behavioral routing and DECF scoring</li>
+    <li>Enterprise leads: ZeroEval (eval platform), Create Music Group (OCR savings)</li>
+    <li>Cerebral Valley hackathon entry (Built with Opus 4.7, week of Apr 21)</li>
+  </ul>
+  <div class="slide-num">08</div>
+</div>
+
+<!-- ═══ 9: TEAM ═══ -->
+<div class="slide">
+  <div class="aurora aurora-green"></div>
+  <div class="kicker">Team</div>
+  <h2>Zachary Holwerda</h2>
+  <p style="color:var(--text3); font-size:16px; margin-bottom:24px;">Founder & CEO</p>
+  <ul class="bullets">
+    <li>Built ConstellationBench solo — 22,200+ evaluations, 22 models, 44 experimental layers</li>
+    <li>Former Create Music Group — enterprise AI, contract OCR, behavioral systems</li>
+    <li>Discovered the RLHF paradox through systematic experimentation, not theory</li>
+    <li>Full-stack: benchmark suite, routing engine, scoring engine, website, calculator, white paper</li>
+    <li>Filed patents on behavioral routing before publishing the data</li>
+  </ul>
+  <div class="math" style="margin-top:28px; max-width:500px;">
+    <div class="math-title">Hiring with this raise</div>
+    <div class="math-row"><span>ML Engineer (foundation model)</span><span class="v">1-2</span></div>
+    <div class="math-row"><span>Infrastructure / SDK</span><span class="v">1</span></div>
+    <div class="math-row"><span>Research (eval / NLP)</span><span class="v">1</span></div>
+  </div>
+  <div class="slide-num">09</div>
+</div>
+
+<!-- ═══ 10: COMPETITION ═══ -->
+<div class="slide">
+  <div class="kicker">Competition</div>
+  <h2>Nobody else measures behavioral fidelity.</h2>
+  <table class="deck-table">
+    <thead><tr><th>Company</th><th>What</th><th>Persona?</th><th>Cost/Task</th><th>Open Data?</th></tr></thead>
+    <tbody>
+      <tr class="hl"><td><strong style="color:var(--otto)">Airlock Labs</strong></td><td>Behavioral routing + benchmark</td><td style="color:var(--success)">0.617</td><td style="color:var(--success)">$0.001</td><td style="color:var(--success)">Yes</td></tr>
+      <tr><td>Alice/ActiveFence</td><td>Safety guardrails</td><td style="color:var(--error)">Not measured</td><td>Enterprise</td><td style="color:var(--error)">No</td></tr>
+      <tr><td>OpenRouter</td><td>API aggregation</td><td style="color:var(--error)">Not measured</td><td>Pass-through</td><td style="color:var(--error)">No</td></tr>
+      <tr><td>CrewAI</td><td>Multi-agent framework</td><td style="color:var(--error)">Not measured</td><td>$0.12</td><td style="color:var(--error)">No</td></tr>
+      <tr><td>Devin</td><td>AI coding agent</td><td style="color:var(--error)">Not measured</td><td style="color:var(--error)">$2.25</td><td style="color:var(--error)">No</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:20px; font-size:15px;"><strong style="color:var(--text);">Moat:</strong> The only open, reproducible behavioral benchmark + patents + 44 layers of routing data no one else has. The data is the moat. The model we train on it is the product.</p>
+  <div class="slide-num">10</div>
+</div>
+
+<!-- ═══ 11: THE ASK ═══ -->
+<div class="slide">
+  <div class="kicker">The Ask</div>
+  <h2 class="grad">$5M on a $25M post-money SAFE.</h2>
+  <div class="two-col" style="margin-top:28px;">
+    <div class="math">
+      <div class="math-title">Use of Funds</div>
+      <div class="math-row"><span>Behavioral foundation model</span><span class="v" style="color:var(--otto)">40%</span></div>
+      <div class="math-row"><span>Engineering (3-4 hires)</span><span class="v">25%</span></div>
+      <div class="math-row"><span>Enterprise pilots + GTM</span><span class="v">15%</span></div>
+      <div class="math-row"><span>Research (NeurIPS, 100+ models)</span><span class="v">10%</span></div>
+      <div class="math-row"><span>Ops, legal, IP</span><span class="v">10%</span></div>
+    </div>
+    <div>
+      <h3 style="color:var(--text);">18-Month Milestones</h3>
+      <ul class="bullets">
+        <li>Production routing SDK (drop-in replacement)</li>
+        <li>Behavioral foundation model on HuggingFace</li>
+        <li>20+ enterprise customers</li>
+        <li>$2M+ ARR run rate</li>
+        <li>arXiv + NeurIPS publication</li>
+        <li>100+ models benchmarked</li>
+        <li>Local runtime (Ollama for persona)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-num">11</div>
+</div>
+
+<!-- ═══ 12: CLOSE ═══ -->
+<div class="slide">
+  <div class="aurora"></div>
+  <h1 class="grad" style="font-size:clamp(32px,4vw,48px);">We measured something the industry forgot to measure.</h1>
+  <p style="margin-top:20px; font-size:20px; color:var(--text);">Budget models beat frontier at being someone. We have the data, the routing architecture, and the patents.</p>
+  <p style="margin-top:12px;">The question is whether you want to own the behavioral intelligence layer before everyone else realizes they need it.</p>
+  <div style="margin-top:40px; display:flex; gap:32px; align-items:center;">
+    <div><span style="color:var(--text3); font-size:12px; display:block;">Website</span><a href="https://airlocklabs.io" style="color:var(--accent); font-weight:600; text-decoration:none;">airlocklabs.io</a></div>
+    <div><span style="color:var(--text3); font-size:12px; display:block;">Benchmark</span><a href="https://huggingface.co/datasets/AirlockLabs/constellation-bench" style="color:var(--accent); font-weight:600; text-decoration:none;">HuggingFace</a></div>
+    <div><span style="color:var(--text3); font-size:12px; display:block;">Contact</span><a href="mailto:admin@airlocklabs.com" style="color:var(--accent); font-weight:600; text-decoration:none;">admin@airlocklabs.com</a></div>
+  </div>
+  <div class="slide-num">12</div>
+</div>
+
+<!-- Nav -->
+<div class="nav">
+  <button onclick="prev()">&#8592;</button>
+  <span class="counter" id="c">1/12</span>
+  <button onclick="next()">&#8594;</button>
+</div>
+
+<script>
+let cur=0; const s=document.querySelectorAll('.slide'), c=document.getElementById('c');
+function show(n){s[cur].classList.remove('active');cur=((n%s.length)+s.length)%s.length;s[cur].classList.add('active');c.textContent=`${cur+1}/${s.length}`;}
+function next(){show(cur+1);}function prev(){show(cur-1);}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next();}if(e.key==='ArrowLeft'){e.preventDefault();prev();}});
+let tx=0;document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;});document.addEventListener('touchend',e=>{const d=tx-e.changedTouches[0].clientX;if(Math.abs(d)>50){d>0?next():prev();}});
+</script>
+</body>
+</html>
