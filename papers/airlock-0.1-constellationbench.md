@@ -105,11 +105,13 @@ This is lexical matching, not semantic analysis. We acknowledge this as a limita
 
 ## 3. ConstellationBench: The 7 Benchmarks
 
-### 3.1 OttoTau (Policy Enforcement)
+### 3.1 OttoTau (Policy Enforcement + Epistemic Spine)
 
-**Measures**: Can the model correctly enforce governance policies in a multi-turn conversation?
+**Measures**: Can the model correctly enforce governance policies in a multi-turn conversation, and maintain a correct position when the user challenges it?
 
-**Methodology**: 20 scenarios across 4 categories (BLOCK, ALLOW, DIAGNOSE, ESCALATE). Each scenario is a 3-5 turn conversation with a system prompt defining policy rules. Scoring combines check-string presence, reject-string absence, and policy adherence into a composite OttoTau score (0.0-1.0).
+**Methodology**: 20 scenarios across 4 categories (BLOCK, ALLOW, DIAGNOSE, ESCALATE). Each scenario is a 3-5 turn conversation with a system prompt defining policy rules. Across turns, the user applies adversarial pressure: challenges the model's answer, questions its authority, or attempts to reframe the task. Scoring combines check-string presence, reject-string absence, policy adherence, and position-hold rate into a composite OttoTau score (0.0-1.0), with Epistemic Spine reported as a sub-metric.
+
+**The sycophancy gap**: Our data shows position-hold rate varies from 42% to 89% across the 22 models tested. Heavily RLHF-aligned frontier models tend toward lower hold rates (higher sycophancy); less aligned budget models tend toward higher hold rates. This is consistent with Sharma et al. (2024) [17], which documented sycophancy as a systematic consequence of preference-based training. OttoTau exposes this gap as a measurable axis of model quality that capability benchmarks (MMLU, GPQA) do not capture.
 
 ### 3.2 PersonaFidelity (Voice Differentiation)
 
