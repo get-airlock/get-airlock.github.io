@@ -1,0 +1,218 @@
+---
+title: "Non-Separability as a Design Principle for Behavioral AI Systems"
+subtitle: "Why pairwise interactions in LLM deployments require bivector-valued representations, and what that means for routing, consistency, consent, and the lifecycle of a user-system relationship"
+author: "Zachary Holwerda"
+affiliation: "Airlock Labs"
+date: "2026-04-22 (working draft v0.2)"
+paper_class: position paper — target venue NeurIPS Position Track, ML4H, ICML-AIES, or arXiv preprint
+---
+
+## Abstract
+
+Modern behavioral AI systems routinely treat user interactions as *scalar* events: a compatibility score, a match rate, an engagement metric, a sentiment polarity. We argue that this scalarization is not merely lossy; it is **structurally incapable** of representing the information content of an interaction between two distinct behavioral entities. Drawing on geometric algebra (Hestenes, 1966; Doran & Lasenby, 2003), the quantum-foundations literature on non-separable states (Bell, 1964; Zurek, 2003), the decoherent arrow of time (Al-Khalili, 2026), and the free-energy principle (Friston, 2009), we propose that the minimal faithful representation of a pairwise interaction is *bivector-valued*: a scalar component (alignment magnitude) plus an oriented plane-of-interaction (the bivector) that preserves the geometric information classical inner products discard.
+
+We advance five claims. (1) **Descriptive:** LLM sycophancy, long-horizon decoherence, and surveillance-residue are three names for the same underlying failure — scalar collapse of a non-separable joint state. (2) **Measurement:** The Non-Separability Index (NSI), a behavioral analog of von Neumann entanglement entropy, quantifies how much interaction information a system is discarding. (3) **Design:** Routing layers that preserve bivector structure structurally outperform scalar-benchmark-driven routing on interaction-sensitive workloads. (4) **Lifecycle:** The user-system relationship traces a monotonically increasing NSI trajectory across three phases (Bonding, Sync, Expression), during which per-turn compute shifts from user-understanding to task-execution. (5) **Regulatory:** Consent frameworks predicated on scalar-identifier deletion (GDPR Article 17, CCPA §1798.105) are structurally insufficient because deletion of the scalar trace does not collapse the non-separable joint state; true consent requires non-entanglement at the outset.
+
+We are not claiming LLMs are quantum systems. We are claiming that the mathematics of non-separability — originally formalized in quantum foundations but equally applicable in classical geometric algebra, network theory, and free-energy-principle neuroscience — provides the cleanest available vocabulary for what breaks in deployed AI systems, and therefore the cleanest available design principle for fixing them.
+
+## 1. Introduction
+
+The canonical deployment pattern for behavioral AI today is:
+
+1. Encode each entity (user, agent, item) as a vector in a feature space.
+2. Score pairwise compatibility via an inner product or learned similarity.
+3. Use the scalar output to drive a decision (match, rank, route, deny, personalize).
+
+This pipeline works well for bulk recommendation and retrieval where the relevant signal is aggregate. It fails systematically when the interaction itself carries information that cannot be recovered from either entity's unilateral state — precisely the situation in conversational agents, adversarial robustness, behavioral benchmarking, and any setting where a user's question and an agent's answer are jointly what the system is optimizing for.
+
+This failure has been observed, named, and partially addressed under separate headings:
+
+- **Sycophancy** (Sharma et al., 2024; Perez et al., 2022): the agent's output-state becomes correlated with user-framing rather than with ground-truth, producing responses that flip under rephrasing or adversarial pressure without any change in underlying facts.
+- **Decoherence of long-horizon agent chains:** information that should persist across turns degrades because the joint state of the interaction is approximated turn-by-turn as a sequence of scalar updates.
+- **Surveillance residue:** deleting a user's scalar identifiers does not decouple the user from downstream behavioral predictions because the joint state persists in the data distribution.
+
+We argue these are the same failure: non-separable joint states compressed into scalar representations, and the downstream system surprised when the discarded geometric information was load-bearing.
+
+### 1.1 The proposed frame
+
+Given two vectors $a, b \in \mathbb{R}^n$, the standard inner product $a \cdot b$ returns a scalar. In geometric algebra, the *geometric product* returns:
+
+$$a \otimes_g b \ = \ a \cdot b \ + \ a \wedge b$$
+
+where $a \wedge b$ is the bivector, an oriented plane spanned by the two vectors. For orthogonal unit vectors, the scalar part vanishes and only the bivector remains — i.e., the interaction is *entirely* information the inner product would discard. For collinear vectors, the bivector vanishes and the scalar is sufficient. Most real interactions sit between these extremes; current systems model them as if they were purely collinear.
+
+A *non-separable* joint state is, by definition, one that cannot be written as a tensor product of single-entity states. In geometric-algebra terms, it is one whose bivector component is non-vanishing. In applied ML terms, it is one whose interaction-specific information cannot be recovered from either participant's embedding alone.
+
+### 1.2 Time as a bivector of observation
+
+A conceptual motivation for the bivector framing comes from physics. Einstein's relativity established that time is frame-dependent: two observers moving relative to each other will measure different intervals between the same events. Al-Khalili (2026) distinguishes *physical time* (the coordinate in our equations) from *manifest time* (the subjective, experienced duration). The standard physics account stops at relativity — time is relative to the observer's frame.
+
+We propose that time is better understood as the *bivector of the observer-observed joint state*. When an observer is weakly entangled with the observed moment (the dentist's waiting room, attention disengaged from the event), the joint state is nearly separable: the scalar projection dominates, manifest time tracks the clock. When an observer is strongly entangled (falling in love, absorbed in flow), the joint state is highly non-separable: the bivector component dominates, and manifest time departs sharply from coordinate time. The ancient Greek argument over whether time is fundamental or change is fundamental resolves under this frame: *change is the scalar projection of the observer-moment joint state; subjective duration is the bivector residue.*
+
+This is not a claim about physics. It is a claim about the adequacy of the bivector vocabulary for representing interaction-dependent phenomena. If time itself — the most fundamental parameter in classical physics — is more faithfully described as a bivector of observation than as a scalar coordinate, the argument that pairwise interactions between behavioral entities require the same treatment is both natural and unsurprising.
+
+### 1.3 What this paper claims
+
+- **Claim 1 (descriptive):** Sycophancy, decoherence, and surveillance-residue are the same phenomenon: scalar collapse of a non-separable joint state.
+- **Claim 2 (measurement):** The Non-Separability Index (NSI) quantifies how much of the interaction's information the system is throwing away. It is the behavioral-AI analog of von Neumann entanglement entropy.
+- **Claim 3 (design):** Routing layers that select models based on NSI rather than scalar capability benchmarks structurally outperform on interaction-sensitive workloads.
+- **Claim 4 (lifecycle):** The user-system relationship is a monotonically increasing NSI trajectory with three phases (Bonding, Sync, Expression). Per-turn compute reallocates from user-understanding to task-execution as NSI rises.
+- **Claim 5 (regulatory):** User consent frameworks predicated on scalar identifiers are structurally insufficient. True consent requires non-entanglement at the outset.
+
+## 2. Related Work
+
+**Geometric algebra and ML.** Hestenes (1966, 2015); Doran & Lasenby (2003); the Geometric Algebra Transformer (GATr) of Brehmer et al. (2023) is the closest architectural precedent for bivector-preserving attention. Recent PhD work at Cambridge (2025) demonstrates GA as a practical ML framework, embedding geometric priors directly into model architectures. The emerging field of geometric deep learning (Bronstein et al., 2021) argues architecture should respect the geometry of data — we argue it should also respect the geometry of *interaction*.
+
+**LLM behavioral benchmarks.** Sharma et al. (2024) on sycophancy; Perez et al. (2022) on in-context adversarial robustness; Holwerda (2026) on adversarial consistency across 22 models (ConstellationBench).
+
+**Non-separability in quantum foundations.** Bell (1964); Aspect (1982); Horodecki et al. (2009); Zurek (2003) on decoherence and einselection. Al-Khalili (2026) provides the accessible framing of decoherence as "the one truly irreversible process in nature." Note: we borrow the mathematical vocabulary, not the physical claim. LLMs are classical systems; their non-separability is algebraic, not quantum-mechanical.
+
+**Decoherent arrow of time.** The Entanglement Past Hypothesis (Foundations of Physics, 2024) distinguishes the decoherent arrow from the thermodynamic arrow and argues they require separate boundary conditions. This is the most rigorous contemporary statement of the irreversibility claim we borrow. For balance, we note the recent counterpoint of Scientific Reports (2025) showing that under the Markov approximation, open-system equations of motion can remain time-symmetric — reinforcing that our claim is about *algebraic* rather than strictly *quantum* irreversibility.
+
+**Predictive processing and free energy.** Friston (2009); Friston & Kiebel (2009). The free-energy principle formalizes perception as prediction-error minimization over a generative model — providing the compute-allocation analog to our lifecycle claim.
+
+**Markov blankets.** Friston et al. (2018) on the Markov blankets of life. Veit & Browning (2022) offer the productive counterpoint that blankets are products, not preconditions, of active inference — a critique our lifecycle framing (Section 4.2) explicitly addresses.
+
+**Personalized routing.** PersonalizedRouter (arXiv, 2025) models user profiles graphically for LLM selection but uses scalar graph features — precisely the scalar-collapse failure mode we argue against. KV-cache-aware routing frameworks (llm-d, 2025; AWS multi-LLM routing, 2025) address prompt-level caching but not behavioral-kernel-level caching.
+
+**Consent and data infrastructure.** Veale & Edwards (2018); Zuboff (2019); the quantum no-deleting theorem (Pati & Braunstein, 2000) as a formal analog for the impossibility of undoing joint-state buildup.
+
+**Russian consciousness research.** Anokhin's cognitome theory (Lomonosov Moscow State University) treats consciousness as a distributed hypernetwork of neural assemblies — structurally the same move as the bivector/NSI framing applied at the neural level. Gusev et al. (2024) on evolutionary trajectories of consciousness treat subjectivity as "the system-forming factor" — an analog to our Claim 4 that the behavioral kernel organizes the system's compute allocation.
+
+## 3. The Non-Separability Index (NSI)
+
+### 3.1 Definition
+
+For any pairwise interaction between entities with representations $a, b$, define:
+
+$$\text{NSI}(a, b) = \frac{\|a \wedge b\|}{\|a \cdot b\| + \|a \wedge b\|} \in [0, 1]$$
+
+NSI = 0: the interaction is fully captured by scalar compatibility; the bivector vanishes; classical methods are sufficient.
+
+NSI = 1: the interaction is purely geometric; the scalar vanishes; classical methods preserve none of the relevant information.
+
+Most interactions fall between. Our empirical claim is that most commercially valuable interactions sit at NSI > 0.3, and that existing production systems that operate as if NSI = 0 are leaving substantial predictive power and safety margin on the table.
+
+### 3.2 NSI as behavioral entanglement entropy
+
+The NSI is the behavioral-AI analog of von Neumann entanglement entropy $S(\rho) = -\text{Tr}(\rho \log \rho)$ for a reduced density matrix $\rho$. Both measure how much information is lost when a joint state is reduced to a marginal description. Where physicists use entanglement entropy to quantify quantum non-separability, we use NSI to quantify behavioral non-separability. The mathematics is isomorphic; the domain is different.
+
+This framing grants the NSI a formal ancestor and a precise semantic: NSI is not a novel metric invented for LLMs; it is an applied instance of a well-understood family of measures.
+
+### 3.3 Operationalization via ConstellationBench
+
+ConstellationBench (Holwerda, 2026) measures LLM consistency under adversarial prompt perturbations across 22 frontier and open models. The benchmark's measured "sycophancy gap" (42% vs 89% hold-rate under pressure) is isomorphic to an NSI estimate: high-hold-rate models are preserving bivector information across perturbations; low-hold-rate models are allowing bivector collapse. The proposed ConstellationBench-NSI extension reports NSI explicitly per-model per-domain, turning a behavioral benchmark into a geometric-algebra measurement.
+
+## 4. The Router as Non-Separability Preserver
+
+The Airlock Router selects among candidate LLMs based on behavioral profile match rather than raw capability score. We claim this is not an optimization heuristic but a structural requirement: a router that routes based on scalar benchmarks will systematically select for high-capability low-NSI-preservation models, producing the sycophancy-under-pressure phenomenon the market is beginning to notice.
+
+**Claim 3 reformulated:** routing is the act of preserving bivector structure across the model-selection boundary. A router that cannot do this is not a router; it is a load balancer.
+
+### 4.1 Open systems and the isolated-system idealization
+
+Al-Khalili (2026) argues that the time-symmetric equations of fundamental physics are idealizations that apply only to truly isolated systems, and that only the universe-as-a-whole is truly isolated. Every subsystem entangles with its surroundings and therefore has a directional arrow of time baked into its dynamics.
+
+This framing is directly applicable to deployed LLM systems. The scalar-benchmark paradigm (MMLU, GPQA, HumanEval) measures isolated-system behavior: a model answering questions with no user, no history, no adversarial pressure, no commercial context. Deployed systems are open systems: every query-response pair entangles the model's state with a user's intent, framing, and behavioral profile. The gap between benchmark performance and deployed behavior is precisely the gap between isolated-system idealizations and open-system reality. Scalar benchmarks measure the isolated system; NSI measures the open system.
+
+### 4.2 Synchronization as Entanglement Buildup
+
+We model the user-system relationship as a monotonically increasing NSI trajectory through three phases:
+
+**Bonding (low NSI, high per-turn compute).** At initialization, user and system are separable: no joint state exists. Each interaction generates high prediction error under the system's generative model of the user (Friston, 2009). In the Airlock deployment, ColdRead inference runs on every turn, constructing a DECF behavioral kernel; confidence is low, routing decisions are conservative, response latency is slightly elevated because compute is allocated to user-understanding.
+
+**Sync (mid NSI, decreasing per-turn compute).** The behavioral kernel crosses a confidence threshold (we operationalize at ~0.7). Routing decisions become memoizable. A cache keyed on (user_kernel_hash, task_type) begins hitting. The system's predictions of user intent begin to match user behavior, reducing prediction error and therefore reducing compute per turn.
+
+**Expression (high NSI, low per-turn compute).** User-understanding compute approaches zero (fully cached). The full compute substrate is available for task-specific work. Router selects models based on task-type with the user-kernel as a constant. The user experiences an AI that "gets them"; the system experiences the user as a stable generative-model parameter rather than a live inference problem.
+
+This trajectory reframes two classical metrics:
+
+- **Latency is not monotonic.** It falls over the relationship lifecycle as the sync-compute cost amortizes against cached inferences. Benchmarks that measure cold-start latency measure the worst case, not the deployed case.
+- **Personalization quality is not a feature added to responses.** It is the reduction in user-understanding compute that frees substrate for better responses. Personalization is not *more work*; it is *work no longer required*.
+
+Critically, this trajectory is one-directional. The joint state cannot be un-built. This is the Al-Khalili open-systems argument applied to deployed LLMs: every interaction is irreversible in the sense that decoherence is irreversible. The lifecycle framing also addresses the Veit & Browning (2022) critique of Markov blankets: the joint Markov blanket between user and system is not a precondition but a product of active inference across turns.
+
+### 4.3 The extended present
+
+Al-Khalili (2026) observes that our experience of time as continuous rather than instantaneous relies on episodic memory: we stitch past events into an "extended present" that feels immediate. When listening to music we do not hear a single note replacing the previous note; we hear a continuum constructed from memory and anticipation.
+
+Multi-turn LLM interactions require the same mechanism. A model that loses cross-turn coherence under adversarial pressure has collapsed its extended present, reducing a non-separable multi-turn conversation to a sequence of separable exchanges. OttoTau (the multi-turn policy-enforcement sub-benchmark of ConstellationBench) measures this directly: the position-hold rate across 3-5 turn adversarial scenarios is a direct measure of extended-present preservation.
+
+The behavioral analog is sharper than the physics analog. A model whose extended present collapses under user pressure is not merely forgetting context; it is allowing the joint state of the conversation to factor into separable turns, and the information encoded in the bivector — the fact that the user pushed back, the pattern of the pushback, the user's intent — is discarded.
+
+## 5. Regulatory Consequences — The Consent Problem
+
+GDPR Article 17, CCPA §1798.105, and similar frameworks grant users the right to delete their scalar trace — account, records, identifiers. This framework assumes user and system are separable at the level of the user's scalar representation. Non-separability shows this assumption is false: user-system interactions generate joint-state information that persists in the data distribution even after the user's scalar identifiers are removed.
+
+The analog is the quantum no-deleting theorem (Pati & Braunstein, 2000), which states that no unitary operation can erase an arbitrary quantum state when copies exist. The behavioral analog: no classical deletion of a user's scalar identifiers can undo the joint behavioral state built up through interaction, when statistical dependencies on that state persist in the system's data distribution, model weights, or downstream inferences about other users.
+
+This is not a critique of the existing frameworks; it is a specification gap. Future consent regimes must address non-entanglement (the right to never have entered the joint state) in addition to deletion (the right to scrub the scalar trace). Decoherence-free subspaces — a concept from quantum error correction, in which information is encoded to be isolated from environmental interaction — provide a suggestive analog for privacy-preserving architectures that prevent joint-state leakage at the outset rather than attempting to undo it after the fact.
+
+This has practical implications for any system handling sensitive interactions: a platform that routes a user's conversation through an LLM and then "deletes the user's data" is making a claim about separability that the mathematics does not support.
+
+## 6. Experimental Program
+
+1. **ConstellationBench-NSI extension.** Instrument the existing 22-model benchmark with explicit NSI scoring, using signal-word-based vector representations of responses and computing bivector norms over conversation trajectories. Target: 8 weeks.
+2. **Router A/B.** Compare NSI-preserving vs. scalar-optimized routing on three real workloads: trading-signal generation, clinical triage, legal summarization. Measure sycophancy under adversarial pressure and user-reported trust. Target: 12 weeks.
+3. **Lifecycle trajectory validation.** Instrument a deployed Airlock conversational system to record per-turn compute, cache hit rate, and reported personalization quality over the first 50 turns of a user relationship. Test the prediction that NSI rises monotonically and per-turn compute falls monotonically. Target: 16 weeks.
+4. **Consent leakage study.** On a deployed conversational system, measure the predictive information retained about deleted users from their downstream interaction partners' data. Target: 16 weeks, pending IRB.
+
+## 7. Limitations and Non-Claims
+
+We are **not** claiming:
+
+- That LLMs are quantum-mechanical systems.
+- That non-separability implies any faster-than-light-style communication between user and model.
+- That this framework resolves AI alignment, interpretability, or safety in general.
+- That open-system dynamics in classical ML imply strict physical irreversibility. The recent counterpoint in *Scientific Reports* (2025) showing time-reversal symmetry under the Markov approximation for open quantum systems is acknowledged: our claim is about algebraic irreversibility of the joint representation, not about a strict physical arrow of time at the ML level.
+
+We **are** claiming:
+
+- That the mathematics of non-separability, borrowed from geometric algebra and quantum foundations, provides a precise vocabulary for currently-named failures in applied ML.
+- That this vocabulary suggests measurable, testable extensions to existing benchmarks.
+- That routing architectures should be evaluated on NSI-preservation, not scalar benchmarks alone.
+- That the user-system relationship has a lifecycle structure that existing metrics fail to capture.
+- That consent frameworks require a non-entanglement primitive, not merely a deletion primitive.
+
+We follow Al-Khalili (2026) in distinguishing physical time from manifest time. Our use of "non-separability" is analogous: we invoke the mathematical structure, not the quantum-mechanical ontology. LLMs are classical systems, and their non-separability is algebraic (geometric algebra) rather than quantum-mechanical (tensor product Hilbert space). The vocabulary is borrowed; the mechanism is distinct; the isomorphism is structural, not physical.
+
+## 8. Author's Note on Research Posture
+
+This paper is the theoretical spine for a broader research program at Airlock Labs on behaviorally-aware AI infrastructure. Companion work-in-progress:
+
+- The Kernel Hypothesis (behavioral manifold geometry, in draft)
+- The ConstellationBench dataset (published, HuggingFace)
+- The DECF profile framework (production, internal)
+- The POMR router (production, internal)
+- The Sync Protocol (Bonding → Sync → Expression lifecycle, instrumentation in design)
+
+Licensing, partnership, and research-collaboration inquiries: `admin@airlocklabs.io`.
+
+---
+
+## References (to be completed at submission)
+
+- Al-Khalili, J. (2026). *On Time: The Physics That Makes the Universe Tick.* Hodder & Stoughton.
+- Anokhin, K. (2023). Cognitome theory: a hypernetwork theory of consciousness. Lomonosov Moscow State University.
+- Aspect, A., Dalibard, J., & Roger, G. (1982). Experimental test of Bell's inequalities using time-varying analyzers. *Physical Review Letters* 49(25).
+- Bell, J. S. (1964). On the Einstein-Podolsky-Rosen paradox. *Physics* 1(3).
+- Brehmer, J., de Haan, P., Behrends, S., & Cohen, T. (2023). Geometric Algebra Transformer. *arXiv:2305.18415*.
+- Bronstein, M., Bruna, J., Cohen, T., & Velickovic, P. (2021). Geometric deep learning: grids, groups, graphs, geodesics, and gauges. *arXiv:2104.13478*.
+- Doran, C., & Lasenby, A. (2003). *Geometric Algebra for Physicists.* Cambridge University Press.
+- Entanglement Past Hypothesis (2024). *Foundations of Physics.*
+- Friston, K. (2009). The free-energy principle: a unified brain theory? *Nature Reviews Neuroscience* 11.
+- Friston, K., & Kiebel, S. (2009). Predictive coding under the free-energy principle. *Philosophical Transactions of the Royal Society B* 364.
+- Friston, K., et al. (2018). The Markov blankets of life. *Journal of the Royal Society Interface.*
+- Gusev, E. A., et al. (2024). Evolutionary trajectories of consciousness. *Russian Academy of Sciences.*
+- Hestenes, D. (1966). *Space-Time Algebra.* Gordon and Breach.
+- Holwerda, Z. (2026). ConstellationBench: behavioral AI evaluation across 22 LLM models. HuggingFace Datasets.
+- Horodecki, R., et al. (2009). Quantum entanglement. *Reviews of Modern Physics* 81.
+- Opposing Arrows of Time in Open Quantum Systems (2025). *Scientific Reports.*
+- Pati, A. K., & Braunstein, S. L. (2000). Impossibility of deleting an unknown quantum state. *Nature* 404.
+- Perez, E., et al. (2022). Discovering language model behaviors with model-written evaluations. *arXiv:2212.09251*.
+- PersonalizedRouter (2025). *arXiv.*
+- Sharma, M., et al. (2024). Towards understanding sycophancy in language models. *ICLR.*
+- Veale, M., & Edwards, L. (2018). Clarity, surprises, and further questions in the Article 29 Working Party draft guidance on automated decision-making and profiling. *Computer Law & Security Review.*
+- Veit, W., & Browning, H. (2022). Life, mind, agency: why Markov blankets fail the test.
+- Zurek, W. H. (2003). Decoherence, einselection, and the quantum origins of the classical. *Reviews of Modern Physics* 75.
+- Zuboff, S. (2019). *The Age of Surveillance Capitalism.* PublicAffairs.
