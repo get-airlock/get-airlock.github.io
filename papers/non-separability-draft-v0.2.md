@@ -213,6 +213,8 @@ This is the positive image of the SBT inversion. SBTs are soul-bound; the Airloc
 
 The tradeoff is real and should be acknowledged. A live-routing architecture cannot accumulate the kind of multi-user statistical advantages that fine-tuning on user data provides. Vendors who rely on behavioral-data aggregation as a moat will find this architecture commercially undesirable. We argue the tradeoff is worth it: the architecture grants users a form of consent that scalar-identifier deletion cannot, and it grants vendors a regulatory position that is structurally defensible under any future extension of GDPR, CCPA, or equivalent frameworks to cover joint-state information.
 
+**The inversion in one line.** The current default of the AI industry treats the user as raw material, the model as the factory, the vendor as the owner, and the behavioral residue as the asset. The architecture proposed here inverts every term. The user is the sovereign. The model is a utility. The vendor is a courier. The behavioral residue never forms, because the weight-update channel was never opened. The user brings wallet, persona, and identity to the interaction; the interaction runs; the user disconnects on their terms. Consent becomes a boundary condition, not a deletion request.
+
 ## 6. Experimental Program
 
 1. **ConstellationBench-NSI extension.** Instrument the existing 22-model benchmark with explicit NSI scoring, using signal-word-based vector representations of responses and computing bivector norms over conversation trajectories. Target: 8 weeks.
