@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Agenda — Airlock Labs</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #fff; color: #0B0E14; font-family: 'Inter', system-ui, sans-serif; font-size: 13px; line-height: 1.6; padding: 40px; max-width: 900px; margin: 0 auto; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #0B0E14; padding-bottom: 12px; margin-bottom: 20px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.logo { width: 24px; height: 24px; background: linear-gradient(135deg, #7C5CFC, #00D1FF); border-radius: 5px; }
+.brand-name { font-weight: 800; font-size: 15px; letter-spacing: -0.5px; }
+.doc-id { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #64748B; }
+
+h1 { font-size: 24px; font-weight: 900; letter-spacing: -1px; margin-bottom: 4px; }
+.subhead { color: #64748B; font-size: 13px; margin-bottom: 20px; font-style: italic; }
+
+h2 { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #7C5CFC; border-bottom: 1px solid #E2E8F0; padding-bottom: 4px; margin: 20px 0 10px; }
+
+p { margin-bottom: 10px; }
+
+.pullquote { background: #F8FAFC; border-left: 3px solid #7C5CFC; padding: 14px 18px; margin: 14px 0; font-size: 14px; font-weight: 500; }
+
+.question { font-weight: 700; margin-top: 14px; }
+.answer { margin-bottom: 14px; }
+
+table { width: 100%; border-collapse: collapse; margin: 10px 0 14px; font-size: 12px; }
+th { text-align: left; padding: 8px 10px; background: #0B0E14; color: #fff; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+td { padding: 8px 10px; border-bottom: 1px solid #E2E8F0; vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+
+ul { list-style: none; padding: 0; margin-bottom: 10px; }
+li { padding: 4px 0 4px 18px; position: relative; font-size: 13px; }
+li::before { content: "▸"; position: absolute; left: 0; color: #7C5CFC; font-weight: 700; }
+
+footer { margin-top: 24px; padding-top: 12px; border-top: 1px solid #E2E8F0; font-size: 11px; color: #64748B; display: flex; justify-content: space-between; }
+
+@media print {
+  body { padding: 20px; font-size: 11px; }
+  header { margin-bottom: 12px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="logo"></div>
+    <div>
+      <div class="brand-name">Airlock Labs</div>
+      <div style="font-size:10px;color:#64748B;">Research Agenda</div>
+    </div>
+  </div>
+  <div class="doc-id">RA-2026-04-22</div>
+</header>
+
+<h1>Why I Want a Partner, Not a Team</h1>
+<div class="subhead">For Sarim. So you know what I'm actually trying to do, and why a licensing structure is the right shape.</div>
+
+<div class="pullquote">
+  The router is the product. The research is the moat. I can build one of those things well. I cannot build both and also run a company. So I am choosing the research and looking for a partner to run the rest.
+</div>
+
+<h2>The Short Version</h2>
+
+<p>I have a theory about why AI routing works — a real theory, drawn from geometric algebra, quantum foundations, and free-energy neuroscience. The paper is drafted. The benchmark is live. The math checks out. But to turn the theory into a defensible moat for whoever is selling this, I need to run four experiments over the next 16 weeks. If I also have to run sales, hire engineers, manage customers, and sign contracts, those experiments don't happen. And if those experiments don't happen, in 12 months someone with more capital reverse-engineers the router, publishes a cheaper version, and the moat closes.</p>
+
+<p>You and Traderverse have the operational and commercial muscle I don't. If we license the router to you for a defined vertical, you scale what already works. I keep building what nobody else can build. Both sides win.</p>
+
+<h2>The Research That Needs To Happen</h2>
+
+<p>These are the four experiments currently described as the Experimental Program in the Non-Separability paper (draft v0.2). They are not speculative. They are the experiments that turn a benchmark into an IP moat.</p>
+
+<table>
+  <tr><th>Experiment</th><th>What it proves</th><th>Time</th></tr>
+  <tr><td><strong>NSI benchmark extension</strong></td><td>That the router's routing decisions are mathematically grounded, not heuristic. Turns ConstellationBench into a measurable geometric property.</td><td class="mono">8 weeks</td></tr>
+  <tr><td><strong>Time-Perception Benchmark</strong></td><td>That users of a synced AI report faster perceived response times than users of a cold-start AI at equal actual latency. This is the strongest behavioral test of the entire framework. If it works, we have the first measurable proof that behavioral routing produces a felt quality difference in users.</td><td class="mono">12 weeks</td></tr>
+  <tr><td><strong>Lifecycle trajectory validation</strong></td><td>That the Bonding → Sync → Expression lifecycle is empirically observable in real deployments. This is the instrumentation that lets us price and market personalization as a declining compute cost rather than an added feature.</td><td class="mono">16 weeks</td></tr>
+  <tr><td><strong>Consent leakage study</strong></td><td>That current GDPR/CCPA frameworks leak predictive information about deleted users. This is the regulatory wedge. If we publish it first, we own the framing.</td><td class="mono">16 weeks + IRB</td></tr>
+</table>
+
+<h2>Anticipated Questions</h2>
+
+<p class="question">Q: Why do these experiments have to be run by you specifically?</p>
+<p class="answer">A: The framework is still partially in my head. Drafting is 60% done; the operationalizations of NSI, the Sync Protocol, and the time-perception measurement protocol are my work. Someone else can execute them only after I have formalized them enough to hand off. That formalization IS the research. It takes focused attention over 16 weeks of writing, experimenting, and revising.</p>
+
+<p class="question">Q: Why can't you do both — run the company and do the research?</p>
+<p class="answer">A: I have lived the answer to this. I did it in 2019 and 2020. The research stops the moment there is a pipeline to manage, a hire to onboard, or a customer escalation to respond to. Researchers who try to run commercial operations produce neither good research nor good operations. My highest leverage is building what doesn't exist yet. Yours is scaling what does.</p>
+
+<p class="question">Q: What if the experiments fail?</p>
+<p class="answer">A: If the Time-Perception Benchmark returns a null result, the bivector framing loses its strongest behavioral validation and the paper's claims weaken. We would publish the null result. The router still works on cost and persona-fidelity grounds — those are measured, not theoretical. But if the experiments succeed, the moat is scientific, not engineering, and nobody can replicate it without running the same experiments themselves. That's the defensibility we want.</p>
+
+<p class="question">Q: What does this mean for the commercial deal?</p>
+<p class="answer">A: Nothing changes about the licensing terms. The research agenda is why I'm the right person to license from and why the license is worth what I'm asking for it. You're licensing a product that keeps getting better because the research arm is actively extending it. Every experiment that lands becomes a new feature for you to sell. Every paper that publishes becomes a new credibility asset for both of us.</p>
+
+<h2>What I'm Asking You To Believe</h2>
+
+<ul>
+  <li>That behavioral AI is a real, defensible category and not a features-race.</li>
+  <li>That the math behind it is load-bearing and not just marketing.</li>
+  <li>That the person building the math should not also be the person closing the sales.</li>
+  <li>That a focused research arm behind a commercial arm is the structure that wins over 5 years, not the structure that looks busiest this quarter.</li>
+</ul>
+
+<h2>What You Get</h2>
+
+<ul>
+  <li>Exclusive commercial rights in financial services software (per separate licensing terms).</li>
+  <li>30-day advance access to every experimental finding before it publishes.</li>
+  <li>Co-authorship credit on the papers, if you want it. Your operational support is load-bearing for the research program; that deserves attribution.</li>
+  <li>A partnership where the product you are selling gets measurably better every 8 weeks, funded by experiments I'm running anyway.</li>
+</ul>
+
+<div class="pullquote" style="margin-top:24px;">
+  You run the business. I run the research. The router is the bridge. This is the shape of the company I want to build with you, and it's the shape that makes both of us indispensable to each other.
+</div>
+
+<footer>
+  <div>Zachary Holwerda · Airlock Labs · admin@airlocklabs.io</div>
+  <div>For Sarim · 2026-04-22</div>
+</footer>
+
+</body>
+</html>
