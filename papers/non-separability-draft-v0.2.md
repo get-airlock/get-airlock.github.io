@@ -192,6 +192,27 @@ This is not a critique of the existing frameworks; it is a specification gap. Fu
 
 This has practical implications for any system handling sensitive interactions: a platform that routes a user's conversation through an LLM and then "deletes the user's data" is making a claim about separability that the mathematics does not support.
 
+### 5.1 The non-entanglement primitive: live-routing architecture
+
+The previous section argued that future consent regimes require a non-entanglement primitive. We now describe what such a primitive would concretely look like, by contrast to a relevant non-analog from web3: the Soul Bound Token (SBT).
+
+An SBT is a non-transferable token bound permanently to a wallet, with metadata persisted on-chain (Weyl, Ohlhaver & Buterin, 2022). SBTs are designed so that user-identity and credential data cannot be detached from the entity they describe. The user becomes inseparable from the data; the data becomes inseparable from the chain. SBTs solve a specific problem (credential portability across services) by making entanglement permanent and auditable.
+
+The architectural inverse of the SBT is the non-entanglement primitive this paper proposes. Rather than binding user-state permanently to a vendor's system, the behavioral kernel should exist only as a live-routing object, reconstructed per session and discarded on disconnect. Under this architecture:
+
+- The user's behavioral profile (the DECF kernel, the interaction history, the Meta-PI prospection surface) is *not* absorbed into the vendor's model weights, embeddings, or fine-tuning distribution.
+- The router interprets the behavioral kernel at query time from session data, applies it to routing decisions, and holds it only in volatile cache.
+- The model itself remains unchanged across users. Fine-tuning, if it happens at all, operates on anonymized task-level signal, not on user-specific behavioral state.
+- "Deleting an account" becomes a genuine disconnect: the router-side cache is purged, the session is terminated, and because no persistent weight update occurred, there is no surveillance residue to pursue.
+
+Formally, this is the behavioral-AI implementation of a decoherence-free subspace. The vendor's model is the "environment"; the user's behavioral kernel is the "encoded information"; the router is the boundary that keeps the encoding isolated from environmental coupling. Environmental noise (model updates, cross-user inference, fine-tuning runs) cannot couple to the user's kernel because the kernel never crosses into the environment's persistent state. The router is a decoherence-free boundary by construction.
+
+Three consequences follow. **First**, the vendor cannot claim to "know" the user across sessions except by reconstructing the kernel from session-data the user controls. **Second**, the consent primitive reduces to a single boolean at the router: does this session contribute to any persistent update, or is it interpreted purely at runtime? **Third**, the surveillance-residue problem is resolved by architecture rather than by post-hoc deletion: the residue never forms because the weight-update channel was never opened.
+
+This is the positive image of the SBT inversion. SBTs are soul-bound; the Airlock Router is soul-free. The user's behavioral state belongs to the user. The router is a courier, not a curator. The model is a utility, not a memory.
+
+The tradeoff is real and should be acknowledged. A live-routing architecture cannot accumulate the kind of multi-user statistical advantages that fine-tuning on user data provides. Vendors who rely on behavioral-data aggregation as a moat will find this architecture commercially undesirable. We argue the tradeoff is worth it: the architecture grants users a form of consent that scalar-identifier deletion cannot, and it grants vendors a regulatory position that is structurally defensible under any future extension of GDPR, CCPA, or equivalent frameworks to cover joint-state information.
+
 ## 6. Experimental Program
 
 1. **ConstellationBench-NSI extension.** Instrument the existing 22-model benchmark with explicit NSI scoring, using signal-word-based vector representations of responses and computing bivector norms over conversation trajectories. Target: 8 weeks.
@@ -268,5 +289,6 @@ Licensing, partnership, and research-collaboration inquiries: `admin@airlocklabs
 - Sharma, M., et al. (2024). Towards understanding sycophancy in language models. *ICLR.*
 - Veale, M., & Edwards, L. (2018). Clarity, surprises, and further questions in the Article 29 Working Party draft guidance on automated decision-making and profiling. *Computer Law & Security Review.*
 - Veit, W., & Browning, H. (2022). Life, mind, agency: why Markov blankets fail the test.
+- Weyl, E. G., Ohlhaver, P., & Buterin, V. (2022). Decentralized Society: Finding Web3's Soul. *SSRN.*
 - Zurek, W. H. (2003). Decoherence, einselection, and the quantum origins of the classical. *Reviews of Modern Physics* 75.
 - Zuboff, S. (2019). *The Age of Surveillance Capitalism.* PublicAffairs.
