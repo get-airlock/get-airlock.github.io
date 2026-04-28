@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spacebar Community — Brain Brigade</title>
+<meta name="description" content="The Brain Brigade Spacebar — Discord-compatible operational shell. Three Founding Partners, one CTO, three Staff Archetypes routing operational packets through eight Octo arms.">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --panel: #111;
+  --panel-edge: #1d1d1d;
+  --ink: #e8e8e8;
+  --ink-dim: #888;
+  --accent-spacebar: #00ff7f;
+  --accent-loki: #b366ff;
+  --accent-operator: #ff8c00;
+  --accent-substrate: #00d4ff;
+  --gate-warn: #ffd23f;
+  --mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+  --display: 'Inter', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--display);
+  min-height: 100vh;
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+header {
+  border-bottom: 1px solid var(--panel-edge);
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+header .brand {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--accent-spacebar);
+}
+header nav a {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+  text-decoration: none;
+  margin-left: 1.5rem;
+}
+header nav a:hover { color: var(--ink); }
+
+.hero {
+  text-align: center;
+  margin-bottom: 4rem;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.hero h1 {
+  font-family: var(--mono);
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  letter-spacing: -0.01em;
+  margin-bottom: 0.75rem;
+}
+.hero .accent { color: var(--accent-spacebar); }
+.hero p {
+  color: var(--ink-dim);
+  line-height: 1.6;
+  font-size: 1.05rem;
+  margin-bottom: 0.85rem;
+}
+.hero .domain {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--accent-loki);
+  margin-top: 1rem;
+}
+
+.section {
+  margin-bottom: 3rem;
+}
+.section-title {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--panel-edge);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.section-title .num { color: var(--accent-spacebar); }
+
+.what-is {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 12px;
+  padding: 1.75rem;
+  line-height: 1.65;
+}
+.what-is p { color: var(--ink); margin-bottom: 0.85rem; font-size: 0.95rem; }
+.what-is p:last-child { margin-bottom: 0; }
+.what-is .accent { color: var(--accent-spacebar); }
+
+.org-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+.org-card {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.org-card.human { border-color: rgba(0, 255, 127, 0.28); }
+.org-card.cto { border-color: rgba(0, 212, 255, 0.28); }
+.org-card.archetype { border-color: rgba(179, 102, 255, 0.28); }
+.org-card .marker {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+.org-card.human .marker { color: var(--accent-spacebar); }
+.org-card.cto .marker { color: var(--accent-substrate); }
+.org-card.archetype .marker { color: var(--accent-loki); }
+.org-card .title {
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 600;
+}
+.org-card .name {
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+.org-card .role {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+}
+
+.staff-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.6rem;
+}
+.staff-row .staff-card {
+  background: var(--panel);
+  border: 1px solid rgba(179, 102, 255, 0.28);
+  border-radius: 10px;
+  padding: 1rem;
+  text-decoration: none;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: border-color 0.15s;
+}
+.staff-row .staff-card:hover { border-color: var(--accent-loki); }
+.staff-row .staff-card .meta {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--accent-loki);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.staff-row .staff-card .title {
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.staff-row .staff-card p {
+  font-size: 0.8rem;
+  color: var(--ink-dim);
+  line-height: 1.45;
+}
+
+.cta {
+  background: linear-gradient(135deg, rgba(0, 255, 127, 0.06), rgba(179, 102, 255, 0.06));
+  border: 1px solid var(--panel-edge);
+  border-radius: 14px;
+  padding: 2rem;
+  text-align: center;
+  margin-top: 3rem;
+}
+.cta h2 {
+  font-family: var(--mono);
+  font-size: 1.4rem;
+  margin-bottom: 0.6rem;
+}
+.cta p {
+  color: var(--ink-dim);
+  line-height: 1.55;
+  margin-bottom: 1.5rem;
+  max-width: 56ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+.cta-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 0.85rem 1.5rem;
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  text-decoration: none;
+  border: 1px solid var(--panel-edge);
+  background: var(--panel);
+  color: var(--ink);
+  letter-spacing: 0.05em;
+  transition: all 0.15s;
+}
+.btn:hover { border-color: var(--accent-spacebar); }
+.btn.primary { background: var(--accent-spacebar); color: #000; border-color: var(--accent-spacebar); }
+.btn.primary:hover { background: var(--ink); border-color: var(--ink); }
+
+footer {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+  margin-top: 4rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--panel-edge);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+footer a { color: var(--accent-spacebar); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">SPACEBAR ▸ COMMUNITY</div>
+  <nav>
+    <a href="signup.html">signup</a>
+    <a href="team.html">team</a>
+    <a href="diy-skills.html">skills</a>
+    <a href="/">home</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <h1>The Spacebar is the operational desk.<br><span class="accent">The community is who sits at it.</span></h1>
+  <p>Brain Brigade Spacebar is a Discord-compatible self-hostable shell that runs the Airlock substrate at human scale. The team behind it is structured for handoff: three Founding Partners, one CTO, and three Staff Archetypes routing operational packets through eight Octo arms.</p>
+  <div class="domain">live at: spacebar.community.space (TBD) · brainbrigade.xyz · airlocklabs.io/community</div>
+</div>
+
+<!-- ─── What it is ─────────────────────────────────────────── -->
+<div class="section">
+  <div class="section-title"><span><span class="num">01</span> What the Spacebar is</span></div>
+  <div class="what-is">
+    <p>The <span class="accent">Spacebar</span> is the operational shell of the Airlock substrate. It's a fork of <a href="https://spacebar.chat" style="color: var(--accent-spacebar);">Spacebar Chat</a> — fully Discord-compatible, fully self-hostable — wrapped in a Tauri native desktop app and served as the operator's command center.</p>
+    <p>Channels, threads, voice, file storage, push notifications: everything Discord does, running on your machine. Plus the substrate underneath that Discord doesn't have — bivector-closed audit logs, persona-aware routing, the Maybe Protocol gate, the eight Octo arms, the OfficeCLI staff archetypes producing operational packets in the background.</p>
+    <p>The community using the Spacebar is the <span class="accent">org tree of the team running it.</span> Operators above; substrate below; staff archetypes routing packets between them.</p>
+  </div>
+</div>
+
+<!-- ─── Founding Partners ─────────────────────────────────── -->
+<div class="section">
+  <div class="section-title"><span><span class="num">02</span> Founding Partners</span></div>
+  <div class="org-grid">
+    <div class="org-card archetype">
+      <span class="marker">◇ ARCHETYPE</span>
+      <span class="title">Coeus</span>
+      <span class="name">Zachary Holwerda</span>
+      <span class="role">CAO · Architect, in handoff</span>
+    </div>
+    <div class="org-card human">
+      <span class="marker">⬢ HUMAN</span>
+      <span class="title">Maverick</span>
+      <span class="name">Alex</span>
+      <span class="role">CEO · The Fool · Hiperweb</span>
+    </div>
+    <div class="org-card archetype">
+      <span class="marker">◇ ARCHETYPE</span>
+      <span class="title">Otto</span>
+      <span class="name">Substrate continuity</span>
+      <span class="role">Memory anchor · audit ledger</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── C-Suite Operations ────────────────────────────────── -->
+<div class="section">
+  <div class="section-title"><span><span class="num">03</span> C-Suite Operations</span></div>
+  <div class="org-grid">
+    <div class="org-card cto">
+      <span class="marker">⬢ HUMAN · CTO</span>
+      <span class="title">Smartrick</span>
+      <span class="name">Matt · "General Rick"</span>
+      <span class="role">Trickster operator · technical operations</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Staff Archetypes ─────────────────────────────────── -->
+<div class="section">
+  <div class="section-title"><span><span class="num">04</span> Staff Archetypes ◇ <span style="text-transform: none; letter-spacing: 0;">(OfficeCLI · team members in the org tree)</span></span></div>
+  <div class="staff-row">
+    <a href="culture.html" class="staff-card">
+      <span class="meta">◇ OFFICECLI · CULTURE</span>
+      <span class="title">Culture</span>
+      <p>Persona brand, design tokens, blog cadence, three-color discipline. The aesthetic substrate that holds the community together visually and in voice.</p>
+    </a>
+    <a href="careers.html" class="staff-card">
+      <span class="meta">◇ OFFICECLI · CAREERS</span>
+      <span class="title">Careers</span>
+      <p>Open persona slots, agent onboarding, promotion criteria. Where new operators and agents enter the constellation and how they advance.</p>
+    </a>
+    <a href="strategies.html" class="staff-card">
+      <span class="meta">◇ OFFICECLI · STRATEGIES</span>
+      <span class="title">Strategies</span>
+      <p>The strategic packet ledger. Closed-only public surface; in-flight items remain encrypted at rest. Where direction is decided and routed.</p>
+    </a>
+  </div>
+</div>
+
+<!-- ─── Eight Octo Arms ──────────────────────────────────── -->
+<div class="section">
+  <div class="section-title"><span><span class="num">05</span> Eight Octo Arms</span></div>
+  <div class="org-grid">
+    <div class="org-card archetype"><span class="marker">◇ ALIAS</span><span class="title">Trading</span><span class="role">strategy · portfolio</span></div>
+    <div class="org-card archetype"><span class="marker">◇ ALIAS</span><span class="title">Skills-Library</span><span class="role">capability registry</span></div>
+    <div class="org-card archetype"><span class="marker">◇ ALIAS</span><span class="title">OSINT</span><span class="role">external intel</span></div>
+    <div class="org-card archetype"><span class="marker">◇ ALIAS</span><span class="title">External X</span><span class="role">social mirror</span></div>
+    <div class="org-card archetype"><span class="marker">◇ ALIAS</span><span class="title">External LinkedIn</span><span class="role">social mirror</span></div>
+    <div class="org-card archetype"><span class="marker">◇ ALIAS</span><span class="title">Maverick Trade Engine</span><span class="role">primary execution</span></div>
+    <div class="org-card archetype"><span class="marker">◇ ARCHETYPE</span><span class="title">Loki</span><span class="role">discovery + sentinel</span></div>
+    <div class="org-card archetype"><span class="marker">◇ ALIAS</span><span class="title">ID Layer</span><span class="role">DID · SBT</span></div>
+  </div>
+</div>
+
+<!-- ─── How operational packets flow ─────────────────────── -->
+<div class="section">
+  <div class="section-title"><span><span class="num">06</span> How packets flow</span></div>
+  <div class="what-is">
+    <p>Staff Archetypes (Culture · Careers · Strategies) <strong>produce</strong> operational packets. <span class="accent">Loki</span> dispatches them across the eight Octo arms. Each individual arm task looks like noise to outside observers — a tweet, a trade, a scrape, an onboarding email — but every task is a slice of the same packet, routed for OPSEC.</p>
+    <p>The Spacebar is where you see this happen. Each channel is a packet flow. Each arm is a thread. The operator sees one signal back; Loki saw a meeting.</p>
+  </div>
+</div>
+
+<!-- ─── CTA ─────────────────────────────────────────────── -->
+<div class="cta">
+  <h2>Three doors in.</h2>
+  <p>Take the Brain Rot Quiz to see where your attention substrate is sitting. Join the Brigade if you already know. Or ask orbitwithotto if you're not sure which door is yours.</p>
+  <div class="cta-buttons">
+    <a href="brain-rot-quiz.html" class="btn">Take the quiz</a>
+    <a href="signup.html" class="btn primary">Join Brain Brigade</a>
+    <a href="orbitwithotto.html" class="btn">Ask orbitwithotto</a>
+  </div>
+</div>
+
+<footer>
+  <span>brainbrigade.xyz · spacebar.community.space (TBD) · v0.1</span>
+  <span><a href="team.html">team</a> · <a href="culture.html">Culture</a> · <a href="careers.html">Careers</a> · <a href="strategies.html">Strategies</a></span>
+</footer>
+
+</body>
+</html>

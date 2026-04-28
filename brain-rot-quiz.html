@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brain Rot Quiz — Brain Brigade</title>
+<meta name="description" content="7 questions. 4 result bands. Where's your attention substrate sitting?">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --panel: #111;
+  --panel-edge: #1d1d1d;
+  --ink: #e8e8e8;
+  --ink-dim: #888;
+  --accent-loki: #b366ff;
+  --accent-spacebar: #00ff7f;
+  --accent-operator: #ff8c00;
+  --gate-good: #00ff7f;
+  --gate-warn: #ffd23f;
+  --gate-bad: #ff4d4d;
+  --mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+  --display: 'Inter', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--display);
+  min-height: 100vh;
+  padding: 2rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+header {
+  border-bottom: 1px solid var(--panel-edge);
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+header .brand { color: var(--accent-loki); letter-spacing: 0.08em; }
+header .progress {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+}
+
+.progress-bar {
+  height: 3px;
+  background: var(--panel-edge);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+.progress-bar .fill {
+  height: 100%;
+  background: var(--accent-loki);
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+.question {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.question .q-num {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+.question h2 {
+  font-size: 1.15rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 1.25rem;
+}
+.options { display: flex; flex-direction: column; gap: 0.5rem; }
+.option {
+  background: transparent;
+  border: 1px solid var(--panel-edge);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.option:hover {
+  border-color: var(--accent-loki);
+  background: rgba(179, 102, 255, 0.06);
+}
+.option.selected {
+  border-color: var(--accent-loki);
+  background: rgba(179, 102, 255, 0.12);
+}
+.option .marker {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--ink-dim);
+  flex-shrink: 0;
+  position: relative;
+}
+.option.selected .marker {
+  border-color: var(--accent-loki);
+  background: var(--accent-loki);
+}
+.option.selected .marker::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  background: #000;
+  border-radius: 50%;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.btn {
+  padding: 0.85rem 1.5rem;
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: 1px solid var(--panel-edge);
+  background: var(--panel);
+  color: var(--ink);
+  letter-spacing: 0.05em;
+  transition: all 0.15s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.btn:hover { border-color: var(--accent-loki); }
+.btn.primary { background: var(--accent-loki); color: #000; border-color: var(--accent-loki); }
+.btn.primary:hover { background: var(--ink); border-color: var(--ink); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Result panel */
+.result {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+.result.hidden { display: none; }
+.result .band-label {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.result h2 {
+  font-family: var(--mono);
+  font-size: 1.8rem;
+  margin: 0.4rem 0 0.5rem;
+}
+.result .score {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+  margin-bottom: 1.25rem;
+}
+.result p { line-height: 1.6; color: var(--ink); margin-bottom: 1rem; }
+.result .next-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--panel-edge);
+}
+.result .next-steps a {
+  color: var(--accent-spacebar);
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+}
+.result .next-steps a:hover { text-decoration: underline; }
+.band-sovereign h2 { color: var(--gate-good); }
+.band-operator h2 { color: var(--accent-spacebar); }
+.band-drifting h2 { color: var(--gate-warn); }
+.band-captured h2 { color: var(--gate-bad); }
+
+footer {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--panel-edge);
+  text-align: center;
+}
+footer a { color: var(--accent-spacebar); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="brand">BRAIN ROT QUIZ</span>
+  <span class="progress" id="progressLabel">question 1 of 7</span>
+</header>
+
+<div class="progress-bar"><div class="fill" id="progressFill"></div></div>
+
+<div id="quizRoot"></div>
+
+<div class="result hidden" id="result"></div>
+
+<div class="actions">
+  <a href="signup.html" class="btn">← back</a>
+  <button class="btn primary" id="nextBtn" disabled>next →</button>
+</div>
+
+<footer>
+  Brain Brigade · 7 questions · 4 bands · scored locally · no data sent
+  · <a href="signup.html">signup</a> · <a href="orbitwithotto.html">help</a>
+</footer>
+
+<script>
+(() => {
+  // ─── Questions — each option scores 0 (low rot) → 3 (high rot) ───────
+  const questions = [
+    {
+      q: "When you wake up, how soon does your phone enter your hands?",
+      opts: [
+        { t: "After breakfast or later — phone stays out of the bedroom", s: 0 },
+        { t: "Within the first hour, but only after I'm up", s: 1 },
+        { t: "Within minutes — checks happen before I'm vertical", s: 2 },
+        { t: "It's the alarm; the scroll begins before my eyes focus", s: 3 },
+      ],
+    },
+    {
+      q: "Can you read a long-form article (4000+ words) in one sitting without switching tabs?",
+      opts: [
+        { t: "Yes — I prefer it that way", s: 0 },
+        { t: "Most of the time, with mild restlessness", s: 1 },
+        { t: "I make it about halfway, then drift", s: 2 },
+        { t: "Honestly, no — long form has become hard", s: 3 },
+      ],
+    },
+    {
+      q: "Right now, how many tabs are open across all your browsers?",
+      opts: [
+        { t: "Under 5 — I close as I go", s: 0 },
+        { t: "5–15 — manageable", s: 1 },
+        { t: "15–40 — I keep meaning to triage", s: 2 },
+        { t: "40+ — I lost count three days ago", s: 3 },
+      ],
+    },
+    {
+      q: "When you start a new task, how often do you finish what you started without a detour?",
+      opts: [
+        { t: "Almost always — I batch detours for later", s: 0 },
+        { t: "Most of the time — small detours happen", s: 1 },
+        { t: "Half the time — frequent context-switching", s: 2 },
+        { t: "Rarely — I leave a trail of unfinished things", s: 3 },
+      ],
+    },
+    {
+      q: "How often do you doomscroll feeds (X / TikTok / Reels / Reddit) without a goal in mind?",
+      opts: [
+        { t: "Almost never — I open feeds with intent or not at all", s: 0 },
+        { t: "Once or twice a week, and I notice when I do", s: 1 },
+        { t: "Daily, in 10–20 minute pockets", s: 2 },
+        { t: "Multiple times a day — it's the default fidget", s: 3 },
+      ],
+    },
+    {
+      q: "When you last built or made something with your hands (cooking, fixing, drawing, music) — when was that?",
+      opts: [
+        { t: "Today or yesterday", s: 0 },
+        { t: "This past week", s: 1 },
+        { t: "This past month", s: 2 },
+        { t: "Longer than I want to say out loud", s: 3 },
+      ],
+    },
+    {
+      q: "If you had a free hour right now with no obligations, what would you most likely do?",
+      opts: [
+        { t: "A walk, a book, a call with someone I love, or a project", s: 0 },
+        { t: "A mix — partly something, partly the phone", s: 1 },
+        { t: "Mostly the phone — but some of it would be 'productive' apps", s: 2 },
+        { t: "Phone, feeds, autoplay — and I'd call that 'rest'", s: 3 },
+      ],
+    },
+  ];
+
+  const bands = [
+    {
+      key: 'sovereign',
+      cls: 'band-sovereign',
+      label: 'BAND 01 — SOVEREIGN',
+      title: 'Sovereign',
+      range: [0, 5],
+      copy: "Your attention substrate is intact. You move toward what matters and recognize when feeds want to pull you. This is rare and you should treat it as an asset — not a final state. It atrophies if unattended.",
+      cta: [
+        { href: "intake.html", label: "Join Brain Brigade — operator track →" },
+        { href: "diy-skills.html", label: "Skills page — sharpen the edges →" },
+      ],
+    },
+    {
+      key: 'operator',
+      cls: 'band-operator',
+      label: 'BAND 02 — OPERATOR',
+      title: 'Operator',
+      range: [6, 11],
+      copy: "You're intentional, but the seams are starting to show. You finish things, but at a cost. You recognize the pull and resist it most days. Brain Brigade is built for exactly your band — operators stretching into the work that matters while the substrate keeps trying to thin.",
+      cta: [
+        { href: "intake.html", label: "Join Brain Brigade — your band →" },
+        { href: "diy-skills.html", label: "Friction tools — slow the thinning →" },
+      ],
+    },
+    {
+      key: 'drifting',
+      cls: 'band-drifting',
+      label: 'BAND 03 — DRIFTING',
+      title: 'Drifting',
+      range: [12, 16],
+      copy: "Attention is fragmenting. You're aware enough to take a quiz like this, which means the operator is still in there. The work now is restoring the gate — making sure the next thing you do is the next thing you chose, not the next thing chosen for you.",
+      cta: [
+        { href: "diy-skills.html", label: "Start with friction tools (free) →" },
+        { href: "orbitwithotto.html", label: "Talk to orbitwithotto first →" },
+      ],
+    },
+    {
+      key: 'captured',
+      cls: 'band-captured',
+      label: 'BAND 04 — CAPTURED',
+      title: 'Captured',
+      range: [17, 21],
+      copy: "The substrate is fully colonized. The operator inside you is still there — quizzes find the operator — but the gate has stopped firing. This is not a moral failure; the systems are designed to capture, and they're winning. The way out starts with one friction event, not a transformation. Pick one tool below. Use it once today.",
+      cta: [
+        { href: "diy-skills.html", label: "Pick one friction tool — start with one →" },
+        { href: "orbitwithotto.html", label: "orbitwithotto can help triage →" },
+      ],
+    },
+  ];
+
+  // ─── State ─────────────────────────────────────────────────────────
+  const root = document.getElementById('quizRoot');
+  const resultEl = document.getElementById('result');
+  const progressFill = document.getElementById('progressFill');
+  const progressLabel = document.getElementById('progressLabel');
+  const nextBtn = document.getElementById('nextBtn');
+  const answers = new Array(questions.length).fill(null);
+  let cur = 0;
+
+  function render() {
+    if (cur >= questions.length) {
+      finish();
+      return;
+    }
+    const q = questions[cur];
+    root.innerHTML = `
+      <div class="question">
+        <div class="q-num">question ${cur + 1} of ${questions.length}</div>
+        <h2>${q.q}</h2>
+        <div class="options">
+          ${q.opts.map((opt, i) => `
+            <button class="option ${answers[cur] === i ? 'selected' : ''}" data-idx="${i}">
+              <span class="marker"></span>
+              <span>${opt.t}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    progressFill.style.width = ((cur / questions.length) * 100) + '%';
+    progressLabel.textContent = `question ${cur + 1} of ${questions.length}`;
+    nextBtn.disabled = answers[cur] === null;
+    nextBtn.textContent = cur === questions.length - 1 ? 'see result →' : 'next →';
+
+    root.querySelectorAll('.option').forEach(el => {
+      el.addEventListener('click', () => {
+        const idx = parseInt(el.dataset.idx);
+        answers[cur] = idx;
+        render();
+      });
+    });
+  }
+
+  function finish() {
+    const total = answers.reduce((sum, idx, qIdx) => sum + questions[qIdx].opts[idx].s, 0);
+    const band = bands.find(b => total >= b.range[0] && total <= b.range[1]);
+    root.style.display = 'none';
+    progressFill.style.width = '100%';
+    progressLabel.textContent = 'complete';
+    nextBtn.style.display = 'none';
+    resultEl.className = 'result ' + band.cls;
+    resultEl.innerHTML = `
+      <div class="band-label">${band.label}</div>
+      <h2>${band.title}</h2>
+      <div class="score">score: ${total} / ${questions.length * 3}</div>
+      <p>${band.copy}</p>
+      <div class="next-steps">
+        ${band.cta.map(c => `<a href="${c.href}">${c.label}</a>`).join('')}
+      </div>
+    `;
+    resultEl.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  nextBtn.addEventListener('click', () => {
+    if (answers[cur] === null) return;
+    cur += 1;
+    render();
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>

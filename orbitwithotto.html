@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>orbitwithotto — stub</title>
+<meta name="description" content="orbitwithotto is the chatbot that helps you find your way in. Stub page; redirects to Nerv.forum and DIY skills.">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --panel: #111;
+  --panel-edge: #1d1d1d;
+  --ink: #e8e8e8;
+  --ink-dim: #888;
+  --accent-loki: #b366ff;
+  --accent-spacebar: #00ff7f;
+  --mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+  --display: 'Inter', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--display);
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+.card {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 16px;
+  padding: 2.5rem;
+  max-width: 540px;
+  width: 100%;
+}
+.card .header {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--accent-loki);
+  letter-spacing: 0.12em;
+  margin-bottom: 0.75rem;
+}
+.card h1 {
+  font-family: var(--mono);
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.01em;
+}
+.card .tagline { color: var(--ink-dim); margin-bottom: 2rem; line-height: 1.6; }
+
+.status {
+  background: rgba(179, 102, 255, 0.08);
+  border: 1px solid rgba(179, 102, 255, 0.3);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--accent-loki);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.status .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-loki);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+p { line-height: 1.6; margin-bottom: 1rem; color: var(--ink); }
+p .dim { color: var(--ink-dim); }
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+.link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  background: transparent;
+  border: 1px solid var(--panel-edge);
+  border-radius: 8px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.15s;
+}
+.link:hover {
+  border-color: var(--accent-spacebar);
+  background: rgba(0, 255, 127, 0.05);
+}
+.link .arrow { color: var(--ink-dim); font-family: var(--mono); }
+
+footer {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--panel-edge);
+}
+footer a { color: var(--accent-spacebar); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">⟁ ORBITWITHOTTO ▸ STUB</div>
+  <h1>orbitwithotto</h1>
+  <div class="tagline">The help-desk chatbot that lives bottom-right of every Brain Brigade page. Right now, this is the static stub. The live chatbot is wiring up at its own domain.</div>
+
+  <div class="status"><span class="dot"></span> chatbot offline · stub mode · live at orbitwithotto.com (TBD)</div>
+
+  <p>If you landed here from the <span class="dim">?</span> button, you're looking for help finding your way through Brain Brigade. The live chatbot will route you in real-time. Until it's online, here are the two paths that cover most cases:</p>
+
+  <div class="links">
+    <a href="https://nerv.forum" class="link" target="_blank" rel="noopener">
+      <span><strong>Nerv.forum</strong> — community discussion, ask anything</span>
+      <span class="arrow">↗</span>
+    </a>
+    <a href="diy-skills.html" class="link">
+      <span><strong>DIY skills</strong> — Claude plugins + tools you can install today</span>
+      <span class="arrow">→</span>
+    </a>
+    <a href="signup.html" class="link">
+      <span><strong>Back to signup</strong> — pick a path</span>
+      <span class="arrow">←</span>
+    </a>
+  </div>
+
+  <footer>
+    orbitwithotto · helper · stub mode · expect the live build by next sprint · <a href="signup.html">home</a>
+  </footer>
+</div>
+
+</body>
+</html>
