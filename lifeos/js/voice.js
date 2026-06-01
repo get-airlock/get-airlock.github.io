@@ -107,16 +107,50 @@ const Voice = {
     this._handleFinal(t);
   },
 
-  _handleFinal(text) {
-    const reply = (window.LifeOSCompanion && window.LifeOSCompanion.reply)
-      ? window.LifeOSCompanion.reply(text)
-      : "I'm here with you.";
+  async _handleFinal(text) {
+    this._status('thinking');
+    let reply;
+    try {
+      reply = await window.LifeOSCompanion.replyRemote(text);   // real brain
+    } catch (_) {
+      reply = (window.LifeOSCompanion && window.LifeOSCompanion.reply)
+        ? window.LifeOSCompanion.reply(text)                    // offline fallback
+        : "I'm here with you.";
+    }
     if (this.cb.onReply) this.cb.onReply(reply, text);
     this.speak(reply);
   },
 
   // ── Speaking ───────────────────────────────────────────────
-  speak(text) {
+  // Try the high-quality shuttle voice; fall back to the browser's built-in speech.
+  async speak(text) {
+    const base = window.LIFEOS_SHUTTLE;
+    if (base) {
+      try {
+        this._cancelSpeech();
+        const r = await fetch(`${base}/api/tts`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+        if (!r.ok) throw new Error('tts ' + r.status);
+        const url = URL.createObjectURL(await r.blob());
+        const audio = new Audio(url);
+        this._audio = audio;
+        this.speaking = true; this._status('speaking'); this._rampLevel(0.85);
+        audio.onended = () => { this.speaking = false; this._rampLevel(0); this._status('idle'); URL.revokeObjectURL(url); };
+        audio.onerror = () => { URL.revokeObjectURL(url); this._browserSpeak(text); };
+        await audio.play();
+        return;
+      } catch (_) {
+        this._browserSpeak(text);
+        return;
+      }
+    }
+    this._browserSpeak(text);
+  },
+
+  _browserSpeak(text) {
     if (!this.supportsTTS()) { this._status('idle'); return; }
     this._cancelSpeech();
     const u = new SpeechSynthesisUtterance(text);
@@ -144,6 +178,7 @@ const Voice = {
   },
 
   _cancelSpeech() {
+    if (this._audio) { try { this._audio.pause(); } catch (_) {} this._audio = null; }
     if (this.supportsTTS()) { try { window.speechSynthesis.cancel(); } catch (_) {} }
     this.speaking = false;
   },

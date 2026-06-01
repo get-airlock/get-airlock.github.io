@@ -2,7 +2,43 @@
 // Per Sisyphus DAG L3.2, invariants G1 (no deterministic identity) + G4 (consented memory)
 // Built 2026-05-30 for Rika June 1 demo
 
+// Demo brain + voice live here (keyless to the client). Folds into airlock-api (Fly) later.
+const SHUTTLE = 'https://lifeos-shuttle.vercel.app';
+
 const Companion = {
+  // Running conversation for continuity (so Carrie doesn't loop).
+  history: [],
+
+  // ── Real reply via the shuttle (OpenRouter). Throws on failure so caller can fall back. ──
+  async replyRemote(userText) {
+    this.history.push({ role: 'user', content: userText });
+    const memory = this.memorySummary();
+    const r = await fetch(`${SHUTTLE}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: this.history.slice(-12), memory }),
+    });
+    if (!r.ok) throw new Error(`chat ${r.status}`);
+    const data = await r.json();
+    const reply = (data && data.reply) ? data.reply : "I'm here with you.";
+    this.history.push({ role: 'assistant', content: reply });
+    return reply;
+  },
+
+  // Compact, consent-bound memory string for the system prompt.
+  memorySummary() {
+    try {
+      const snap = window.LifeOSMemory.allowedMemorySnapshot();
+      if (!snap || snap.mode === 'nothing' || !snap.canon_pages || !snap.canon_pages.length) return '';
+      const bits = snap.canon_pages.map((p) => {
+        const first = p.prompts && p.prompts[0];
+        return first ? `${capitalize(p.session)}: ${truncate(first.answer, 120)}` : null;
+      }).filter(Boolean);
+      const name = localStorage.getItem('lifeos.name');
+      return [name ? `Name: ${name}` : '', ...bits].filter(Boolean).join('\n');
+    } catch (_) { return ''; }
+  },
+
   // ── Welcome/greeting based on memory state ──
   greet() {
     const snap = window.LifeOSMemory.allowedMemorySnapshot();
@@ -87,4 +123,5 @@ function truncate(s, n) {
 
 if (typeof window !== 'undefined') {
   window.LifeOSCompanion = Companion;
+  window.LIFEOS_SHUTTLE = SHUTTLE;
 }

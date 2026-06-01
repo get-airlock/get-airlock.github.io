@@ -70,7 +70,17 @@
       </div>
     </section>
 
-    <p class="demo-banner">Mock demo · No accounts · Memory stays on this device · Voice runs on-device</p>
+    <!-- Geometry of meaning — substrate's user-facing voice (quiet, closed by default) -->
+    <details class="card card-cool" style="cursor:pointer; text-align:left;">
+      <summary style="font-family: var(--font-display); font-size: 16px; font-weight: 500; color: var(--ink-strong); list-style:none;">What kind of space is this?</summary>
+      <div style="margin-top: 16px; color: var(--ink-soft); line-height: 1.6;">
+        <p>To describe a life, a line is not enough. It can show before and after, but not depth — not the way one moment can echo for decades, or one person can widen the whole world.</p>
+        <p>A life is not just chronological. It is dimensional: it has <strong>meaning</strong>, <strong>relation</strong>, <strong>aspiration</strong>, and <strong>time</strong> — inward, outward, upward, and forward.</p>
+        <p>LifeOS doesn't reduce you to a profile or a score. It holds the shape of what you've chosen to share, only as long as you want it held, and never claims to know what you haven't said.</p>
+      </div>
+    </details>
+
+    <p class="demo-banner">Mock demo · No accounts · Memory stays on this device · Carrie speaks with a real voice</p>
   </main>
 
   <div id="bottom-nav"></div>
@@ -104,6 +114,7 @@
     const STATUS = {
       idle: 'Tap the circle and talk to me',
       listening: "I'm listening…",
+      thinking: 'Thinking…',
       speaking: 'Speaking…',
     };
 
