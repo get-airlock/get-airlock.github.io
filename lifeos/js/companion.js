@@ -75,34 +75,17 @@ const Companion = {
     return responses[session] || "Thank you. We can keep going whenever you're ready.";
   },
 
-  // ── Free-form chat response (mock, calm, references-only-allowed-memory) ──
-  reply(userText) {
-    const snap = window.LifeOSMemory.allowedMemorySnapshot();
-    const text = (userText || '').toLowerCase();
-
-    // Pattern-match a few common Rika-friendly prompts
-    if (/(how|what).*(remember|memory|know)/i.test(text)) {
-      if (snap.canon_pages.length === 0) {
-        return "Right now, I don't remember anything yet. When you complete an Arrive session, the things you choose to share become memory I can carry forward — and you can always clear it.";
-      }
-      const themes = extractThemes(snap.canon_pages);
-      return `Here is what I'm holding, with your permission: ${themes}. You can see and change this anytime in Memory.`;
-    }
-
-    if (/(create|make|build|draw|write|reflect)/i.test(text)) {
-      return "Creation is open — you can write a note, dictate a thought, or sketch something. After you make it, I'll offer one gentle reflection question, and the rest is yours.";
-    }
-
-    if (/(family|carrie|share|together)/i.test(text)) {
-      return "There's a shared family space here. Each person has their own private memory, and only what they've chosen to share moves into the shared layer. I'll never expose anyone's private notes — only the signals they've approved.";
-    }
-
-    if (/(calm|tired|quiet|breath|rest|stressed|anxious)/i.test(text)) {
-      return "We can keep this light. There's no obligation to do anything — sometimes the most useful thing is to sit for a moment. I'm here when you want to continue.";
-    }
-
-    // Default — warm, non-determining
-    return "I hear you. Tell me a little more about what would feel useful right now — quiet, reflection, creation, or just a conversation.";
+  // ── Offline fallback ONLY (used when the live brain can't be reached). ──
+  // Deliberately NOT an onboarding menu — a brief reconnect line that holds the thread,
+  // so a momentary network blip never pulls the user back into "onboarding" feeling.
+  reply() {
+    const lines = [
+      "Sorry — I lost the connection for a second there. Say that once more and I'll pick right back up.",
+      "I didn't quite catch that — could you say it again? I'm still right here with you.",
+      "One moment, my connection hiccuped. Go ahead and repeat that and we'll keep going.",
+    ];
+    this._fallbackIdx = ((this._fallbackIdx || 0) + 1) % lines.length;
+    return lines[this._fallbackIdx];
   },
 
   // ── Family permissioned summary per Sisyphus L7.2 ──

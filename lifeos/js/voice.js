@@ -13,6 +13,12 @@ const Voice = {
   _ctx: null,
   cb: {},            // { onStatus, onTranscript, onReply }
 
+  // Hands-free conversation: one tap to begin, then listen→reply→listen with no taps.
+  conversationMode: false,
+  _gotResult: false,
+  _errStreak: 0,
+  greeting: "Hi, I'm right here. What's on your mind?",
+
   supportsSTT() {
     return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
   },
@@ -33,6 +39,31 @@ const Voice = {
     if (this.supportsTTS()) {
       window.speechSynthesis.getVoices();
       window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+  },
+
+  // ── Hands-free conversation ────────────────────────────────
+  // Called from the one "begin" tap (user gesture → unlocks mic + audio on iOS).
+  startConversation() {
+    this.conversationMode = true;
+    this._errStreak = 0;
+    this.speak(this.greeting);   // greeting ends → _afterSpeak → auto-listen
+  },
+
+  stopConversation() {
+    this.conversationMode = false;
+    this.stop();
+    this._cancelSpeech();
+    this._status('paused');
+  },
+
+  // After Carrie finishes speaking, re-open the ear automatically.
+  _afterSpeak() {
+    this.speaking = false;
+    this._rampLevel(0);
+    this._status('idle');
+    if (this.conversationMode) {
+      setTimeout(() => { if (this.conversationMode && !this.speaking && !this.listening) this.start(); }, 250);
     }
   },
 
@@ -58,6 +89,7 @@ const Voice = {
 
     rec.onstart = () => {
       this.listening = true;
+      this._gotResult = false;
       this._status('listening');
       this._rampLevel(0.7);
     };
@@ -70,22 +102,30 @@ const Voice = {
       const shown = (final || interim).trim();
       if (shown && this.cb.onTranscript) this.cb.onTranscript(shown, !!final);
       this.level = Math.min(1, 0.5 + shown.length / 60);
-      if (final) this._handleFinal(final.trim());
+      if (final) { this._gotResult = true; this._errStreak = 0; this._handleFinal(final.trim()); }
     };
     rec.onerror = (e) => {
       this.listening = false;
       this._rampLevel(0);
       if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-        this._status('Microphone permission is needed to talk.');
-      } else if (e.error === 'no-speech') {
-        this._status('idle');
+        this.conversationMode = false;
+        this._status('Tap to allow the microphone, then we can talk.');
+      } else if (e.error === 'no-speech' || e.error === 'aborted') {
+        // silence is fine in a conversation — onend will re-arm the ear
       } else {
-        this._status('idle');
+        this._errStreak++;
       }
     };
     rec.onend = () => {
       this.listening = false;
-      if (!this.speaking) { this._rampLevel(0); this._status('idle'); }
+      if (this.speaking || this._gotResult) return;     // a reply is coming; speak flow re-arms
+      if (this.conversationMode && this._errStreak < 4) {
+        // silence — keep listening, hands-free
+        setTimeout(() => { if (this.conversationMode && !this.listening && !this.speaking) this.start(); }, 400);
+      } else {
+        if (this._errStreak >= 4) { this.conversationMode = false; this._status('paused'); }
+        this._rampLevel(0); this._status(this.conversationMode ? 'idle' : 'paused');
+      }
     };
 
     this.rec = rec;
@@ -138,7 +178,7 @@ const Voice = {
         const audio = new Audio(url);
         this._audio = audio;
         this.speaking = true; this._status('speaking'); this._rampLevel(0.85);
-        audio.onended = () => { this.speaking = false; this._rampLevel(0); this._status('idle'); URL.revokeObjectURL(url); };
+        audio.onended = () => { URL.revokeObjectURL(url); this._afterSpeak(); };
         audio.onerror = () => { URL.revokeObjectURL(url); this._browserSpeak(text); };
         await audio.play();
         return;
@@ -160,8 +200,8 @@ const Voice = {
     const v = this._pickVoice();
     if (v) u.voice = v;
     u.onstart = () => { this.speaking = true; this._status('speaking'); this._rampLevel(0.85); };
-    u.onend = () => { this.speaking = false; this._rampLevel(0); this._status('idle'); };
-    u.onerror = () => { this.speaking = false; this._rampLevel(0); this._status('idle'); };
+    u.onend = () => { this._afterSpeak(); };
+    u.onerror = () => { this._afterSpeak(); };
     window.speechSynthesis.speak(u);
   },
 

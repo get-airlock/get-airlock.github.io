@@ -112,10 +112,12 @@
     const orbWrap = document.querySelector('.orb-wrap');
 
     const STATUS = {
-      idle: 'Tap the circle and talk to me',
+      begin: 'Tap to begin — then just talk',
+      idle: 'Listening when you are…',
       listening: "I'm listening…",
       thinking: 'Thinking…',
       speaking: 'Speaking…',
+      paused: 'Paused — tap to continue',
     };
 
     LifeOSVoice.init({
@@ -137,7 +139,19 @@
       },
     });
 
-    orbTap.addEventListener('click', () => LifeOSVoice.toggle());
+    // One tap begins a hands-free conversation; tap again to pause/resume.
+    let started = false;
+    LifeOSVoice.greeting = `Hi${name && name !== 'friend' ? ' ' + name : ''}, I'm right here. What's on your mind?`;
+    function beginOrToggle() {
+      if (!started) {
+        started = true;
+        LifeOSVoice.startConversation();   // gesture unlocks mic + audio (iOS)
+        return;
+      }
+      if (LifeOSVoice.conversationMode) LifeOSVoice.stopConversation();
+      else LifeOSVoice.startConversation();
+    }
+    orbTap.addEventListener('click', beginOrToggle);
 
     document.getElementById('say-form').addEventListener('submit', (e) => {
       e.preventDefault();
@@ -152,6 +166,7 @@
       document.body.classList.toggle('nav-open');
     });
 
+    statusText.textContent = STATUS.begin;
     if (!LifeOSVoice.supportsSTT()) {
       statusText.textContent = 'Type below to talk — I’ll speak back';
     }
