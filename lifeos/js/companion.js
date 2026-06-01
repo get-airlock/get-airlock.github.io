@@ -9,20 +9,33 @@ const Companion = {
   // Running conversation for continuity (so Carrie doesn't loop).
   history: [],
 
-  // ── Real reply via the shuttle (OpenRouter). Throws on failure so caller can fall back. ──
+  // ── Real reply via the shuttle (OpenRouter). Throws only after retries so caller can fall back. ──
+  // History is NOT mutated until a call succeeds — a failed turn must never corrupt the conversation
+  // (a half-written turn leaves consecutive user messages, which the model rejects on every later turn).
   async replyRemote(userText) {
-    this.history.push({ role: 'user', content: userText });
     const memory = this.memorySummary();
-    const r = await fetch(`${SHUTTLE}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: this.history.slice(-12), memory }),
-    });
-    if (!r.ok) throw new Error(`chat ${r.status}`);
-    const data = await r.json();
-    const reply = (data && data.reply) ? data.reply : "I'm here with you.";
-    this.history.push({ role: 'assistant', content: reply });
-    return reply;
+    const outgoing = [...this.history.slice(-12), { role: 'user', content: userText }];
+
+    let lastErr;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const r = await fetch(`${SHUTTLE}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: outgoing, memory }),
+        });
+        if (!r.ok) throw new Error(`chat ${r.status}`);
+        const data = await r.json();
+        const reply = (data && data.reply) ? data.reply : "I'm here with you.";
+        // Commit both turns only on success — keeps history clean and alternating.
+        this.history.push({ role: 'user', content: userText }, { role: 'assistant', content: reply });
+        return reply;
+      } catch (e) {
+        lastErr = e;
+        if (attempt === 0) await new Promise((res) => setTimeout(res, 500));
+      }
+    }
+    throw lastErr;
   },
 
   // Compact, consent-bound memory string for the system prompt.
