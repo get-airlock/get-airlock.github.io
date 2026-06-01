@@ -90,12 +90,26 @@
   <script src="js/voice.js"></script>
   <script src="js/nav.js"></script>
   <script>
-    // ── Greeting: time of day + remembered name ──
-    const name = localStorage.getItem('lifeos.name') || 'Carrie';
+    // ── Companion soul: pick from the URL (?c=sparky), default Carrie ──
+    const params = new URLSearchParams(location.search);
+    const COMPANIONS = {
+      carrie: { id: 'carrie', user: localStorage.getItem('lifeos.name') || 'Carrie',
+                badge: (localStorage.getItem('lifeos.model') || 'DEEP').toUpperCase(),
+                greetWord: null,
+                voiceGreeting: (n) => `Hi${n ? ' ' + n : ''}, I'm right here. What's on your mind?` },
+      sparky: { id: 'sparky', user: 'Noah', badge: 'SPARKY', greetWord: 'Hey',
+                voiceGreeting: () => "Hey Noah, it's Sparky. I've been looking forward to this. What do you want to get into today?" },
+    };
+    const companion = COMPANIONS[(params.get('c') || '').toLowerCase()] || COMPANIONS.carrie;
+    LifeOSCompanion.setCompanion(companion.id);
+
+    // ── Greeting: time of day + the companion's person ──
+    const name = companion.user;
     const hr = new Date().getHours();
     const partOfDay = hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening';
-    document.getElementById('greet').innerHTML = `${partOfDay}, <span class="greet-name">${name}</span>.`;
-    document.getElementById('model-badge').textContent = (localStorage.getItem('lifeos.model') || 'DEEP').toUpperCase();
+    const greetWord = companion.greetWord || partOfDay;
+    document.getElementById('greet').innerHTML = `${greetWord}, <span class="greet-name">${name}</span>.`;
+    document.getElementById('model-badge').textContent = companion.badge;
 
     // Progress reflection in focus card
     const prog = LifeOSMemory.load().progress;
@@ -141,7 +155,7 @@
 
     // One tap begins a hands-free conversation; tap again to pause/resume.
     let started = false;
-    LifeOSVoice.greeting = `Hi${name && name !== 'friend' ? ' ' + name : ''}, I'm right here. What's on your mind?`;
+    LifeOSVoice.greeting = companion.voiceGreeting(name && name !== 'friend' ? name : '');
     function beginOrToggle() {
       if (!started) {
         started = true;

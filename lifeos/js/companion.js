@@ -6,8 +6,12 @@
 const SHUTTLE = 'https://lifeos-shuttle.vercel.app';
 
 const Companion = {
-  // Running conversation for continuity (so Carrie doesn't loop).
+  // Running conversation for continuity (so the companion doesn't loop).
   history: [],
+
+  // Which companion soul is active (server picks the matching persona). 'carrie' | 'sparky'
+  companionId: 'carrie',
+  setCompanion(id) { if (id) this.companionId = String(id).toLowerCase(); },
 
   // ── Real reply via the shuttle (OpenRouter). Throws only after retries so caller can fall back. ──
   // History is NOT mutated until a call succeeds — a failed turn must never corrupt the conversation
@@ -22,7 +26,7 @@ const Companion = {
         const r = await fetch(`${SHUTTLE}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: outgoing, memory }),
+          body: JSON.stringify({ messages: outgoing, memory, companion: this.companionId }),
         });
         if (!r.ok) throw new Error(`chat ${r.status}`);
         const data = await r.json();
