@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#9ed1c6">
+  <link rel="stylesheet" href="css/lifeos.css">
+  <title>Create · LifeOS</title>
+</head>
+<body>
+
+  <div class="page-header">
+    <div class="page-header-eyebrow">Create</div>
+    <h1>Make something gentle.</h1>
+    <p class="lead">A note, a thought, a fragment. After you make it, one reflection question — and the rest is yours.</p>
+  </div>
+
+  <!-- Locked state -->
+  <div id="locked-state" class="card" style="display:none;">
+    <h3>This surface unlocks after Continue.</h3>
+    <p>Finish the Continue session in KYI to open Create.</p>
+    <div class="btn-row"><a href="kyi/" class="btn">Open KYI</a></div>
+  </div>
+
+  <!-- Creation form -->
+  <div id="create-form-section">
+    <div class="card card-cool">
+      <h3>Your creation</h3>
+      <textarea class="prompt-input" id="creation-body" placeholder="Write a note, dictate a thought, sketch in words…" style="min-height:160px;"></textarea>
+      <div class="btn-row">
+        <button class="btn" id="reflect-btn">Save & reflect</button>
+      </div>
+    </div>
+
+    <!-- Reflection step -->
+    <div id="reflect-section" style="display:none;">
+      <div class="prompt">
+        <div class="prompt-question" id="reflect-question">What does this remind you of from earlier today?</div>
+        <textarea class="prompt-input" id="reflection-body" placeholder="One sentence is enough…"></textarea>
+        <div class="btn-row" style="margin-top:14px;">
+          <button class="btn" id="complete-btn">Save reflection</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Proof-of-creation card per L5.2 -->
+    <div id="poc-section" style="display:none;">
+      <div class="signal-card">
+        <div class="signal-label">Proof of Creation</div>
+        <div class="signal-value">Validated</div>
+        <div style="margin-top:14px; font-size:14px; color: var(--ink-soft);">
+          <div>· Creation saved to your canon</div>
+          <div>· Reflection completed</div>
+          <div>· Value signal: pending (demo)</div>
+          <div class="faint" style="margin-top:8px;" id="poc-cid"></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <a href="wallet.html" class="btn">See your signals</a>
+        <button class="btn btn-soft" id="another-btn">Make another</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent creations -->
+  <div class="card">
+    <h3>Recent creations</h3>
+    <div id="creation-list" style="margin-top:14px;"><p class="faint">Nothing yet.</p></div>
+  </div>
+
+  <div id="bottom-nav"></div>
+
+  <script src="js/memory.js"></script>
+  <script src="js/companion.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    // Guard: lock if Continue not done
+    if (!LifeOSMemory.isUnlocked('create')) {
+      document.getElementById('locked-state').style.display = 'block';
+      document.getElementById('create-form-section').style.display = 'none';
+    }
+
+    let stagedCreation = null;
+
+    document.getElementById('reflect-btn').addEventListener('click', () => {
+      const body = document.getElementById('creation-body').value.trim();
+      if (!body) { alert('Write a little something first.'); return; }
+      stagedCreation = { kind: 'note', body };
+      // Choose a gentle reflection question based on keyword
+      const q = chooseReflectionQuestion(body);
+      document.getElementById('reflect-question').textContent = q;
+      document.getElementById('reflect-section').style.display = 'block';
+      document.getElementById('reflect-btn').textContent = 'Saved · reflect below';
+      document.getElementById('reflect-btn').disabled = true;
+    });
+
+    document.getElementById('complete-btn').addEventListener('click', () => {
+      const reflection = document.getElementById('reflection-body').value.trim();
+      if (!stagedCreation) return;
+      const state = LifeOSMemory.addCreation({ ...stagedCreation, reflection: reflection || '(skipped)' });
+      const latest = state.creations[state.creations.length - 1];
+      document.getElementById('poc-cid').textContent = `Mock CID · ${latest.mock_cid}`;
+      document.getElementById('poc-section').style.display = 'block';
+      document.getElementById('complete-btn').textContent = 'Saved';
+      document.getElementById('complete-btn').disabled = true;
+      renderCreations();
+    });
+
+    document.getElementById('another-btn').addEventListener('click', () => {
+      document.getElementById('creation-body').value = '';
+      document.getElementById('reflection-body').value = '';
+      document.getElementById('reflect-section').style.display = 'none';
+      document.getElementById('poc-section').style.display = 'none';
+      document.getElementById('reflect-btn').textContent = 'Save & reflect';
+      document.getElementById('reflect-btn').disabled = false;
+      document.getElementById('complete-btn').textContent = 'Save reflection';
+      document.getElementById('complete-btn').disabled = false;
+      stagedCreation = null;
+    });
+
+    function chooseReflectionQuestion(body) {
+      const t = body.toLowerCase();
+      if (/(family|friend|love|brother|sister|mom|dad|daughter|son)/.test(t)) return 'Who would you want to read this, even if you don\'t share it?';
+      if (/(work|project|build|ship|deadline)/.test(t)) return 'What part of this matters most to keep going?';
+      if (/(tired|stress|worry|fear|anxious|sad)/.test(t)) return 'What small kindness could you offer yourself about this?';
+      return 'What does this remind you of from earlier today?';
+    }
+
+    function renderCreations() {
+      const state = LifeOSMemory.load();
+      const el = document.getElementById('creation-list');
+      if (state.creations.length === 0) { el.innerHTML = '<p class="faint">Nothing yet.</p>'; return; }
+      el.innerHTML = state.creations.slice().reverse().map((c) => `
+        <div class="memory-item">
+          <div><span class="chip chip-lavender">${c.kind}</span> <span class="faint">${c.mock_cid}</span></div>
+          <div style="margin-top:8px;">${escapeHtml(truncate(c.body, 200))}</div>
+          ${c.reflection ? `<div class="memory-item-why">Reflection: ${escapeHtml(truncate(c.reflection, 160))}</div>` : ''}
+        </div>`).join('');
+    }
+    renderCreations();
+
+    function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function truncate(s, n) { return (s && s.length > n) ? s.slice(0, n - 1) + '…' : s; }
+
+    LifeOSNav.render('create');
+  </script>
+</body>
+</html>

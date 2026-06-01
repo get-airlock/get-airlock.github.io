@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#9ed1c6">
+  <link rel="stylesheet" href="../css/lifeos.css">
+  <title>Contribute · LifeOS</title>
+</head>
+<body>
+
+  <div class="page-header">
+    <div class="page-header-eyebrow">KYI · Contribute (3 of 3)</div>
+    <h1>Begin gently.</h1>
+    <p class="lead">One short prompt. No expectation, no obligation — naming what you'd like to make or explore is already the first step.</p>
+    <div class="progress-row">
+      <div class="progress-dot done"></div>
+      <div class="progress-dot done"></div>
+      <div class="progress-dot active"></div>
+    </div>
+  </div>
+
+  <!-- Prompt 5: intent — what to make/reflect/help with (Sisyphus L2.2 #5) -->
+  <div class="prompt">
+    <div class="prompt-question">What would you like to make, reflect on, or help with today?</div>
+    <textarea class="prompt-input" id="q5" placeholder="A note, a project, a question, a gentle goal — your call…"></textarea>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" id="save-btn">Save & complete KYI</button>
+    <a href="index.html" class="btn btn-soft">Back to KYI</a>
+  </div>
+
+  <div id="companion-response" style="display:none; margin-top:24px;">
+    <div class="companion">
+      <div class="companion-body" id="companion-text"></div>
+      <div class="companion-meta">Memory written · canon page 3 · KYI complete · all surfaces unlocked</div>
+    </div>
+    <div class="btn-row">
+      <a href="/lifeos/create.html" class="btn">Open Create space</a>
+      <a href="/lifeos/wallet.html" class="btn btn-soft">See your signals</a>
+      <a href="/lifeos/memory.html" class="btn btn-soft">See everything remembered</a>
+    </div>
+  </div>
+
+  <div id="bottom-nav"></div>
+
+  <script src="../js/memory.js"></script>
+  <script src="../js/companion.js"></script>
+  <script src="../js/nav.js"></script>
+  <script>
+    if (!LifeOSMemory.load().progress.continue_complete) {
+      window.location.href = 'continue.html';
+    }
+    document.getElementById('save-btn').addEventListener('click', () => {
+      const a5 = document.getElementById('q5').value.trim();
+      LifeOSMemory.addCanonPage({
+        session: 'contribute',
+        prompts_and_answers: [
+          { dimension: 'intent', question: 'What would you like to make, reflect on, or help with today?', answer: a5 || '(skipped)' }
+        ]
+      });
+      document.getElementById('companion-text').textContent = LifeOSCompanion.respondAfterKYI('contribute');
+      document.getElementById('companion-response').style.display = 'block';
+      document.getElementById('save-btn').textContent = 'KYI complete · welcome';
+      document.getElementById('save-btn').disabled = true;
+      const nav = document.querySelector('.bottom-nav'); if (nav) nav.remove();
+      LifeOSNav.render('kyi');
+    });
+    LifeOSNav.render('kyi');
+  </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#9ed1c6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="LifeOS">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="stylesheet" href="css/lifeos.css">
+  <title>You · LifeOS</title>
+</head>
+<body class="app-shell">
+
+  <header class="topbar">
+    <a class="topbar-btn" href="index.html" aria-label="Back">←</a>
+    <div class="brand"><span class="brand-mark">✦</span> LifeOS</div>
+    <span class="topbar-btn" aria-hidden="true"></span>
+  </header>
+
+  <div class="page-header" style="text-align:center;">
+    <h1>You</h1>
+    <p class="faint">Tune how LifeOS supports you. Nothing here is a test.</p>
+  </div>
+
+  <div class="card">
+    <div class="you-field">
+      <div class="you-field-label"><span>Name</span><a href="#" id="clear-name" class="faint" style="text-decoration:none;">Clear</a></div>
+      <input class="you-name-input" id="name-input" type="text" value="Carrie" aria-label="Your name">
+      <p class="faint" style="margin:8px 0 0;">Set via conversation — change it anytime.</p>
+    </div>
+
+    <div class="you-field">
+      <div class="you-field-label"><span>Character</span></div>
+      <div class="mascot-row" id="mascot-row">
+        <button class="mascot" data-m="cloud" title="Cloud">☁️</button>
+        <button class="mascot" data-m="drop" title="Drop">💧</button>
+        <button class="mascot" data-m="flame" title="Flame">🔥</button>
+        <button class="mascot" data-m="sprout" title="Sprout">🌱</button>
+      </div>
+    </div>
+
+    <div class="you-field">
+      <div class="you-field-label"><span>Model</span></div>
+      <div class="seg-row" id="model-row">
+        <button class="seg" data-v="FAST">Fast</button>
+        <button class="seg" data-v="MID">Mid</button>
+        <button class="seg" data-v="DEEP">Deep</button>
+        <button class="seg" data-v="PLUS">Plus</button>
+      </div>
+      <p class="faint" style="margin:10px 0 0;">Fast is snappy. Mid balances speed and depth. Deep and Plus take longer but reason over more context.</p>
+    </div>
+
+    <div class="you-field">
+      <div class="you-field-label"><span>Memory</span></div>
+      <div class="seg-row" id="memory-row">
+        <button class="seg" data-v="nothing">Nothing</button>
+        <button class="seg" data-v="requested">Only requested ones</button>
+        <button class="seg" data-v="all">All</button>
+      </div>
+    </div>
+
+    <div class="you-field" style="margin-bottom:0;">
+      <div class="you-field-label"><span>Screen</span></div>
+      <div class="seg-row" id="screen-row">
+        <button class="seg" data-v="note">Note space</button>
+        <button class="seg" data-v="draw">Drawing space</button>
+        <button class="seg" data-v="none">Not needed</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="bottom-nav"></div>
+
+  <script src="js/memory.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    // ── Name ──
+    const nameInput = document.getElementById('name-input');
+    nameInput.value = localStorage.getItem('lifeos.name') || 'Carrie';
+    nameInput.addEventListener('input', () => localStorage.setItem('lifeos.name', nameInput.value.trim() || 'friend'));
+    document.getElementById('clear-name').addEventListener('click', (e) => {
+      e.preventDefault(); nameInput.value = ''; localStorage.setItem('lifeos.name', 'friend'); nameInput.focus();
+    });
+
+    // ── Generic segmented selector ──
+    function wireSegments(rowId, storageKey, defaultVal, onPick) {
+      const row = document.getElementById(rowId);
+      const current = localStorage.getItem(storageKey) || defaultVal;
+      row.querySelectorAll('[data-v]').forEach((b) => {
+        if (b.dataset.v === current) b.classList.add('selected');
+        b.addEventListener('click', () => {
+          row.querySelectorAll('[data-v]').forEach((x) => x.classList.remove('selected'));
+          b.classList.add('selected');
+          localStorage.setItem(storageKey, b.dataset.v);
+          if (onPick) onPick(b.dataset.v);
+        });
+      });
+    }
+
+    document.querySelectorAll('#mascot-row .mascot').forEach((b) => {
+      if (b.dataset.m === (localStorage.getItem('lifeos.mascot') || 'drop')) b.classList.add('selected');
+      b.addEventListener('click', () => {
+        document.querySelectorAll('#mascot-row .mascot').forEach((x) => x.classList.remove('selected'));
+        b.classList.add('selected');
+        localStorage.setItem('lifeos.mascot', b.dataset.m);
+      });
+    });
+
+    wireSegments('model-row', 'lifeos.model', 'DEEP');
+    wireSegments('memory-row', 'lifeos.memory.choice', LifeOSMemory.getMode(), (v) => LifeOSMemory.setMode(v));
+    wireSegments('screen-row', 'lifeos.screen', 'note');
+
+    LifeOSNav.render('you');
+  </script>
+</body>
+</html>

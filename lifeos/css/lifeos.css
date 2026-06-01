@@ -1,0 +1,683 @@
+/* LifeOS Theme — calm, white/soft-blue/teal/lavender, family-friendly, breathable
+   Per Sisyphus DAG L1.2 invariant G3: light, calm, minimal, emotionally breathable
+   Built 2026-05-30 for Rika June 1 demo */
+
+:root {
+  /* Palette — white-base with soft accents, no operator/terminal language */
+  --bg-base: #fafbfc;
+  --bg-card: #ffffff;
+  --bg-elev: #f4f7fa;
+
+  --accent-blue: #a8c7e8;      /* soft sky */
+  --accent-teal: #9ed1c6;      /* gentle teal */
+  --accent-lavender: #c8b8e0;  /* breathable lavender */
+  --accent-warm: #f5e1d8;      /* warm sand for highlights */
+
+  --ink-strong: #2c3744;
+  --ink-soft: #5a6878;
+  --ink-faint: #8a98a8;
+
+  --border-soft: #e6ecf2;
+  --border-stronger: #d4dde6;
+
+  --shadow-card: 0 1px 3px rgba(44, 55, 68, 0.04), 0 4px 16px rgba(44, 55, 68, 0.06);
+  --shadow-elev: 0 2px 8px rgba(44, 55, 68, 0.06), 0 12px 32px rgba(44, 55, 68, 0.08);
+
+  --radius-soft: 14px;
+  --radius-pill: 999px;
+
+  --pad-tight: 12px;
+  --pad-normal: 20px;
+  --pad-loose: 32px;
+  --pad-breath: 48px;
+
+  --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  font-family: var(--font-body);
+  background: var(--bg-base);
+  color: var(--ink-strong);
+  line-height: 1.55;
+  font-size: 17px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+body {
+  padding: var(--pad-normal);
+  padding-bottom: 100px; /* room for bottom nav */
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* Typography */
+h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+  margin-bottom: var(--pad-tight);
+  color: var(--ink-strong);
+}
+
+h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 22px;
+  margin-bottom: var(--pad-tight);
+  color: var(--ink-strong);
+}
+
+h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: var(--ink-strong);
+}
+
+p {
+  color: var(--ink-soft);
+  margin-bottom: var(--pad-normal);
+}
+
+.lead {
+  font-size: 18px;
+  color: var(--ink-strong);
+  line-height: 1.5;
+  margin-bottom: var(--pad-loose);
+}
+
+.faint {
+  color: var(--ink-faint);
+  font-size: 14px;
+}
+
+/* Layout — Card */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-soft);
+  padding: var(--pad-loose);
+  margin-bottom: var(--pad-normal);
+  box-shadow: var(--shadow-card);
+}
+
+.card-warm {
+  background: linear-gradient(135deg, #ffffff 0%, var(--accent-warm) 200%);
+}
+
+.card-cool {
+  background: linear-gradient(135deg, #ffffff 0%, var(--bg-elev) 200%);
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 14px 24px;
+  background: var(--ink-strong);
+  color: white;
+  border: none;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-align: center;
+}
+
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-elev); }
+.btn:active { transform: translateY(0); }
+
+.btn-soft {
+  background: var(--bg-elev);
+  color: var(--ink-strong);
+  border: 1px solid var(--border-stronger);
+}
+
+.btn-block { display: block; width: 100%; }
+
+.btn-row {
+  display: flex;
+  gap: var(--pad-tight);
+  flex-wrap: wrap;
+  margin-top: var(--pad-normal);
+}
+
+/* Chip — for memory tags, sessions, gentle labels */
+.chip {
+  display: inline-block;
+  padding: 6px 14px;
+  background: var(--accent-teal);
+  color: white;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+
+.chip-blue { background: var(--accent-blue); }
+.chip-lavender { background: var(--accent-lavender); }
+.chip-soft { background: var(--bg-elev); color: var(--ink-soft); }
+.chip-locked { background: var(--bg-elev); color: var(--ink-faint); }
+
+/* KYI prompt — gentle, conversational, not a form */
+.prompt {
+  background: var(--bg-card);
+  border-left: 3px solid var(--accent-teal);
+  padding: var(--pad-loose);
+  border-radius: 0 var(--radius-soft) var(--radius-soft) 0;
+  margin-bottom: var(--pad-normal);
+  box-shadow: var(--shadow-card);
+}
+
+.prompt-question {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--ink-strong);
+  margin-bottom: var(--pad-normal);
+  line-height: 1.45;
+}
+
+.prompt-input {
+  width: 100%;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-soft);
+  padding: 14px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  background: var(--bg-base);
+  color: var(--ink-strong);
+  resize: vertical;
+  min-height: 80px;
+}
+
+.prompt-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  background: white;
+}
+
+/* Companion response card */
+.companion {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-soft);
+  padding: var(--pad-loose);
+  margin-bottom: var(--pad-normal);
+  box-shadow: var(--shadow-card);
+  position: relative;
+}
+
+.companion::before {
+  content: "·";
+  position: absolute;
+  top: var(--pad-tight);
+  left: var(--pad-loose);
+  color: var(--accent-teal);
+  font-size: 28px;
+  line-height: 1;
+}
+
+.companion-body {
+  padding-top: var(--pad-tight);
+  color: var(--ink-strong);
+  line-height: 1.55;
+}
+
+.companion-meta {
+  font-size: 13px;
+  color: var(--ink-faint);
+  margin-top: var(--pad-normal);
+  padding-top: var(--pad-tight);
+  border-top: 1px solid var(--border-soft);
+}
+
+/* Bottom navigation — calm, family-friendly, never operator/cockpit */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-soft);
+  padding: 8px 0 12px;
+  display: flex;
+  justify-content: space-around;
+  z-index: 100;
+  box-shadow: 0 -2px 12px rgba(44, 55, 68, 0.04);
+}
+
+.bottom-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: var(--ink-faint);
+  font-size: 11px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: color 0.15s ease;
+}
+
+.bottom-nav a.active { color: var(--ink-strong); }
+.bottom-nav a:hover { color: var(--accent-teal); }
+.bottom-nav a.locked { opacity: 0.4; pointer-events: none; }
+
+.bottom-nav-icon {
+  font-size: 20px;
+  margin-bottom: 2px;
+  line-height: 1;
+}
+
+.bottom-nav-label { font-weight: 500; }
+
+/* Memory display */
+.memory-item {
+  padding: var(--pad-normal);
+  background: var(--bg-elev);
+  border-radius: var(--radius-soft);
+  margin-bottom: var(--pad-tight);
+  border-left: 2px solid var(--accent-lavender);
+}
+
+.memory-item-why {
+  font-size: 13px;
+  color: var(--ink-faint);
+  margin-top: 6px;
+  font-style: italic;
+}
+
+/* Mode selector — for memory consent (Nothing / Only requested / All) */
+.mode-row {
+  display: flex;
+  gap: var(--pad-tight);
+  margin-top: var(--pad-normal);
+}
+
+.mode-option {
+  flex: 1;
+  padding: var(--pad-normal);
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-soft);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.mode-option.selected {
+  border-color: var(--accent-teal);
+  background: linear-gradient(135deg, #ffffff, var(--accent-teal) 400%);
+  box-shadow: var(--shadow-card);
+}
+
+.mode-option-title {
+  font-weight: 500;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.mode-option-desc {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+/* Progress indicator — for KYI session progression */
+.progress-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: var(--pad-loose);
+}
+
+.progress-dot {
+  flex: 1;
+  height: 4px;
+  background: var(--border-soft);
+  border-radius: 2px;
+}
+
+.progress-dot.active { background: var(--accent-teal); }
+.progress-dot.done { background: var(--accent-blue); }
+
+/* PoC / Reflection card — for Create + Wallet surfaces */
+.signal-card {
+  background: linear-gradient(135deg, #ffffff 0%, var(--accent-lavender) 300%);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-soft);
+  padding: var(--pad-loose);
+  margin-bottom: var(--pad-normal);
+  box-shadow: var(--shadow-card);
+}
+
+.signal-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  margin-bottom: 4px;
+}
+
+.signal-value {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--ink-strong);
+}
+
+/* Page header — gentle, never institutional */
+.page-header {
+  margin-bottom: var(--pad-loose);
+  padding-top: var(--pad-tight);
+}
+
+.page-header-eyebrow {
+  font-size: 13px;
+  color: var(--accent-teal);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+/* Limit banner — honest about mock state */
+.demo-banner {
+  background: var(--bg-elev);
+  border: 1px dashed var(--border-stronger);
+  border-radius: var(--radius-soft);
+  padding: var(--pad-tight) var(--pad-normal);
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: var(--pad-normal);
+  text-align: center;
+}
+
+/* ───────────────────────────────────────────────
+   Interaction / Voice surface (Home) — matches Rika's screenshot
+   ─────────────────────────────────────────────── */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px 18px;
+}
+
+.topbar-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  text-decoration: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.topbar-btn:hover { background: var(--bg-elev); }
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--ink-strong);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.brand-mark { color: var(--accent-teal); }
+.brand-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent-blue);
+  background: var(--bg-elev);
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  margin-left: 2px;
+}
+
+.interaction { text-align: center; }
+
+.greet-block { margin-bottom: 8px; }
+.greet {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 27px;
+  color: var(--ink-strong);
+  margin-bottom: 4px;
+}
+.greet-name { color: var(--accent-blue); }
+.greet-sub { color: var(--ink-faint); font-size: 15px; margin-bottom: 0; }
+
+/* Voice orb */
+.orb-wrap {
+  position: relative;
+  width: min(74vw, 300px);
+  aspect-ratio: 1;
+  margin: 26px auto 18px;
+  border-radius: 50%;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.orb-canvas { width: 100%; height: 100%; display: block; }
+.orb-tap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.orb-wrap.is-listening {
+  transform: scale(1.03);
+  box-shadow: 0 0 0 6px rgba(158, 209, 198, 0.12), 0 0 48px rgba(110, 196, 214, 0.25);
+}
+.orb-wrap.is-speaking {
+  box-shadow: 0 0 0 6px rgba(200, 184, 224, 0.14), 0 0 48px rgba(176, 156, 222, 0.28);
+}
+
+.voice-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--accent-teal);
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 14px;
+  min-height: 22px;
+}
+.status-spark { transition: opacity 0.3s ease; }
+
+.transcript {
+  color: var(--accent-blue);
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0 auto 14px;
+  max-width: 440px;
+  opacity: 0.75;
+}
+.transcript.final { opacity: 1; }
+
+.reply-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--accent-teal);
+  border-radius: var(--radius-soft);
+  padding: var(--pad-normal) var(--pad-loose);
+  margin: 0 auto var(--pad-normal);
+  max-width: 480px;
+  text-align: left;
+  box-shadow: var(--shadow-card);
+  animation: rise 0.35s ease;
+}
+.reply-body { color: var(--ink-strong); line-height: 1.55; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.say-row {
+  display: flex;
+  gap: 8px;
+  max-width: 480px;
+  margin: 0 auto var(--pad-loose);
+  align-items: center;
+}
+.say-input {
+  flex: 1;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-pill);
+  padding: 12px 18px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  background: var(--bg-card);
+  color: var(--ink-strong);
+}
+.say-input:focus { outline: none; border-color: var(--accent-blue); }
+.say-send {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent-teal);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.say-send:hover { background: var(--accent-blue); }
+
+/* Current focus card */
+.focus-card { text-align: left; }
+.focus-head { display: flex; align-items: center; justify-content: space-between; }
+.focus-head h3 { margin-bottom: 0; }
+.focus-line { color: var(--ink-soft); margin: 12px 0 var(--pad-normal); }
+.focus-stats { display: flex; gap: var(--pad-tight); }
+.focus-stat {
+  flex: 1;
+  background: var(--bg-elev);
+  border-radius: var(--radius-soft);
+  padding: var(--pad-normal) var(--pad-tight);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.fs-icon { color: var(--accent-teal); font-size: 18px; }
+.fs-label { font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.05em; }
+.fs-val { font-size: 12px; color: var(--ink-soft); }
+
+/* ── You / Identity surface ── */
+.you-field { margin-bottom: var(--pad-loose); }
+.you-field-label { font-size: 13px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; display: flex; justify-content: space-between; }
+.you-name-input {
+  font-family: "Snell Roundhand", "Apple Chancery", cursive;
+  font-size: 30px;
+  color: var(--accent-lavender);
+  border: none;
+  border-bottom: 1px solid var(--border-soft);
+  background: transparent;
+  width: 100%;
+  padding: 4px 0;
+}
+.you-name-input:focus { outline: none; border-color: var(--accent-blue); }
+.mascot-row { display: flex; gap: var(--pad-tight); }
+.mascot {
+  flex: 1;
+  aspect-ratio: 1;
+  border-radius: var(--radius-soft);
+  background: var(--bg-elev);
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.mascot.selected { border-color: var(--accent-teal); background: var(--bg-card); box-shadow: var(--shadow-card); }
+.seg-row { display: flex; gap: 6px; }
+.seg {
+  flex: 1;
+  padding: 12px 6px;
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-soft);
+  font-size: 14px;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.seg.selected { border-color: var(--accent-teal); color: var(--ink-strong); font-weight: 500; background: linear-gradient(135deg, #fff, var(--accent-teal) 500%); }
+
+/* ───────────────────────────────────────────────
+   iPad / tablet — Rika's primary test device. Left sidebar nav.
+   ─────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  body {
+    padding: var(--pad-breath);
+    padding-bottom: 100px;
+  }
+  h1 { font-size: 32px; }
+  h2 { font-size: 24px; }
+
+  .app-shell {
+    max-width: none;
+    padding-left: 220px;
+    padding-bottom: var(--pad-breath);
+  }
+  .app-shell .interaction,
+  .app-shell .page-header,
+  .app-shell > .card,
+  .app-shell > .signal-card,
+  .app-shell > .companion,
+  .app-shell .demo-banner { max-width: 680px; margin-left: auto; margin-right: auto; }
+
+  .greet { font-size: 30px; }
+  .orb-wrap { width: min(40vw, 320px); }
+
+  /* turn bottom nav into a left sidebar on tablet */
+  .bottom-nav {
+    flex-direction: column;
+    justify-content: flex-start;
+    top: 0;
+    bottom: 0;
+    right: auto;
+    width: 200px;
+    border-top: none;
+    border-right: 1px solid var(--border-soft);
+    padding: 92px 16px 16px;
+    gap: 4px;
+    box-shadow: none;
+    background: var(--bg-card);
+  }
+  .bottom-nav a {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    width: 100%;
+    font-size: 15px;
+    padding: 12px 16px;
+  }
+  .bottom-nav a.active { background: var(--bg-elev); }
+  .bottom-nav-icon { font-size: 18px; margin-bottom: 0; }
+  .bottom-nav-label { font-size: 15px; }
+  .topbar #menu-btn { display: none; }
+}
+
+@media (display-mode: standalone) {
+  /* When installed as PWA from Safari */
+  body { padding-top: env(safe-area-inset-top, var(--pad-normal)); }
+}

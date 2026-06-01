@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+  <meta name="theme-color" content="#9ed1c6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="LifeOS">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link rel="stylesheet" href="css/lifeos.css">
+  <title>LifeOS</title>
+</head>
+<body class="app-shell">
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <button class="topbar-btn" id="menu-btn" aria-label="Menu">☰</button>
+    <div class="brand">
+      <span class="brand-mark">✦</span> LifeOS
+      <span class="brand-badge" id="model-badge">DEEP</span>
+    </div>
+    <a class="topbar-btn" href="you.html" aria-label="You &amp; settings">⚙</a>
+  </header>
+
+  <main class="interaction">
+    <div class="greet-block">
+      <h1 class="greet" id="greet">Good morning.</h1>
+      <p class="greet-sub">How can I support you today?</p>
+    </div>
+
+    <!-- Voice orb -->
+    <div class="orb-wrap">
+      <canvas id="wave" class="orb-canvas" aria-hidden="true"></canvas>
+      <button class="orb-tap" id="orb-tap" aria-label="Tap to talk"></button>
+    </div>
+
+    <div class="voice-status" id="voice-status">
+      <span class="status-spark">✦</span>
+      <span id="status-text">Tap the circle and talk to me</span>
+    </div>
+
+    <!-- Live transcript (what you said) -->
+    <p class="transcript" id="transcript" hidden></p>
+
+    <!-- Companion reply -->
+    <div class="reply-card" id="reply-card" hidden>
+      <div class="reply-body" id="reply-body"></div>
+    </div>
+
+    <!-- Typed fallback (always available, primary if no mic) -->
+    <form class="say-row" id="say-form" autocomplete="off">
+      <input class="say-input" id="say-input" type="text" placeholder="…or type to talk" aria-label="Type a message">
+      <button class="say-send" type="submit" aria-label="Send">→</button>
+    </form>
+
+    <!-- Current focus -->
+    <section class="card focus-card">
+      <div class="focus-head">
+        <h3>Current focus</h3>
+        <span class="chip chip-soft" id="focus-tag">today</span>
+      </div>
+      <p class="focus-line" id="focus-line">A little restless today, honestly. How are things going with you?</p>
+      <div class="focus-stats">
+        <div class="focus-stat"><span class="fs-icon">◍</span><span class="fs-label">Meaning</span><span class="fs-val">Checking in</span></div>
+        <div class="focus-stat"><span class="fs-icon">→</span><span class="fs-label">Next action</span><span class="fs-val">What's on your mind?</span></div>
+        <div class="focus-stat"><span class="fs-icon">↗</span><span class="fs-label">Progress</span><span class="fs-val" id="focus-progress">just getting started</span></div>
+      </div>
+    </section>
+
+    <p class="demo-banner">Mock demo · No accounts · Memory stays on this device · Voice runs on-device</p>
+  </main>
+
+  <div id="bottom-nav"></div>
+
+  <script src="js/memory.js"></script>
+  <script src="js/companion.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    // ── Greeting: time of day + remembered name ──
+    const name = localStorage.getItem('lifeos.name') || 'Carrie';
+    const hr = new Date().getHours();
+    const partOfDay = hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('greet').innerHTML = `${partOfDay}, <span class="greet-name">${name}</span>.`;
+    document.getElementById('model-badge').textContent = (localStorage.getItem('lifeos.model') || 'DEEP').toUpperCase();
+
+    // Progress reflection in focus card
+    const prog = LifeOSMemory.load().progress;
+    const done = ['arrive_complete','continue_complete','contribute_complete'].filter(k => prog[k]).length;
+    document.getElementById('focus-progress').textContent = done ? `${done} of 3 steps` : 'just getting started';
+
+    // ── UI refs ──
+    const statusText = document.getElementById('status-text');
+    const spark = document.querySelector('.status-spark');
+    const transcript = document.getElementById('transcript');
+    const replyCard = document.getElementById('reply-card');
+    const replyBody = document.getElementById('reply-body');
+    const orbTap = document.getElementById('orb-tap');
+    const orbWrap = document.querySelector('.orb-wrap');
+
+    const STATUS = {
+      idle: 'Tap the circle and talk to me',
+      listening: "I'm listening…",
+      speaking: 'Speaking…',
+    };
+
+    LifeOSVoice.init({
+      canvas: document.getElementById('wave'),
+      onStatus: (s) => {
+        orbWrap.classList.toggle('is-listening', s === 'listening');
+        orbWrap.classList.toggle('is-speaking', s === 'speaking');
+        statusText.textContent = STATUS[s] || s;
+        spark.style.opacity = (s === 'listening' || s === 'speaking') ? '1' : '0.5';
+      },
+      onTranscript: (text, isFinal) => {
+        transcript.hidden = false;
+        transcript.textContent = '“' + text + '”';
+        transcript.classList.toggle('final', isFinal);
+      },
+      onReply: (reply) => {
+        replyCard.hidden = false;
+        replyBody.textContent = reply;
+      },
+    });
+
+    orbTap.addEventListener('click', () => LifeOSVoice.toggle());
+
+    document.getElementById('say-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('say-input');
+      const v = input.value.trim();
+      if (!v) return;
+      LifeOSVoice.submitText(v);
+      input.value = '';
+    });
+
+    document.getElementById('menu-btn').addEventListener('click', () => {
+      document.body.classList.toggle('nav-open');
+    });
+
+    if (!LifeOSVoice.supportsSTT()) {
+      statusText.textContent = 'Type below to talk — I’ll speak back';
+    }
+
+    LifeOSNav.render('home');
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    }
+  </script>
+</body>
+</html>

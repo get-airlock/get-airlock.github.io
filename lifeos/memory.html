@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#9ed1c6">
+  <link rel="stylesheet" href="css/lifeos.css">
+  <title>Memory · LifeOS</title>
+</head>
+<body>
+
+  <div class="page-header">
+    <div class="page-header-eyebrow">Memory</div>
+    <h1>What LifeOS remembers.</h1>
+    <p class="lead">Everything here is local to this device and visible to you. Change the mode at any time — your call.</p>
+  </div>
+
+  <!-- Memory mode selector per Sisyphus L4.2 -->
+  <div class="card">
+    <h3>Memory mode</h3>
+    <p class="faint">How much should I carry between visits?</p>
+    <div class="mode-row">
+      <div class="mode-option" data-mode="nothing">
+        <div class="mode-option-title">Nothing</div>
+        <div class="mode-option-desc">Forget between visits.</div>
+      </div>
+      <div class="mode-option" data-mode="requested">
+        <div class="mode-option-title">Only requested</div>
+        <div class="mode-option-desc">Carry only what you ask.</div>
+      </div>
+      <div class="mode-option" data-mode="all">
+        <div class="mode-option-title">All</div>
+        <div class="mode-option-desc">Carry the whole thread.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- What LifeOS remembers — canon pages -->
+  <div class="card">
+    <h3>Canon pages</h3>
+    <p class="faint">Each KYI session writes one canon page. These are the pieces I hold with your permission.</p>
+    <div id="canon-list" style="margin-top:20px;"></div>
+  </div>
+
+  <!-- Family shared context per L7.1 -->
+  <div class="card card-warm">
+    <h3>Shared family context</h3>
+    <p class="faint">Each person has private memory. Only what they choose to share enters the shared layer below.</p>
+    <div id="family-shared" style="margin-top:20px;"></div>
+    <div class="btn-row">
+      <button class="btn btn-soft" id="ask-carrie-btn">How is Carrie doing?</button>
+    </div>
+    <div id="family-companion-response" style="display:none; margin-top:20px;">
+      <div class="companion">
+        <div class="companion-body" id="family-companion-text" style="white-space:pre-wrap;"></div>
+        <div class="companion-meta">Permissioned summary · never exposes private notes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset / clear -->
+  <div class="card">
+    <h3>Clear memory</h3>
+    <p>Delete everything LifeOS remembers on this device. This cannot be undone.</p>
+    <div class="btn-row">
+      <button class="btn btn-soft" id="reset-btn" style="border-color:#e8a8a8; color:#a85a5a;">Clear all memory</button>
+    </div>
+  </div>
+
+  <div id="bottom-nav"></div>
+
+  <script src="js/memory.js"></script>
+  <script src="js/companion.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    // ── Render mode selector ──
+    function renderMode() {
+      const current = LifeOSMemory.getMode();
+      document.querySelectorAll('.mode-option').forEach((el) => {
+        el.classList.toggle('selected', el.dataset.mode === current);
+      });
+    }
+    renderMode();
+    document.querySelectorAll('.mode-option').forEach((el) => {
+      el.addEventListener('click', () => {
+        LifeOSMemory.setMode(el.dataset.mode);
+        renderMode();
+      });
+    });
+
+    // ── Render canon pages ──
+    function renderCanon() {
+      const state = LifeOSMemory.load();
+      const list = document.getElementById('canon-list');
+      if (state.canon_pages.length === 0) {
+        list.innerHTML = '<p class="faint">No canon pages yet. Begin <a href="kyi/">KYI</a> to write the first one.</p>';
+        return;
+      }
+      list.innerHTML = state.canon_pages.map((p) => `
+        <div class="memory-item">
+          <div><span class="chip chip-blue">${p.session}</span> <span class="faint">${p.ipfs_cid}</span></div>
+          ${p.prompts.map((qa) => `
+            <div style="margin-top:10px;">
+              <div class="faint">${qa.dimension} · ${qa.question}</div>
+              <div style="margin-top:4px;">${escapeHtml(qa.answer)}</div>
+            </div>
+          `).join('')}
+          <div class="memory-item-why">Saved ${new Date(p.created_at).toLocaleString()}</div>
+        </div>`).join('');
+    }
+    renderCanon();
+
+    // ── Render shared family context ──
+    function renderFamily() {
+      const shared = LifeOSMemory.familyShared();
+      const el = document.getElementById('family-shared');
+      if (shared.length === 0) {
+        el.innerHTML = '<p class="faint">No shared family context yet.</p>';
+        return;
+      }
+      el.innerHTML = shared.map((s) => `
+        <div class="memory-item">
+          <div><span class="chip chip-lavender">${s.member}</span> <span class="faint">${s.role}</span></div>
+          <div style="margin-top:8px;">${escapeHtml(s.shared)}</div>
+        </div>`).join('');
+    }
+    renderFamily();
+
+    // ── Family companion summary demo (L7.2) ──
+    document.getElementById('ask-carrie-btn').addEventListener('click', () => {
+      const summary = LifeOSCompanion.familySummary('Carrie');
+      document.getElementById('family-companion-text').textContent = summary;
+      document.getElementById('family-companion-response').style.display = 'block';
+    });
+
+    // ── Reset ──
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      if (confirm('Clear all LifeOS memory on this device? This cannot be undone.')) {
+        LifeOSMemory.reset();
+        location.reload();
+      }
+    });
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    LifeOSNav.render('memory');
+  </script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#9ed1c6">
+  <link rel="stylesheet" href="css/lifeos.css">
+  <title>Wallet · LifeOS</title>
+</head>
+<body>
+
+  <div class="page-header">
+    <div class="page-header-eyebrow">Wallet · SIS Preview</div>
+    <h1>Your signals.</h1>
+    <p class="lead">A gentle view of what your creations and reflections produced. This is a preview — values are demo signals, not money.</p>
+  </div>
+
+  <div id="locked-state" class="card" style="display:none;">
+    <h3>This surface unlocks after Contribute.</h3>
+    <p>Finish the Contribute session in KYI to open Wallet.</p>
+    <div class="btn-row"><a href="kyi/" class="btn">Open KYI</a></div>
+  </div>
+
+  <div id="wallet-content">
+    <!-- Signals row -->
+    <div class="signal-card">
+      <div class="signal-label">Creations Validated</div>
+      <div class="signal-value" id="sig-creations">0</div>
+    </div>
+
+    <div class="signal-card">
+      <div class="signal-label">Reflections Completed</div>
+      <div class="signal-value" id="sig-reflections">0</div>
+    </div>
+
+    <div class="signal-card">
+      <div class="signal-label">Participation Value</div>
+      <div class="signal-value">pending · demo</div>
+      <div style="margin-top:8px; font-size:13px; color: var(--ink-soft);">
+        SIS values are not yet assigned in this preview. Real signal weighting comes later — for now this is a visual.
+      </div>
+    </div>
+
+    <!-- Per-creation breakdown -->
+    <div class="card">
+      <h3>Signal log</h3>
+      <p class="faint">One row per creation. Each carries a mock CID and a validation status.</p>
+      <div id="signal-list" style="margin-top:14px;"></div>
+    </div>
+
+    <!-- Demo banner — honesty per Sisyphus invariant -->
+    <div class="demo-banner">
+      Demo · No real wallet · No tokens · No financial value · Signals are visual representations
+    </div>
+  </div>
+
+  <div id="bottom-nav"></div>
+
+  <script src="js/memory.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    if (!LifeOSMemory.isUnlocked('wallet')) {
+      document.getElementById('locked-state').style.display = 'block';
+      document.getElementById('wallet-content').style.display = 'none';
+    }
+
+    const state = LifeOSMemory.load();
+    document.getElementById('sig-creations').textContent = state.signals.creations_validated;
+    document.getElementById('sig-reflections').textContent = state.signals.reflections_completed;
+
+    const list = document.getElementById('signal-list');
+    if (state.creations.length === 0) {
+      list.innerHTML = '<p class="faint">No signals yet. Make something in <a href="create.html">Create</a> to see one here.</p>';
+    } else {
+      list.innerHTML = state.creations.slice().reverse().map((c) => `
+        <div class="memory-item">
+          <div><span class="chip chip-teal">${c.kind}</span> <span class="faint">${c.mock_cid}</span></div>
+          <div style="margin-top:8px;">${escapeHtml(truncate(c.body, 140))}</div>
+          <div class="memory-item-why">PoC validated · reflection ${c.reflection && c.reflection !== '(skipped)' ? 'completed' : 'skipped'} · value pending</div>
+        </div>`).join('');
+    }
+
+    function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function truncate(s, n) { return (s && s.length > n) ? s.slice(0, n - 1) + '…' : s; }
+
+    LifeOSNav.render('wallet');
+  </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#9ed1c6">
+  <link rel="stylesheet" href="../css/lifeos.css">
+  <title>Arrive · LifeOS</title>
+</head>
+<body>
+
+  <div class="page-header">
+    <div class="page-header-eyebrow">KYI · Arrive (1 of 3)</div>
+    <h1>Notice.</h1>
+    <p class="lead">Two short prompts. No right answer. Take your time, or skip — both are fine.</p>
+    <div class="progress-row">
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+  </div>
+
+  <!-- Prompt 1: persona / identity layer (Sisyphus L2.2 #1) -->
+  <div class="prompt">
+    <div class="prompt-question">What would make this space feel safe and useful for you today?</div>
+    <textarea class="prompt-input" id="q1" placeholder="In your own words, no wrong answer…"></textarea>
+  </div>
+
+  <!-- Prompt 2: body / present state layer (Sisyphus L2.2 #2) -->
+  <div class="prompt">
+    <div class="prompt-question">What kind of support would feel good right now — quiet, playful, focused, or reflective?</div>
+    <textarea class="prompt-input" id="q2" placeholder="A few words, or skip…"></textarea>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" id="save-btn">Save & continue</button>
+    <a href="index.html" class="btn btn-soft">Back to KYI</a>
+  </div>
+
+  <!-- Companion response appears after save -->
+  <div id="companion-response" style="display:none; margin-top:24px;">
+    <div class="companion">
+      <div class="companion-body" id="companion-text"></div>
+      <div class="companion-meta">Memory written · canon page 1 · mock CID generated</div>
+    </div>
+    <div class="btn-row">
+      <a href="continue.html" class="btn">Continue to next session</a>
+      <a href="/lifeos/memory.html" class="btn btn-soft">See what was remembered</a>
+    </div>
+  </div>
+
+  <div id="bottom-nav"></div>
+
+  <script src="../js/memory.js"></script>
+  <script src="../js/companion.js"></script>
+  <script src="../js/nav.js"></script>
+  <script>
+    document.getElementById('save-btn').addEventListener('click', () => {
+      const a1 = document.getElementById('q1').value.trim();
+      const a2 = document.getElementById('q2').value.trim();
+      LifeOSMemory.addCanonPage({
+        session: 'arrive',
+        prompts_and_answers: [
+          { dimension: 'persona', question: 'What would make this space feel safe and useful for you today?', answer: a1 || '(skipped)' },
+          { dimension: 'body',    question: 'What kind of support would feel good right now?',                answer: a2 || '(skipped)' }
+        ]
+      });
+      document.getElementById('companion-text').textContent = LifeOSCompanion.respondAfterKYI('arrive');
+      document.getElementById('companion-response').style.display = 'block';
+      document.getElementById('save-btn').textContent = 'Saved · gentle pace ahead';
+      document.getElementById('save-btn').disabled = true;
+      // re-render nav to show Memory now unlocked
+      const nav = document.querySelector('.bottom-nav');
+      if (nav) nav.remove();
+      LifeOSNav.render('kyi');
+    });
+    LifeOSNav.render('kyi');
+  </script>
+</body>
+</html>
