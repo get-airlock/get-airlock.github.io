@@ -151,10 +151,10 @@ const Voice = {
     this._status('thinking');
     let reply;
     try {
-      reply = await window.LifeOSCompanion.replyRemote(text);   // real brain
+      reply = await window.LifeOSCompanion.respond(text);       // deterministic (free) → shuttle (Pro, on help)
     } catch (_) {
-      reply = (window.LifeOSCompanion && window.LifeOSCompanion.reply)
-        ? window.LifeOSCompanion.reply(text)                    // offline fallback
+      reply = (window.LifeOSCompanion && window.LifeOSCompanion.autonomousReply)
+        ? window.LifeOSCompanion.autonomousReply(text)          // zero-LLM fallback
         : "I'm here with you.";
     }
     if (this.cb.onReply) this.cb.onReply(reply, text);

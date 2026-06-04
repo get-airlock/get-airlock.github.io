@@ -27,7 +27,7 @@
   <div class="card">
     <div class="you-field">
       <div class="you-field-label"><span>Name</span><a href="#" id="clear-name" class="faint" style="text-decoration:none;">Clear</a></div>
-      <input class="you-name-input" id="name-input" type="text" value="Carrie" aria-label="Your name">
+      <input class="you-name-input" id="name-input" type="text" value="" placeholder="Your name…" aria-label="Your name">
       <p class="faint" style="margin:8px 0 0;">Set via conversation — change it anytime.</p>
     </div>
 
@@ -78,7 +78,7 @@
   <script>
     // ── Name ──
     const nameInput = document.getElementById('name-input');
-    nameInput.value = localStorage.getItem('lifeos.name') || 'Carrie';
+    nameInput.value = localStorage.getItem('lifeos.name') || '';
     nameInput.addEventListener('input', () => localStorage.setItem('lifeos.name', nameInput.value.trim() || 'friend'));
     document.getElementById('clear-name').addEventListener('click', (e) => {
       e.preventDefault(); nameInput.value = ''; localStorage.setItem('lifeos.name', 'friend'); nameInput.focus();

@@ -26,7 +26,8 @@ function defaultState() {
     },
     family: defaultFamilyMock(),
     creations: [],
-    signals: { creations_validated: 0, reflections_completed: 0 }
+    signals: { creations_validated: 0, reflections_completed: 0 },
+    imprint: null            // deterministic DECF lean, recomputed from KYI answers (zero-LLM)
   };
 }
 
@@ -102,7 +103,10 @@ const Memory = {
     if (state.progress[`${session}_complete`] !== undefined) {
       state.progress[`${session}_complete`] = true;
     }
-    return Memory.save(state);
+    Memory.save(state);
+    // Deterministic imprint refresh — zero-LLM, no key. Recomputes the DECF array from answers.
+    if (typeof window !== 'undefined' && window.LifeOSImprint) window.LifeOSImprint.recompute();
+    return Memory.load();
   },
 
   // ── Creation/reflection writing ──
@@ -138,7 +142,8 @@ const Memory = {
       canon_pages: state.canon_pages,
       creations: state.creations,
       progress: state.progress,
-      signals: state.signals
+      signals: state.signals,
+      imprint: state.imprint || null
     };
   },
 

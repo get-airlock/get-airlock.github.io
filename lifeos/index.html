@@ -93,7 +93,7 @@
     // ── Companion soul: pick from the URL (?c=sparky), default Carrie ──
     const params = new URLSearchParams(location.search);
     const COMPANIONS = {
-      carrie: { id: 'carrie', user: localStorage.getItem('lifeos.name') || 'Carrie',
+      carrie: { id: 'carrie', user: localStorage.getItem('lifeos.name') || 'friend',
                 badge: (localStorage.getItem('lifeos.model') || 'DEEP').toUpperCase(),
                 greetWord: null,
                 voiceGreeting: (n) => `Hi${n ? ' ' + n : ''}, I'm right here. What's on your mind?` },
