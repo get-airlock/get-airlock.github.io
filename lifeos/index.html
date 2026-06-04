@@ -92,6 +92,11 @@
   <script>
     // ── Companion soul: pick from the URL (?c=sparky), default Carrie ──
     const params = new URLSearchParams(location.search);
+
+    // ── First run → onboarding. A new person meets KYI (name + arrive) before any companion. ──
+    if (!localStorage.getItem('lifeos.onboarded') && !params.get('c')) {
+      location.replace('kyi/arrive.html');
+    }
     const COMPANIONS = {
       carrie: { id: 'carrie', user: localStorage.getItem('lifeos.name') || 'friend',
                 badge: (localStorage.getItem('lifeos.model') || 'DEEP').toUpperCase(),

@@ -65,6 +65,7 @@
     document.getElementById('save-btn').addEventListener('click', () => {
       const nm = document.getElementById('name').value.trim();
       if (nm) localStorage.setItem('lifeos.name', nm);   // custom name, set in onboarding
+      localStorage.setItem('lifeos.onboarded', '1');     // releases the first-run gate → home after KYI
       const a1 = document.getElementById('q1').value.trim();
       const a2 = document.getElementById('q2').value.trim();
       LifeOSMemory.addCanonPage({
