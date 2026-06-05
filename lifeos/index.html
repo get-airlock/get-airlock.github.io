@@ -185,6 +185,8 @@
   <script src="js/store.js"></script>
   <script src="js/ui.js"></script>
   <script>
+    // Keep the PWA worker fresh (network-first pages) — also self-heals a stale old worker.
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(() => {}); }
     // First run → KYI onboarding (our conversational flow) before the home surface.
     if (!localStorage.getItem('lifeos.onboarded')) { location.replace('kyi/arrive.html'); }
     LifeOSUI.mount('home');
