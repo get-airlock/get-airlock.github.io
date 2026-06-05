@@ -253,15 +253,42 @@
     let busy = false, assist = false, audio = null, mediaRecorder = null, audioChunks = [], recording = false;
     const HELP_RE = /\b(help|plan|find|organi[sz]e|schedule|study|tutor|homework|remind|fix|figure|decide|build|make|write|draft)\b/i;
 
-    function speak(text){ return new Promise((res) => {
-      try {
-        fetch(SHUTTLE + '/api/tts', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text }) })
-          .then(r => r.ok ? r.blob() : Promise.reject()).then(b => {
-            const u = URL.createObjectURL(b); if(audio) audio.pause(); audio = new Audio(u); setState('speaking');
-            audio.onended = () => { URL.revokeObjectURL(u); res(); }; audio.onerror = () => res(); audio.play().catch(() => res());
-          }).catch(() => res());
-      } catch(e){ res(); }
+    // Streaming chunked TTS (ported from Sven's Super Voice Engine): synthesize sentence-by-sentence
+    // so Carrie STARTS talking on chunk one while the rest renders — kills the dead-air-then-talks lag.
+    // Non-interrupting queue: each chunk is awaited before the next, so she never cuts herself off.
+    function splitChunks(text){
+      const parts = (''+text).match(/[^.!?\n]+[.!?]*\s*/g) || [text];
+      const chunks = []; let cur = '';
+      for(const p of parts){
+        cur += p;
+        const limit = chunks.length === 0 ? 0 : 140;   // flush 1st sentence fast, then ~140-char groups
+        if(cur.trim().length > limit){ chunks.push(cur.trim()); cur = ''; }
+      }
+      if(cur.trim()) chunks.push(cur.trim());
+      return chunks;
+    }
+    function ttsBlob(text){
+      return fetch(SHUTTLE + '/api/tts', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text }) })
+        .then(r => r.ok ? r.blob() : Promise.reject()).catch(() => null);
+    }
+    function playBlob(blob){ return new Promise((res) => {
+      const u = URL.createObjectURL(blob);
+      if(audio) audio.pause(); audio = new Audio(u);
+      audio.onended = () => { URL.revokeObjectURL(u); res(); };
+      audio.onerror = () => { URL.revokeObjectURL(u); res(); };
+      audio.play().catch(() => res());
     }); }
+    async function speak(text){
+      const chunks = splitChunks(text);
+      if(!chunks.length) return;
+      setState('speaking');
+      let nextFetch = ttsBlob(chunks[0]);            // producer runs one chunk ahead of the consumer
+      for(let i = 0; i < chunks.length; i++){
+        const blob = await nextFetch;
+        nextFetch = (i + 1 < chunks.length) ? ttsBlob(chunks[i + 1]) : null;   // prefetch next while playing this
+        if(blob) await playBlob(blob);
+      }
+    }
 
     async function brain(userText){
       history.push({ role:'user', content:userText });
