@@ -61,11 +61,19 @@
       el.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
 
-    // Three gentle moments — asked conversationally, one at a time.
+    // Gentle moments — asked conversationally, one at a time. Each is a low-energy,
+    // high-signal OPERATOR on the nerve.name field (boop's framing): name anchors,
+    // birthday gives the whole-chart authentic-self read, song reads arousal/aesthetic,
+    // weather reads live mood so the companion can feel how they are right now.
     const beats = [
-      { key: 'name',  ask: () => "You made it. No forms, no test — let's just talk for a sec. What should I call you?" },
-      { key: 'music', ask: (n) => `Good to meet you${n ? ', ' + n : ''}. What song are you into right now? Even just the vibe is enough. 🎵` },
-      { key: 'body',  ask: () => "Love that. Last one for today — what would feel good right now: quiet, playful, focused, or reflective?" },
+      { key: 'name',     nerve: 'call.name',          dim: 'identity-anchor',
+        ask: () => "You made it. No forms, no test — let's just talk for a sec. What should I call you?" },
+      { key: 'birthday', nerve: 'birthday.chart',     dim: 'authentic-self',
+        ask: (n) => `Good to meet you${n ? ', ' + n : ''}. When's your birthday? I want to make sure I can wish you a happy one. 🎂` },
+      { key: 'music',    nerve: 'favorite-song.now',  dim: 'arousal · aesthetic',
+        ask: () => "Love that. What song are you into right now? Even just the vibe is enough. 🎵" },
+      { key: 'feeling',  nerve: 'today-weather.self',  dim: 'mood · valence',
+        ask: () => "One more, just for today — if today had a weather forecast made just for you, what would it be? Sunny, cloudy, stormy, windy, or something else?" },
     ];
     const answers = {};
     let step = 0;
@@ -81,7 +89,8 @@
       bubble(v, 'me');
       input.value = '';
       answers[beats[step].key] = v;
-      if (beats[step].key === 'name') localStorage.setItem('lifeos.name', v); // for greeting only
+      if (beats[step].key === 'name') localStorage.setItem('lifeos.name', v);       // greeting only
+      if (beats[step].key === 'birthday') localStorage.setItem('lifeos.birthday', v); // chart seed + birthday wish
       step += 1;
 
       if (step < beats.length) {
@@ -100,8 +109,9 @@
       LifeOSMemory.addCanonPage({
         session: 'arrive',
         prompts_and_answers: [
+          { dimension: 'chart', question: 'birthday (authentic-self read)', answer: answers.birthday || '(skipped)' },
           { dimension: 'music', question: 'What song are you into right now?', answer: answers.music || '(skipped)' },
-          { dimension: 'body',  question: 'What kind of support would feel good right now?', answer: answers.body || '(skipped)' },
+          { dimension: 'mood',  question: "today's weather, just for you",   answer: answers.feeling || '(skipped)' },
         ],
       });
       localStorage.setItem('lifeos.onboarded', '1'); // releases the first-run gate
