@@ -26,16 +26,31 @@ const Companion = {
     const outgoing = [...this.history.slice(-12), { role: 'user', content: userText }];
 
     let lastErr;
+    // Sovereign-first: try the local-inference relay, fall back to the Vercel shuttle.
+    // Set window.LIFEOS_RELAY (e.g. 'http://192.168.1.152:8200') to route through the relay's
+    // Otto brain (Maverick-floored). Empty/unreachable → shuttle, so the demo never breaks.
+    const RELAY = (typeof window !== 'undefined' && window.LIFEOS_RELAY) ? window.LIFEOS_RELAY : '';
+    const body = JSON.stringify({ messages: outgoing, memory, companion: this.companionId, assist: this.assist });
+
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        const r = await fetch(`${SHUTTLE}/api/chat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: outgoing, memory, companion: this.companionId, assist: this.assist }),
-        });
-        if (!r.ok) throw new Error(`chat ${r.status}`);
-        const data = await r.json();
-        const reply = (data && data.reply) ? data.reply : "I'm here with you.";
+        let reply = '';
+        if (RELAY) {
+          try {
+            const rr = await fetch(`${RELAY}/lifeos/chat`, {
+              method: 'POST', headers: { 'Content-Type': 'application/json' }, body,
+            });
+            if (rr.ok) { const d = await rr.json(); if (d && d.reply) reply = d.reply; }
+          } catch (_) { /* relay unreachable → shuttle below */ }
+        }
+        if (!reply) {
+          const r = await fetch(`${SHUTTLE}/api/chat`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body,
+          });
+          if (!r.ok) throw new Error(`chat ${r.status}`);
+          const data = await r.json();
+          reply = (data && data.reply) ? data.reply : "I'm here with you.";
+        }
         // Commit both turns only on success — keeps history clean and alternating.
         this.history.push({ role: 'user', content: userText }, { role: 'assistant', content: reply });
         return reply;
