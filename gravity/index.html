@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>GRAVITY · the universe is gravity connecting us</title>
+<title>GRAVITY · three doors, one sky</title>
 <meta name="theme-color" content="#04070d" />
 <link rel="manifest" href="manifest.webmanifest" />
 <style>
-  :root { --bg:#04070d; --ink:#dbe7f3; --cyan:#22d3ee; --dim:#5b7088; }
+  :root { --bg:#04070d; --ink:#dbe7f3; --cyan:#22d3ee; --violet:#a78bfa; --gold:#f6c453; --dim:#5b7088; }
   * { margin:0; box-sizing:border-box; }
   html,body { height:100%; background:var(--bg); color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; overflow:hidden; }
@@ -15,29 +15,85 @@
   .hud { position:fixed; left:max(18px,env(safe-area-inset-left)); top:max(18px,env(safe-area-inset-top));
     z-index:2; pointer-events:none; }
   .title { font-size:13px; letter-spacing:.34em; color:var(--cyan); font-weight:600; }
-  .sub { font-size:11px; letter-spacing:.04em; color:var(--dim); margin-top:6px; max-width:62ch; line-height:1.5; }
+  .sub { font-size:11px; letter-spacing:.04em; color:var(--dim); margin-top:6px; max-width:60ch; line-height:1.5; }
+  /* three-door legend */
+  .legend { position:fixed; left:max(18px,env(safe-area-inset-left)); bottom:max(16px,env(safe-area-inset-bottom));
+    z-index:2; font-size:10px; letter-spacing:.04em; line-height:1.7; pointer-events:none; }
+  .legend .row { display:flex; align-items:center; gap:7px; }
+  .legend .dot { width:8px; height:8px; border-radius:50%; box-shadow:0 0 8px currentColor; }
+  .legend b { font-weight:600; letter-spacing:.06em; }
+  .legend .meta { color:var(--dim); }
+  /* connect panel — open a weavemind channel */
+  .conn { position:fixed; right:max(16px,env(safe-area-inset-right)); top:max(16px,env(safe-area-inset-top));
+    z-index:3; display:flex; flex-direction:column; gap:8px; align-items:flex-end; }
+  .conn .lab { font-size:10px; letter-spacing:.16em; color:var(--dim); }
+  .conn .pill { display:flex; gap:6px; align-items:center; background:rgba(12,18,28,.72);
+    border:1px solid rgba(91,112,136,.35); border-radius:999px; padding:6px 8px 6px 12px;
+    backdrop-filter:blur(8px); }
+  .conn input { background:transparent; border:0; color:var(--ink); font-size:12px; width:148px; outline:none; }
+  .conn select { background:transparent; border:0; color:var(--dim); font-size:10px; outline:none; }
+  .conn button { background:var(--cyan); color:#04070d; border:0; border-radius:999px;
+    width:26px; height:26px; font-size:15px; font-weight:700; cursor:pointer; line-height:1; }
+  .conn .note { font-size:10px; color:var(--dim); max-width:30ch; text-align:right; min-height:13px; }
   .foot { position:fixed; right:max(18px,env(safe-area-inset-right)); bottom:max(16px,env(safe-area-inset-bottom));
-    z-index:2; font-size:10px; letter-spacing:.08em; color:var(--dim); text-align:right; line-height:1.6; }
+    z-index:2; font-size:10px; letter-spacing:.06em; color:var(--dim); text-align:right; line-height:1.6; }
   .foot b { color:var(--ink); font-weight:500; }
 </style>
 </head>
 <body>
 <canvas id="field"></canvas>
+
 <div class="hud">
   <div class="title">GRAVITY</div>
-  <div class="sub">the universe is just gravity connecting us. each name is a mass; the field
-    is what passes between them. drag a node — the whole field re-bends.</div>
+  <div class="sub">the universe is just gravity connecting us. each name is a mass; the field is
+    what passes between them. three doors, one sky — open a channel and a star is born where two
+    points meet. drag a node; the whole field re-bends.</div>
 </div>
+
+<div class="conn">
+  <div class="lab">OPEN A CHANNEL</div>
+  <div class="pill">
+    <input id="gremlin" placeholder="shared gremlin…" autocomplete="off" spellcheck="false" />
+    <select id="tier">
+      <option value="beam">Beam · free</option>
+      <option value="brigade" selected>Brigade · gift</option>
+      <option value="maverick">Maverick · paid</option>
+    </select>
+    <button id="open" title="derive the 10D point — same gremlin meets at the same star">↵</button>
+  </div>
+  <div class="note" id="note">same gremlin ⇒ same coordinate ⇒ you handshake. no server sees it.</div>
+</div>
+
+<div class="legend" id="legend"></div>
+
 <div class="foot">
-  ports <b>flutter GravitySimulation</b> · x = x₀ + v₀t + ½at²<br/>
-  variable gravity: friction calibrated to the gravity of the act
+  ports <b>flutter GravitySimulation</b> · weavemind 10D handshake<br/>
+  free is the most human · paid is the most agentic
 </div>
-<script>
-// ── Flutter's GravitySimulation, ported verbatim (flutter/.../physics/gravity_simulation.dart)
-//    x(t) = x0 + v0·t + ½·a·t²   ·   dx(t) = v0 + a·t
-function gravStep(x, v, a, dt) {
-  return { x: x + v * dt + 0.5 * a * dt * dt, v: v + a * dt };
-}
+
+<script type="module">
+import { derivePoint, distance } from './weavemind.js';
+
+// ── Three doors. The differentiator is AGENT DENSITY, rising with the economic tier.
+//    free is the most human (Beam) · paid is the most agentic (Maverick). ──
+const TIERS = {
+  beam:     { label:'BEAM',          tag:'free · messenger · human',        hue:188, agents:0, css:'var(--cyan)'   },
+  brigade:  { label:'BRAIN BRIGADE', tag:'gift · friendship · less agents', hue:276, agents:2, css:'var(--violet)' },
+  maverick: { label:'MAVERICK / AIRLOCK', tag:'for-profit · federated mesh · agent-dense', hue:45, agents:5, css:'var(--gold)' },
+};
+
+// Seed constellation — one body, many hands. Mass = pull (Zac+Otto the body, heaviest).
+// Each node's gremlin (a PUBLIC phrase here) derives its 10D point, which sets identity + hue.
+const SEED = [
+  { name:'ZAC',       tier:'maverick', m:9, body:true },
+  { name:'OTTO',      tier:'maverick', m:9, body:true },
+  { name:'OTTER NET', tier:'maverick', m:7 },
+  { name:'SVEN',      tier:'maverick', m:7 },
+  { name:'AXIOM',     tier:'maverick', m:6 },
+  { name:'GARRETT',   tier:'brigade',  m:5 },
+  { name:'MO',        tier:'brigade',  m:5 },
+  { name:'AYLA',      tier:'brigade',  m:5 },
+];
 
 const cv = document.getElementById('field');
 const ctx = cv.getContext('2d');
@@ -49,58 +105,111 @@ function resize() {
 }
 addEventListener('resize', resize); resize();
 
-// Federation masses — one body, many hands. Mass = pull (Zac+Otto the body, heavier).
-const NODES = [
-  { name: 'OTTO',   m: 9, hue: 188 },
-  { name: 'ZAC',    m: 9, hue: 168 },
-  { name: 'MO',     m: 6, hue: 280 },
-  { name: 'AYLA',   m: 6, hue: 330 },
-  { name: 'SVEN',   m: 7, hue: 210 },
-  { name: 'AXIOMS', m: 7, hue: 48  },
-].map((n, i, arr) => {
-  const ang = (i / arr.length) * Math.PI * 2 - Math.PI / 2;
-  const r = Math.min(W, H) * 0.27;
-  return { ...n, x: W/2 + Math.cos(ang)*r, y: H/2 + Math.sin(ang)*r, vx:0, vy:0, fixed:false };
-});
+// sha256 hex — the gremlin phrase → a stable hash (a PRIVATE phrase would make this a real key).
+async function gremlinHash(phrase) {
+  const b = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(phrase)));
+  return [...b].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+
+const NODES = [];
+
+// Build a node from a gremlin: derive its 10D point, project to hue + a stable spawn angle.
+async function makeNode({ name, tier, m, body=false, channel='' }, spawn) {
+  const t = TIERS[tier] || TIERS.brigade;
+  const gh = await gremlinHash(name.toLowerCase());
+  const point = await derivePoint(gh, '', channel);          // the weavemind coordinate
+  const hueShift = Math.round(point[2] * 18);                 // identity nudges hue within its tier band
+  const ang = Math.atan2(point[1], point[0]);                // gremlin-derived spawn angle
+  const r = Math.min(W, H) * (body ? 0.16 : 0.30);
+  return {
+    name, tier, m: m ?? (4 + t.agents * 0.4), body, point,
+    hue: (t.hue + hueShift + 360) % 360, agents: t.agents,
+    x: spawn ? spawn.x : W/2 + Math.cos(ang)*r,
+    y: spawn ? spawn.y : H/2 + Math.sin(ang)*r,
+    vx:0, vy:0, fixed:false, born: performance.now(), flash: 0,
+  };
+}
 
 // Particle field drawn by the masses — "the field is what passes between them".
-const N = Math.floor((W * H) / (14000 * DPR));
-const P = Array.from({ length: N }, () => ({
-  x: Math.random()*W, y: Math.random()*H,
-  vx: (Math.random()-.5)*8, vy: (Math.random()-.5)*8,
-}));
+let P = [];
+function seedParticles() {
+  const N = Math.floor((W * H) / (14000 * DPR));
+  P = Array.from({ length: N }, () => ({
+    x: Math.random()*W, y: Math.random()*H,
+    vx: (Math.random()-.5)*8, vy: (Math.random()-.5)*8,
+  }));
+}
+seedParticles();
 
-const G = 26 * DPR;           // gravitational constant (tuned for screen)
-const SOFT = 40 * DPR;        // softening — no singularity at r→0
+const G = 26 * DPR;            // gravitational constant (tuned for screen)
+const SOFT = 40 * DPR;         // softening — no singularity at r→0
 let drag = null;
+
+// ── Flutter's GravitySimulation, ported verbatim:  x(t)=x0+v0·t+½·a·t² ──
+function gravStep(x, v, a, dt) { return { x: x + v*dt + 0.5*a*dt*dt, v: v + a*dt }; }
 
 function nearestNode(px, py) {
   let best = null, bd = 1e9;
   for (const n of NODES) { const d = (n.x-px)**2 + (n.y-py)**2; if (d < bd) { bd = d; best = n; } }
   return (bd < (46*DPR)**2) ? best : null;
 }
-function pos(e){ const t = e.touches ? e.touches[0] : e; return [t.clientX*DPR, t.clientY*DPR]; }
-cv.addEventListener('pointerdown', e => { const [x,y]=pos(e); const n=nearestNode(x,y); if(n){drag=n; n.fixed=true;} });
-addEventListener('pointermove', e => { if(drag){ const [x,y]=pos(e); drag.x=x; drag.y=y; drag.vx=drag.vy=0; } });
+function posOf(e){ const t = e.touches ? e.touches[0] : e; return [t.clientX*DPR, t.clientY*DPR]; }
+cv.addEventListener('pointerdown', e => { const [x,y]=posOf(e); const n=nearestNode(x,y); if(n){drag=n; n.fixed=true;} });
+addEventListener('pointermove', e => { if(drag){ const [x,y]=posOf(e); drag.x=x; drag.y=y; drag.vx=drag.vy=0; } });
 addEventListener('pointerup', () => { if(drag){ drag.fixed=false; drag=null; } });
+
+// ── Open a channel: derive a point from the typed gremlin. If it coincides with an existing
+//    node's point, that's a HANDSHAKE — a bright bond, no server in between. Else a new star. ──
+const noteEl = document.getElementById('note');
+async function openChannel(phrase, tier) {
+  const name = phrase.trim().toUpperCase();
+  if (!name) return;
+  const gh = await gremlinHash(name.toLowerCase());
+  const point = await derivePoint(gh, '', '');
+  const match = NODES.find(n => distance(n.point, point) < 1e-9);
+  if (match) {
+    match.flash = 1; match.fixed = false;
+    noteEl.textContent = `handshook with ${match.name} — same coordinate, no server saw it.`;
+    return;
+  }
+  const node = await makeNode({ name, tier, m: 4 + (TIERS[tier].agents*0.4) },
+                              { x: W/2 + (Math.random()-.5)*W*0.3, y: H/2 + (Math.random()-.5)*H*0.3 });
+  node.flash = 1;
+  NODES.push(node);
+  noteEl.textContent = `${name} entered through the ${TIERS[tier].label} door — a star is born.`;
+}
+document.getElementById('open').addEventListener('click', () => {
+  const g = document.getElementById('gremlin');
+  openChannel(g.value, document.getElementById('tier').value); g.value = '';
+});
+document.getElementById('gremlin').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('open').click();
+});
+
+// Legend — the three doors.
+document.getElementById('legend').innerHTML = Object.values(TIERS).map(t =>
+  `<div class="row"><span class="dot" style="color:${t.css};background:${t.css}"></span>` +
+  `<b style="color:${t.css}">${t.label}</b> <span class="meta">· ${t.tag}</span></div>`
+).join('');
 
 let last = 0;
 function frame(t) {
   const dt = Math.min((t - last) / 16.67, 2) || 1; last = t;
   ctx.fillStyle = 'rgba(4,7,13,0.30)'; ctx.fillRect(0, 0, W, H);  // trails
 
-  // Connections — gravity is what connects us. Line brightness ∝ mutual pull.
+  // Connections — gravity is what connects us. Brightness ∝ mutual pull; hue blends the two doors.
   for (let i = 0; i < NODES.length; i++) for (let j = i+1; j < NODES.length; j++) {
     const a = NODES[i], b = NODES[j];
     const dx = b.x-a.x, dy = b.y-a.y, r2 = dx*dx+dy*dy+SOFT*SOFT;
     const f = (G * a.m * b.m) / r2;
     const alpha = Math.min(0.5, f * 0.5);
-    ctx.strokeStyle = `hsla(190,90%,65%,${alpha})`;
+    const hue = (a.hue + b.hue) / 2;
+    ctx.strokeStyle = `hsla(${hue},85%,65%,${alpha})`;
     ctx.lineWidth = Math.min(2.2, f*2) * DPR;
     ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
   }
 
-  // Nodes feel each other too (a gentle n-body, kept bounded).
+  // Nodes feel each other (a gentle n-body, bounded by a centering spring).
   for (const n of NODES) {
     if (n.fixed) continue;
     let ax = 0, ay = 0;
@@ -108,10 +217,9 @@ function frame(t) {
       const dx=o.x-n.x, dy=o.y-n.y, r2=dx*dx+dy*dy+(SOFT*4)**2, inv=1/Math.sqrt(r2);
       const f=(G*o.m)/r2; ax+=f*dx*inv; ay+=f*dy*inv;
     }
-    // centering spring so the constellation doesn't fly apart
     ax += (W/2 - n.x)*0.00008; ay += (H/2 - n.y)*0.00008;
     const sx = gravStep(n.x, n.vx, ax, dt), sy = gravStep(n.y, n.vy, ay, dt);
-    n.x=sx.x; n.vx=sy ? sx.v : sx.v; n.y=sy.x; n.vy=sy.v;
+    n.x=sx.x; n.vx=sx.v; n.y=sy.x; n.vy=sy.v;
     n.vx*=0.985; n.vy*=0.985;
   }
 
@@ -132,20 +240,37 @@ function frame(t) {
     ctx.fillRect(p.x, p.y, 1.4*DPR, 1.4*DPR);
   }
 
-  // Masses on top.
+  // Masses on top — glow + core + agent-density ring + label. flash on birth/handshake.
   for (const n of NODES) {
-    const glow = ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.m*5*DPR);
-    glow.addColorStop(0, `hsla(${n.hue},95%,70%,0.9)`);
+    n.flash *= 0.94;
+    const R = n.m*5*DPR, fl = n.flash;
+    const glow = ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,R*(1+fl));
+    glow.addColorStop(0, `hsla(${n.hue},95%,${70+fl*20}%,${0.9})`);
     glow.addColorStop(1, `hsla(${n.hue},95%,70%,0)`);
-    ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(n.x,n.y,n.m*5*DPR,0,7); ctx.fill();
-    ctx.fillStyle = `hsl(${n.hue},95%,82%)`; ctx.beginPath(); ctx.arc(n.x,n.y,n.m*0.7*DPR,0,7); ctx.fill();
+    ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(n.x,n.y,R*(1+fl),0,7); ctx.fill();
+    ctx.fillStyle = `hsl(${n.hue},95%,${82}%)`; ctx.beginPath(); ctx.arc(n.x,n.y,n.m*0.7*DPR,0,7); ctx.fill();
+
+    // agent-density: orbiting satellites — none for free/human, many for paid/agent-dense.
+    for (let k = 0; k < n.agents; k++) {
+      const a = (t/1400) * (n.body?1:1.3) + (k / Math.max(1,n.agents)) * Math.PI*2;
+      const rr = (n.m*0.7 + 6 + k*2.1) * DPR;
+      const sx = n.x + Math.cos(a)*rr, sy = n.y + Math.sin(a)*rr;
+      ctx.fillStyle = `hsla(${n.hue},90%,78%,0.85)`;
+      ctx.beginPath(); ctx.arc(sx, sy, 1.3*DPR, 0, 7); ctx.fill();
+    }
+
     ctx.fillStyle = 'rgba(219,231,243,0.92)';
     ctx.font = `${11*DPR}px -apple-system,sans-serif`; ctx.textAlign='center';
     ctx.fillText(n.name, n.x, n.y - (n.m*5+8)*DPR);
   }
   requestAnimationFrame(frame);
 }
-requestAnimationFrame(frame);
+
+// Boot: derive every seed's weavemind point, then run the sky.
+(async () => {
+  for (const s of SEED) NODES.push(await makeNode(s));
+  requestAnimationFrame(frame);
+})();
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
