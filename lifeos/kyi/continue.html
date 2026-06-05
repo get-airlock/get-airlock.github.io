@@ -10,9 +10,9 @@
 <body>
 
   <div class="page-header">
-    <div class="page-header-eyebrow">KYI · Continue (2 of 3)</div>
-    <h1>Carry forward.</h1>
-    <p class="lead">Two short prompts about what — and who — matters. You choose what LifeOS remembers.</p>
+    <div class="page-header-eyebrow">KYI · Continue (day 2 of 3)</div>
+    <h1>Good to see you again.</h1>
+    <p class="lead">No right answers. A couple of in-the-moment things — only if you want.</p>
     <div class="progress-row">
       <div class="progress-dot done"></div>
       <div class="progress-dot active"></div>
@@ -20,31 +20,17 @@
     </div>
   </div>
 
-  <!-- Prompt 3: universe / rules — relationships, commitments, context (Sisyphus L2.2 #3) -->
-  <div class="prompt">
-    <div class="prompt-question">Who or what should LifeOS remember matters to you — only if you want to share?</div>
-    <textarea class="prompt-input" id="q3" placeholder="People, projects, places, beliefs — only what you choose…"></textarea>
-  </div>
+  <div id="thread" class="kyi-thread"></div>
 
-  <!-- Prompt 4: invariant / commitment — what you want carried (Sisyphus L2.2 #4) -->
-  <div class="prompt">
-    <div class="prompt-question">When we talk again, what would you like me to carry forward?</div>
-    <textarea class="prompt-input" id="q4" placeholder="A tone, a thread, a reminder — your call…"></textarea>
-  </div>
+  <form class="say-row" id="say-form" autocomplete="off">
+    <input class="say-input" id="say-input" type="text" placeholder="say a little…" aria-label="Reply">
+    <button class="say-send" type="submit" aria-label="Send">→</button>
+  </form>
 
-  <div class="btn-row">
-    <button class="btn" id="save-btn">Save & continue</button>
-    <a href="index.html" class="btn btn-soft">Back to KYI</a>
-  </div>
-
-  <div id="companion-response" style="display:none; margin-top:24px;">
-    <div class="companion">
-      <div class="companion-body" id="companion-text"></div>
-      <div class="companion-meta">Memory written · canon page 2 · mock CID generated</div>
-    </div>
+  <div id="done" style="display:none; margin-top:20px;">
     <div class="btn-row">
-      <a href="contribute.html" class="btn">Continue to final session</a>
-      <a href="/lifeos/memory.html" class="btn btn-soft">See what was remembered</a>
+      <a href="contribute.html" class="btn">One more day →</a>
+      <a href="../index.html" class="btn btn-soft">Enter LifeOS</a>
     </div>
   </div>
 
@@ -55,27 +41,63 @@
   <script src="../js/companion.js"></script>
   <script src="../js/nav.js"></script>
   <script>
-    // Guard: redirect back if Arrive not completed
-    if (!LifeOSMemory.load().progress.arrive_complete) {
-      window.location.href = 'arrive.html';
+    // ── KYI · Continue — Day 2 (relationships / reflection). Point, don't rank. ──
+    if (!LifeOSMemory.load().progress.arrive_complete) { window.location.href = 'arrive.html'; }
+    const thread = document.getElementById('thread');
+    const form = document.getElementById('say-form');
+    const input = document.getElementById('say-input');
+    const name = localStorage.getItem('lifeos.name') || '';
+
+    function bubble(text, who) {
+      const el = document.createElement('div');
+      el.className = who === 'me' ? 'kyi-msg kyi-me' : 'companion';
+      el.innerHTML = who === 'me' ? `<div class="kyi-me-body">${text}</div>` : `<div class="companion-body">${text}</div>`;
+      thread.appendChild(el);
+      el.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
-    document.getElementById('save-btn').addEventListener('click', () => {
-      const a3 = document.getElementById('q3').value.trim();
-      const a4 = document.getElementById('q4').value.trim();
+
+    // In-the-moment, concrete, escapable — not "who matters to you" (an absolute a kid can't answer).
+    const beats = [
+      { key: 'smile', ask: () => `Hey${name ? ', ' + name : ''} — welcome back. Who made you smile today?` },
+      { key: 'carry', ask: () => "Love that. Anything you want me to remember for next time? Totally okay to say 'nah' — no pressure." },
+    ];
+    const answers = {};
+    let step = 0;
+    function askCurrent() { bubble(beats[step].ask(), 'companion'); }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = input.value.trim();
+      if (!v) return;
+      bubble(v, 'me'); input.value = '';
+      answers[beats[step].key] = v;
+      step += 1;
+      if (step < beats.length) {
+        const ack = (window.LifeOSCompanion && LifeOSCompanion.autonomousReply) ? LifeOSCompanion.autonomousReply(v) : '';
+        setTimeout(() => { if (ack) bubble(ack, 'companion'); askCurrent(); }, 450);
+      } else { finish(); }
+    });
+
+    function finish() {
       LifeOSMemory.addCanonPage({
         session: 'continue',
         prompts_and_answers: [
-          { dimension: 'universe',  question: 'Who or what should LifeOS remember matters to you?', answer: a3 || '(skipped)' },
-          { dimension: 'invariant', question: 'When we talk again, what would you like me to carry forward?', answer: a4 || '(skipped)' }
-        ]
+          { dimension: 'relationships', question: 'Who made you smile today?', answer: answers.smile || '(skipped)' },
+          { dimension: 'carry-forward', question: 'Anything to remember for next time?', answer: answers.carry || '(skipped)' },
+        ],
       });
-      document.getElementById('companion-text').textContent = LifeOSCompanion.respondAfterKYI('continue');
-      document.getElementById('companion-response').style.display = 'block';
-      document.getElementById('save-btn').textContent = 'Saved · onward';
-      document.getElementById('save-btn').disabled = true;
-      const nav = document.querySelector('.bottom-nav'); if (nav) nav.remove();
-      LifeOSNav.render('kyi');
-    });
+      const close = (window.LifeOSCompanion && LifeOSCompanion.respondAfterKYI)
+        ? LifeOSCompanion.respondAfterKYI('continue') : "I'll hold onto that. See you tomorrow.";
+      setTimeout(() => {
+        bubble(close, 'companion');
+        form.style.display = 'none';
+        document.getElementById('done').style.display = 'block';
+        const nav = document.querySelector('.bottom-nav'); if (nav) nav.remove();
+        LifeOSNav.render('kyi');
+      }, 500);
+    }
+
+    askCurrent();
     LifeOSNav.render('kyi');
   </script>
 </body>
