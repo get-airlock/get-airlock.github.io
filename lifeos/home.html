@@ -286,44 +286,69 @@
       setState('idle'); busy = false;
     }
 
-    // iOS-reliable voice: record with MediaRecorder → server STT (not the flaky Web Speech API).
+    // ── Continuous hands-free voice: tap once to start, then just talk. No tap-per-turn. ──
+    // (iOS needs ONE gesture to grant the mic + unlock audio; after that it's seamless.)
     function blobToBase64(blob){ return new Promise(r => { const fr = new FileReader(); fr.onloadend = () => r((''+fr.result).split(',')[1] || ''); fr.readAsDataURL(blob); }); }
-    async function startRecording(){
+    let micStream=null, audioCtx=null, analyser=null, vadOn=false, segRec=null, segChunks=[], speechOn=false, silenceAt=0;
+    const SILENCE_MS=1100, SPEECH_ON=0.022, SPEECH_OFF=0.013, MIN_MS=350;
+    const _sup = (t)=> window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t);
+    const MIME = _sup('audio/mp4') ? 'audio/mp4' : _sup('audio/webm') ? 'audio/webm' : '';
+
+    function rms(){ const buf=new Uint8Array(analyser.fftSize); analyser.getByteTimeDomainData(buf); let s=0; for(let i=0;i<buf.length;i++){ const x=(buf[i]-128)/128; s+=x*x; } return Math.sqrt(s/buf.length); }
+    function startSeg(){
+      segChunks=[]; segRec = MIME ? new MediaRecorder(micStream,{mimeType:MIME}) : new MediaRecorder(micStream);
+      segRec._t0 = performance.now();
+      segRec.ondataavailable = e => { if(e.data && e.data.size>0) segChunks.push(e.data); };
+      segRec.onstop = async () => {
+        if(performance.now() - segRec._t0 < MIN_MS) { if(vadOn) setState('listening'); return; }
+        setState('thinking');
+        try {
+          const blob = new Blob(segChunks, { type: segRec.mimeType || 'audio/webm' });
+          const b64 = await blobToBase64(blob);
+          const r = await fetch(SHUTTLE + '/api/stt', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ audio: b64, mime: blob.type }) });
+          const d = await r.json();
+          if(d && d.text){ await converse(d.text); }   // converse holds busy=true through brain + TTS
+        } catch(_){}
+        if(vadOn){ setState('listening'); statusText.textContent='Listening… just talk'; }
+      };
+      segRec.start();
+    }
+    function vadLoop(){
+      if(!vadOn) return;
+      requestAnimationFrame(vadLoop);
+      if(busy) return;                                  // paused while Carrie thinks/speaks (no self-capture)
+      const lvl = rms();
+      if(!speechOn){
+        if(lvl > SPEECH_ON){ speechOn=true; silenceAt=0; startSeg(); }
+      } else {
+        if(lvl > SPEECH_OFF){ silenceAt=0; }
+        else if(!silenceAt){ silenceAt=performance.now(); }
+        else if(performance.now()-silenceAt > SILENCE_MS){ speechOn=false; silenceAt=0; try{ if(segRec && segRec.state!=='inactive') segRec.stop(); }catch(_){} }
+      }
+    }
+    async function startSession(){
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        audioChunks = [];
-        const pick = (t) => window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t);
-        const mime = pick('audio/mp4') ? 'audio/mp4' : pick('audio/webm') ? 'audio/webm' : '';
-        mediaRecorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
-        mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) audioChunks.push(e.data); };
-        mediaRecorder.onstop = async () => {
-          stream.getTracks().forEach(t => t.stop());
-          recording = false;
-          setState('thinking');
-          try {
-            const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
-            const b64 = await blobToBase64(blob);
-            const r = await fetch(SHUTTLE + '/api/stt', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ audio: b64, mime: blob.type }) });
-            const d = await r.json();
-            if (d && d.text) { converse(d.text); }
-            else { setState('idle'); statusText.textContent = "I didn't catch that — tap and try again"; }
-          } catch(_) { setState('idle'); statusText.textContent = 'Voice hiccup — tap to try again, or type below'; }
-        };
-        mediaRecorder.start();
-        recording = true;
-        setState('listening');
-        statusText.textContent = 'Listening… tap the orb when you’re done';
+        micStream = await navigator.mediaDevices.getUserMedia({ audio:true });
+        audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+        if(audioCtx.state==='suspended') await audioCtx.resume();
+        const src = audioCtx.createMediaStreamSource(micStream);
+        analyser = audioCtx.createAnalyser(); analyser.fftSize=512; src.connect(analyser);
+        vadOn=true; speechOn=false; silenceAt=0;
+        setState('listening'); statusText.textContent='Listening… just talk';
+        vadLoop();
       } catch(e) {
-        setState('idle');
-        statusText.textContent = 'Allow the mic to talk — or type below';
+        setState('idle'); statusText.textContent='Allow the mic, then just talk — or type below';
         document.getElementById('say-input').focus();
       }
     }
-    tap.addEventListener('click', () => {
-      if (busy) return;
-      if (recording) { try { mediaRecorder.stop(); } catch(_) { recording = false; setState('idle'); } return; }
-      startRecording();
-    });
+    function stopSession(){
+      vadOn=false; speechOn=false;
+      try{ if(segRec && segRec.state!=='inactive') segRec.stop(); }catch(_){}
+      try{ if(micStream) micStream.getTracks().forEach(t=>t.stop()); }catch(_){}
+      try{ if(audioCtx) audioCtx.close(); }catch(_){}
+      setState('idle'); statusText.textContent='Tap the orb to talk';
+    }
+    tap.addEventListener('click', () => { if(vadOn) stopSession(); else startSession(); });
     document.getElementById('say-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const input = document.getElementById('say-input');
