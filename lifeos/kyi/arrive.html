@@ -26,10 +26,10 @@
     <input class="prompt-input" id="name" type="text" placeholder="Your name…" autocomplete="given-name" />
   </div>
 
-  <!-- Prompt 1: persona / identity layer (Sisyphus L2.2 #1) -->
+  <!-- Prompt 1: the music seed (Zac + Sven) — low-friction imprint. A song carries tempo→energy, genre→identity, lyrics→values. Kid-answerable. -->
   <div class="prompt">
-    <div class="prompt-question">What would make this space feel safe and useful for you today?</div>
-    <textarea class="prompt-input" id="q1" placeholder="In your own words, no wrong answer…"></textarea>
+    <div class="prompt-question">What song are you into right now? 🎵</div>
+    <textarea class="prompt-input" id="q1" placeholder="Artist + track, or just the vibe…"></textarea>
   </div>
 
   <!-- Prompt 2: body / present state layer (Sisyphus L2.2 #2) -->
@@ -72,7 +72,7 @@
       LifeOSMemory.addCanonPage({
         session: 'arrive',
         prompts_and_answers: [
-          { dimension: 'persona', question: 'What would make this space feel safe and useful for you today?', answer: a1 || '(skipped)' },
+          { dimension: 'music', question: 'What song are you into right now?', answer: a1 || '(skipped)' },
           { dimension: 'body',    question: 'What kind of support would feel good right now?',                answer: a2 || '(skipped)' }
         ]
       });
