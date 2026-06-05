@@ -1,5 +1,5 @@
 // GRAVITY PWA — network-first for HTML, cache-first for static assets.
-const CACHE = 'gravity-v0.2.0';
+const CACHE = 'gravity-v0.3.0';
 const ASSETS = ['./index.html', './manifest.webmanifest', './icon.svg', './weavemind.js'];
 
 self.addEventListener('install', e => {
