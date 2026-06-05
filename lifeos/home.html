@@ -283,6 +283,10 @@
       const rep = await brain(userText);
       replyBody.textContent = rep; showEl(reply);
       await speak(rep);
+      // iOS suspends the capture context while the TTS <audio> plays — wake it back up
+      // so the analyser hears the next turn instead of reading flatline forever.
+      try { if(audioCtx && audioCtx.state!=='running') await audioCtx.resume(); } catch(_){}
+      speechOn=false; silenceAt=0;
       setState('idle'); busy = false;
     }
 
@@ -317,6 +321,8 @@
       if(!vadOn) return;
       requestAnimationFrame(vadLoop);
       if(busy) return;                                  // paused while Carrie thinks/speaks (no self-capture)
+      // If iOS parked the context (after playback, screen, or interruption), revive it and skip this frame.
+      if(audioCtx && audioCtx.state!=='running'){ audioCtx.resume().catch(()=>{}); return; }
       const lvl = rms();
       if(!speechOn){
         if(lvl > SPEECH_ON){ speechOn=true; silenceAt=0; startSeg(); }
