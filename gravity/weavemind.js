@@ -22,11 +22,15 @@ async function sha256(bytes) { return new Uint8Array(await _crypto.subtle.digest
 
 // Deterministic coordinate in the 10D handshake space. Both devices, same inputs,
 // same point. Hash → 10 floats in [-1, 1] via counter-expansion.
-export async function derivePoint(gremlinHash, nonce) {
+//
+// Bound to gremlin + nonce + CHANNEL/context (Sven's refinement): the same two
+// nodes meet at a DIFFERENT star per channel, so otto::axioms and mem::noah never
+// collide even on one shared gremlin + nonce.
+export async function derivePoint(gremlinHash, nonce, channel = '') {
   const out = new Float64Array(DIM);
   let need = DIM, counter = 0, idx = 0;
   while (need > 0) {
-    const h = await sha256(enc(`${gremlinHash}:${nonce}:${counter++}`));
+    const h = await sha256(enc(`${gremlinHash}:${nonce}:${channel}:${counter++}`));
     for (let b = 0; b + 4 <= h.length && need > 0; b += 4, need--) {
       const u = ((h[b] << 24) | (h[b + 1] << 16) | (h[b + 2] << 8) | h[b + 3]) >>> 0;
       out[idx++] = (u / 0xffffffff) * 2 - 1;

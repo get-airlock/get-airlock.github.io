@@ -37,3 +37,11 @@ vessel.release();
 assert.strictEqual(vessel.isEmpty, true, 'link drops → vessel empty again');
 
 console.log('weavemind: 6/6 passed — empty vessel, deterministic 10D point, on-device collapse');
+
+// 7. Sven's refinement: same gremlin+nonce on DIFFERENT channels → different stars
+const onAxioms = await derivePoint(G, 'nonce-1', 'otto::axioms');
+const onMem    = await derivePoint(G, 'nonce-1', 'mem::noah');
+assert.ok(distance(onAxioms, onMem) > 0.01, 'different channel must move the star');
+const onAxioms2 = await derivePoint(G, 'nonce-1', 'otto::axioms');
+assert.strictEqual(distance(onAxioms, onAxioms2), 0, 'same channel still deterministic');
+console.log('weavemind: channel-binding holds (7th check) — otto::axioms ≠ mem::noah');
