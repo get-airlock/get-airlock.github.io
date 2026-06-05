@@ -249,9 +249,8 @@
     const _local = /^(localhost|127\.|192\.168\.)/.test(location.hostname);
     const RELAY = (window.LIFEOS_RELAY || (_local ? 'http://127.0.0.1:8200' : '')).replace(/\/$/, '');
     const SHUTTLE = 'https://lifeos-shuttle.vercel.app';
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     const history = [];
-    let busy = false, assist = false, audio = null;
+    let busy = false, assist = false, audio = null, mediaRecorder = null, audioChunks = [], recording = false;
     const HELP_RE = /\b(help|plan|find|organi[sz]e|schedule|study|tutor|homework|remind|fix|figure|decide|build|make|write|draft)\b/i;
 
     function speak(text){ return new Promise((res) => {
@@ -287,15 +286,43 @@
       setState('idle'); busy = false;
     }
 
+    // iOS-reliable voice: record with MediaRecorder → server STT (not the flaky Web Speech API).
+    function blobToBase64(blob){ return new Promise(r => { const fr = new FileReader(); fr.onloadend = () => r((''+fr.result).split(',')[1] || ''); fr.readAsDataURL(blob); }); }
+    async function startRecording(){
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioChunks = [];
+        const pick = (t) => window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t);
+        const mime = pick('audio/mp4') ? 'audio/mp4' : pick('audio/webm') ? 'audio/webm' : '';
+        mediaRecorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) audioChunks.push(e.data); };
+        mediaRecorder.onstop = async () => {
+          stream.getTracks().forEach(t => t.stop());
+          recording = false;
+          setState('thinking');
+          try {
+            const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+            const b64 = await blobToBase64(blob);
+            const r = await fetch(SHUTTLE + '/api/stt', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ audio: b64, mime: blob.type }) });
+            const d = await r.json();
+            if (d && d.text) { converse(d.text); }
+            else { setState('idle'); statusText.textContent = "I didn't catch that — tap and try again"; }
+          } catch(_) { setState('idle'); statusText.textContent = 'Voice hiccup — tap to try again, or type below'; }
+        };
+        mediaRecorder.start();
+        recording = true;
+        setState('listening');
+        statusText.textContent = 'Listening… tap the orb when you’re done';
+      } catch(e) {
+        setState('idle');
+        statusText.textContent = 'Allow the mic to talk — or type below';
+        document.getElementById('say-input').focus();
+      }
+    }
     tap.addEventListener('click', () => {
-      if(busy) return;
-      if(SR){
-        const rec = new SR(); rec.lang = 'en-US'; rec.interimResults = false; setState('listening');
-        rec.onresult = (e) => converse(e.results[0][0].transcript);
-        rec.onerror = () => setState('idle');
-        rec.onend = () => { if(stage.classList.contains('listening')) setState('idle'); };
-        try { rec.start(); } catch(_){ setState('idle'); }
-      } else { statusText.textContent = 'Type to talk — voice needs Safari or Chrome'; document.getElementById('say-input').focus(); }
+      if (busy) return;
+      if (recording) { try { mediaRecorder.stop(); } catch(_) { recording = false; setState('idle'); } return; }
+      startRecording();
     });
     document.getElementById('say-form').addEventListener('submit', (e) => {
       e.preventDefault();
