@@ -3,109 +3,142 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#9ed1c6">
-  <link rel="stylesheet" href="../css/lifeos.css">
+  <meta name="theme-color" content="#eef4f1">
   <title>Arrive · LifeOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Hanken Grotesk', -apple-system, sans-serif; color: #1c2b27;
+           background: #eef4f1; min-height: 100dvh; display: flex; justify-content: center;
+           -webkit-font-smoothing: antialiased; }
+    /* Aurora — soft glow like the boop's */
+    .aurora { position: fixed; inset: 0; z-index: -2; overflow: hidden; }
+    .aurora .blob { position: absolute; border-radius: 50%; filter: blur(72px); opacity: .55; }
+    .b1 { width: 48vw; height: 48vw; left: -10vw; top: -12vw; background: #bfe3d6; }
+    .b2 { width: 42vw; height: 42vw; right: -8vw; top: 4vh; background: #ddd6f2; }
+    .b3 { width: 44vw; height: 44vw; left: 16vw; bottom: -18vw; background: #f4ded1; }
+    .b4 { width: 32vw; height: 32vw; right: 8vw; bottom: -4vh; background: #cfe7f2; }
+
+    .wrap { width: 100%; max-width: 620px; min-height: 100dvh; display: flex; flex-direction: column;
+            padding: 40px 22px calc(24px + env(safe-area-inset-bottom)); }
+    .head { margin-bottom: 18px; }
+    .crumb { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .avatar { width: 26px; height: 26px; border-radius: 50%;
+              background: linear-gradient(140deg, #8fd3c2, #b9a8e6); flex: 0 0 auto; }
+    .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+               color: #3f8c7a; }
+    .dots { display: flex; gap: 7px; margin-left: auto; }
+    .dot { width: 22px; height: 5px; border-radius: 99px; background: #cdded7; }
+    .dot.on { background: #3f8c7a; }
+    h1 { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: clamp(44px, 9vw, 68px);
+         line-height: 1.02; letter-spacing: -.01em; margin: 6px 0 10px; }
+    .lead { color: #5d6f69; font-size: 16px; line-height: 1.5; max-width: 30ch; }
+
+    .thread { flex: 1; display: flex; flex-direction: column; gap: 12px; margin: 22px 0; }
+    .row { display: flex; }
+    .row.me { justify-content: flex-end; }
+    .bubble { max-width: 82%; padding: 13px 17px; font-size: 16px; line-height: 1.45;
+              border-radius: 20px; animation: rise .42s cubic-bezier(.2,.7,.2,1); }
+    .row.bot .bubble { background: rgba(255,255,255,.78); backdrop-filter: blur(8px);
+              border: 1px solid rgba(255,255,255,.7); border-bottom-left-radius: 6px;
+              box-shadow: 0 8px 26px rgba(60,90,80,.10); }
+    .row.me .bubble { background: linear-gradient(140deg, #4bb39c, #3f8c7a); color: #fff;
+              border-bottom-right-radius: 6px; box-shadow: 0 8px 22px rgba(63,140,122,.28); }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    form { position: sticky; bottom: 0; display: flex; align-items: center; gap: 8px;
+           background: #fff; border-radius: 99px; padding: 7px 7px 7px 20px;
+           box-shadow: 0 10px 30px rgba(50,80,70,.14); }
+    input { flex: 1; border: 0; outline: 0; background: transparent; font: inherit; font-size: 16px;
+            color: #1c2b27; }
+    input::placeholder { color: #9aaaa4; }
+    .send { width: 44px; height: 44px; flex: 0 0 auto; border: 0; border-radius: 50%; cursor: pointer;
+            background: linear-gradient(140deg, #4bb39c, #3f8c7a); color: #fff; font-size: 20px;
+            display: grid; place-items: center; transition: transform .12s; }
+    .send:active { transform: scale(.92); }
+  </style>
 </head>
 <body>
+  <div class="aurora" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
 
-  <div class="page-header">
-    <div class="page-header-eyebrow">Getting to know you · 3 quick things</div>
-    <h1>Just arrive.</h1>
-    <p class="lead">No forms, no test. We'll talk for a minute. You're a person I'm getting to know — not a profile.</p>
-    <div class="progress-row">
-      <div class="progress-dot active"></div>
-      <div class="progress-dot"></div>
-      <div class="progress-dot"></div>
+  <div class="wrap">
+    <div class="head">
+      <div class="crumb">
+        <div class="avatar"></div>
+        <div class="eyebrow">KYI · Arrive</div>
+        <div class="dots"><span class="dot on" id="d0"></span><span class="dot" id="d1"></span><span class="dot" id="d2"></span></div>
+      </div>
+      <h1>Just arrive.</h1>
+      <p class="lead">No forms, no test. We’ll just talk — you’re a person I’m getting to know, not a profile.</p>
     </div>
+
+    <div id="thread" class="thread"></div>
+
+    <form id="say-form" autocomplete="off">
+      <input id="say-input" type="text" placeholder="Your name…" aria-label="Reply" autofocus>
+      <button class="send" type="submit" aria-label="Send">→</button>
+    </form>
   </div>
-
-  <!-- The conversation thread — companion-led, one thing at a time. NOT a wizard. -->
-  <div id="thread" class="kyi-thread"></div>
-
-  <!-- Single conversational input (replaces the labeled form fields) -->
-  <form class="say-row" id="say-form" autocomplete="off">
-    <input class="say-input" id="say-input" type="text" placeholder="say a little…" aria-label="Reply">
-    <button class="say-send" type="submit" aria-label="Send">→</button>
-  </form>
-
-  <!-- Close card appears when the three gentle moments are done -->
-  <div id="done" style="display:none; margin-top:20px;">
-    <div class="btn-row">
-      <a href="../index.html" class="btn">Enter LifeOS →</a>
-      <a href="index.html" class="btn btn-soft">Back to KYI</a>
-    </div>
-  </div>
-
-  <div id="bottom-nav"></div>
 
   <script src="../js/memory.js"></script>
   <script src="../js/imprint.js"></script>
   <script src="../js/companion.js"></script>
-  <script src="../js/nav.js"></script>
   <script>
-    // ── KYI · Arrive — Day 1 (perception). A conversation, not a form. ──
-    // Per Rika's spec: calm, relational, continuity-oriented, alive. Identity is
-    // NEVER derived from answers — we just observe continuity and remember it.
+    // ── KYI · Arrive — 3-question chat onboarding. No skip. Then the app opens. ──
     const thread = document.getElementById('thread');
     const form = document.getElementById('say-form');
     const input = document.getElementById('say-input');
 
     function bubble(text, who) {
-      const el = document.createElement('div');
-      el.className = who === 'me' ? 'kyi-msg kyi-me' : 'companion';
-      el.innerHTML = who === 'me'
-        ? `<div class="kyi-me-body">${text}</div>`
-        : `<div class="companion-body">${text}</div>`;
-      thread.appendChild(el);
-      el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      const row = document.createElement('div');
+      row.className = 'row ' + (who === 'me' ? 'me' : 'bot');
+      row.innerHTML = `<div class="bubble">${text}</div>`;
+      thread.appendChild(row);
+      row.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
+    function setDots(i) { [0,1,2].forEach((n) => { const d = document.getElementById('d'+n); if (d) d.classList.toggle('on', n <= i); }); }
 
-    // Three gentle moments — one at a time, each a low-energy/high-signal operator
-    // on the nerve.name field: name anchors, birthday = the whole-chart authentic-self
-    // read, favorite-song reads arousal/aesthetic. No skip — every one is answered.
     const beats = [
-      { key: 'name',     nerve: 'call.name',          dim: 'identity-anchor',
-        ask: () => "Hey — you made it. No forms, no test, we'll just talk. What should I call you?" },
-      { key: 'birthday', nerve: 'birthday.chart',     dim: 'authentic-self',
-        ask: (n) => `Good to meet you${n ? ', ' + n : ''}. When's your birthday? I want to make sure I can wish you a happy one. 🎂` },
-      { key: 'music',    nerve: 'favorite-song.now',  dim: 'arousal · aesthetic',
-        ask: () => "Love it. Last one — what song are you into right now? Even just the vibe is enough. 🎵" },
+      { key: 'name',     ask: () => "Hey — you made it. No forms, no test, we’ll just talk. What should I call you?",
+        placeholder: 'Your name…' },
+      { key: 'birthday', ask: (n) => `Good to meet you${n ? ', ' + n : ''}. When’s your birthday? I want to make sure I can wish you a happy one. 🎂`,
+        placeholder: 'e.g. March 3…' },
+      { key: 'music',    ask: () => "Love it. Last one — what song are you into right now? Even just the vibe is enough. 🎵",
+        placeholder: 'A song, or the vibe…' },
     ];
     const answers = {};
     let step = 0;
 
     function askCurrent() {
-      bubble(beats[step].ask(answers.name), 'companion');
+      bubble(beats[step].ask(answers.name), 'bot');
+      input.placeholder = beats[step].placeholder;
+      setDots(step);
     }
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const v = input.value.trim();
-      if (!v) return;
+      if (!v) return;                 // no skip — every question is answered
       bubble(v, 'me');
       input.value = '';
       answers[beats[step].key] = v;
-      if (beats[step].key === 'name') localStorage.setItem('lifeos.name', v);       // greeting only
-      if (beats[step].key === 'birthday') localStorage.setItem('lifeos.birthday', v); // chart seed + birthday wish
+      if (beats[step].key === 'name') localStorage.setItem('lifeos.name', v);
+      if (beats[step].key === 'birthday') localStorage.setItem('lifeos.birthday', v);
       step += 1;
 
       if (step < beats.length) {
-        // A warm, alive, zero-LLM acknowledgement (free tier) — then the next moment.
-        const ack = (window.LifeOSCompanion && LifeOSCompanion.autonomousReply)
-          ? LifeOSCompanion.autonomousReply(v) : '';
-        setTimeout(() => { if (ack) bubble(ack, 'companion'); askCurrent(); }, 450);
+        const ack = (window.LifeOSCompanion && LifeOSCompanion.autonomousReply) ? LifeOSCompanion.autonomousReply(v) : '';
+        setTimeout(() => { if (ack) bubble(ack, 'bot'); askCurrent(); }, 450);
       } else {
         finish();
       }
     });
 
     function finish() {
-      // One last warm bop on their favorite, then store + open the app.
-      const ack = (window.LifeOSCompanion && LifeOSCompanion.autonomousReply)
-        ? LifeOSCompanion.autonomousReply(answers.music || '') : '';
-      // Store as CONTINUITY observations — not a derived profile. addCanonPage
-      // also flips progress.arrive_complete.
+      setDots(2);
+      const ack = (window.LifeOSCompanion && LifeOSCompanion.autonomousReply) ? LifeOSCompanion.autonomousReply(answers.music || '') : '';
       LifeOSMemory.addCanonPage({
         session: 'arrive',
         prompts_and_answers: [
@@ -113,19 +146,17 @@
           { dimension: 'music', question: 'What song are you into right now?', answer: answers.music },
         ],
       });
-      localStorage.setItem('lifeos.onboarded', '1'); // releases the first-run gate
+      localStorage.setItem('lifeos.onboarded', '1');
       form.style.display = 'none';
       setTimeout(() => {
-        if (ack) bubble(ack, 'companion');
-        bubble("That's all I needed. Opening LifeOS — welcome. 🌿", 'companion');
-        // The rest of the app opens up.
+        if (ack) bubble(ack, 'bot');
+        bubble("That’s all I needed. Opening LifeOS — welcome. 🌿", 'bot');
         setTimeout(() => { window.location.href = '../index.html'; }, 1400);
       }, 450);
     }
 
-    // Open the conversation.
     askCurrent();
-    LifeOSNav.render('kyi');
+    input.focus();
   </script>
 </body>
 </html>
