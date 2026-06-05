@@ -1,0 +1,14 @@
+{
+  "name": "GRAVITY — gravity connecting us",
+  "short_name": "GRAVITY",
+  "description": "The universe is just gravity connecting us. A live gravity field over the federation, porting Flutter's GravitySimulation.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#04070d",
+  "theme_color": "#04070d",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

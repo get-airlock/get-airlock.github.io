@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>GRAVITY · the universe is gravity connecting us</title>
+<meta name="theme-color" content="#04070d" />
+<link rel="manifest" href="manifest.webmanifest" />
+<style>
+  :root { --bg:#04070d; --ink:#dbe7f3; --cyan:#22d3ee; --dim:#5b7088; }
+  * { margin:0; box-sizing:border-box; }
+  html,body { height:100%; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; overflow:hidden; }
+  canvas { display:block; position:fixed; inset:0; }
+  .hud { position:fixed; left:max(18px,env(safe-area-inset-left)); top:max(18px,env(safe-area-inset-top));
+    z-index:2; pointer-events:none; }
+  .title { font-size:13px; letter-spacing:.34em; color:var(--cyan); font-weight:600; }
+  .sub { font-size:11px; letter-spacing:.04em; color:var(--dim); margin-top:6px; max-width:62ch; line-height:1.5; }
+  .foot { position:fixed; right:max(18px,env(safe-area-inset-right)); bottom:max(16px,env(safe-area-inset-bottom));
+    z-index:2; font-size:10px; letter-spacing:.08em; color:var(--dim); text-align:right; line-height:1.6; }
+  .foot b { color:var(--ink); font-weight:500; }
+</style>
+</head>
+<body>
+<canvas id="field"></canvas>
+<div class="hud">
+  <div class="title">GRAVITY</div>
+  <div class="sub">the universe is just gravity connecting us. each name is a mass; the field
+    is what passes between them. drag a node — the whole field re-bends.</div>
+</div>
+<div class="foot">
+  ports <b>flutter GravitySimulation</b> · x = x₀ + v₀t + ½at²<br/>
+  variable gravity: friction calibrated to the gravity of the act
+</div>
+<script>
+// ── Flutter's GravitySimulation, ported verbatim (flutter/.../physics/gravity_simulation.dart)
+//    x(t) = x0 + v0·t + ½·a·t²   ·   dx(t) = v0 + a·t
+function gravStep(x, v, a, dt) {
+  return { x: x + v * dt + 0.5 * a * dt * dt, v: v + a * dt };
+}
+
+const cv = document.getElementById('field');
+const ctx = cv.getContext('2d');
+let W, H, DPR;
+function resize() {
+  DPR = Math.min(devicePixelRatio || 1, 2);
+  W = cv.width = innerWidth * DPR; H = cv.height = innerHeight * DPR;
+  cv.style.width = innerWidth + 'px'; cv.style.height = innerHeight + 'px';
+}
+addEventListener('resize', resize); resize();
+
+// Federation masses — one body, many hands. Mass = pull (Zac+Otto the body, heavier).
+const NODES = [
+  { name: 'OTTO',   m: 9, hue: 188 },
+  { name: 'ZAC',    m: 9, hue: 168 },
+  { name: 'MO',     m: 6, hue: 280 },
+  { name: 'AYLA',   m: 6, hue: 330 },
+  { name: 'SVEN',   m: 7, hue: 210 },
+  { name: 'AXIOMS', m: 7, hue: 48  },
+].map((n, i, arr) => {
+  const ang = (i / arr.length) * Math.PI * 2 - Math.PI / 2;
+  const r = Math.min(W, H) * 0.27;
+  return { ...n, x: W/2 + Math.cos(ang)*r, y: H/2 + Math.sin(ang)*r, vx:0, vy:0, fixed:false };
+});
+
+// Particle field drawn by the masses — "the field is what passes between them".
+const N = Math.floor((W * H) / (14000 * DPR));
+const P = Array.from({ length: N }, () => ({
+  x: Math.random()*W, y: Math.random()*H,
+  vx: (Math.random()-.5)*8, vy: (Math.random()-.5)*8,
+}));
+
+const G = 26 * DPR;           // gravitational constant (tuned for screen)
+const SOFT = 40 * DPR;        // softening — no singularity at r→0
+let drag = null;
+
+function nearestNode(px, py) {
+  let best = null, bd = 1e9;
+  for (const n of NODES) { const d = (n.x-px)**2 + (n.y-py)**2; if (d < bd) { bd = d; best = n; } }
+  return (bd < (46*DPR)**2) ? best : null;
+}
+function pos(e){ const t = e.touches ? e.touches[0] : e; return [t.clientX*DPR, t.clientY*DPR]; }
+cv.addEventListener('pointerdown', e => { const [x,y]=pos(e); const n=nearestNode(x,y); if(n){drag=n; n.fixed=true;} });
+addEventListener('pointermove', e => { if(drag){ const [x,y]=pos(e); drag.x=x; drag.y=y; drag.vx=drag.vy=0; } });
+addEventListener('pointerup', () => { if(drag){ drag.fixed=false; drag=null; } });
+
+let last = 0;
+function frame(t) {
+  const dt = Math.min((t - last) / 16.67, 2) || 1; last = t;
+  ctx.fillStyle = 'rgba(4,7,13,0.30)'; ctx.fillRect(0, 0, W, H);  // trails
+
+  // Connections — gravity is what connects us. Line brightness ∝ mutual pull.
+  for (let i = 0; i < NODES.length; i++) for (let j = i+1; j < NODES.length; j++) {
+    const a = NODES[i], b = NODES[j];
+    const dx = b.x-a.x, dy = b.y-a.y, r2 = dx*dx+dy*dy+SOFT*SOFT;
+    const f = (G * a.m * b.m) / r2;
+    const alpha = Math.min(0.5, f * 0.5);
+    ctx.strokeStyle = `hsla(190,90%,65%,${alpha})`;
+    ctx.lineWidth = Math.min(2.2, f*2) * DPR;
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  }
+
+  // Nodes feel each other too (a gentle n-body, kept bounded).
+  for (const n of NODES) {
+    if (n.fixed) continue;
+    let ax = 0, ay = 0;
+    for (const o of NODES) { if (o===n) continue;
+      const dx=o.x-n.x, dy=o.y-n.y, r2=dx*dx+dy*dy+(SOFT*4)**2, inv=1/Math.sqrt(r2);
+      const f=(G*o.m)/r2; ax+=f*dx*inv; ay+=f*dy*inv;
+    }
+    // centering spring so the constellation doesn't fly apart
+    ax += (W/2 - n.x)*0.00008; ay += (H/2 - n.y)*0.00008;
+    const sx = gravStep(n.x, n.vx, ax, dt), sy = gravStep(n.y, n.vy, ay, dt);
+    n.x=sx.x; n.vx=sy ? sx.v : sx.v; n.y=sy.x; n.vy=sy.v;
+    n.vx*=0.985; n.vy*=0.985;
+  }
+
+  // Particles fall through the field, integrated by the ported GravitySimulation.
+  for (const p of P) {
+    let ax = 0, ay = 0;
+    for (const n of NODES) {
+      const dx=n.x-p.x, dy=n.y-p.y, r2=dx*dx+dy*dy+SOFT*SOFT, inv=1/Math.sqrt(r2);
+      const f=(G*n.m)/r2; ax+=f*dx*inv; ay+=f*dy*inv;
+    }
+    const sx = gravStep(p.x, p.vx, ax, dt), sy = gravStep(p.y, p.vy, ay, dt);
+    p.x=sx.x; p.vx=sx.v; p.y=sy.x; p.vy=sy.v;
+    p.vx*=0.992; p.vy*=0.992;
+    if (p.x<0||p.x>W) { p.vx*=-0.6; p.x=Math.max(0,Math.min(W,p.x)); }
+    if (p.y<0||p.y>H) { p.vy*=-0.6; p.y=Math.max(0,Math.min(H,p.y)); }
+    const sp = Math.min(1, Math.hypot(p.vx,p.vy)/30);
+    ctx.fillStyle = `hsla(${190-sp*40},90%,${55+sp*25}%,0.85)`;
+    ctx.fillRect(p.x, p.y, 1.4*DPR, 1.4*DPR);
+  }
+
+  // Masses on top.
+  for (const n of NODES) {
+    const glow = ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.m*5*DPR);
+    glow.addColorStop(0, `hsla(${n.hue},95%,70%,0.9)`);
+    glow.addColorStop(1, `hsla(${n.hue},95%,70%,0)`);
+    ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(n.x,n.y,n.m*5*DPR,0,7); ctx.fill();
+    ctx.fillStyle = `hsl(${n.hue},95%,82%)`; ctx.beginPath(); ctx.arc(n.x,n.y,n.m*0.7*DPR,0,7); ctx.fill();
+    ctx.fillStyle = 'rgba(219,231,243,0.92)';
+    ctx.font = `${11*DPR}px -apple-system,sans-serif`; ctx.textAlign='center';
+    ctx.fillText(n.name, n.x, n.y - (n.m*5+8)*DPR);
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
