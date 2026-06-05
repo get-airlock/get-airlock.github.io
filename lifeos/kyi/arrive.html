@@ -10,9 +10,9 @@
 <body>
 
   <div class="page-header">
-    <div class="page-header-eyebrow">KYI · Arrive (1 of 3)</div>
-    <h1>Notice.</h1>
-    <p class="lead">Two short prompts. No right answer. Take your time, or skip — both are fine.</p>
+    <div class="page-header-eyebrow">KYI · Arrive (day 1 of 3)</div>
+    <h1>Just arrive.</h1>
+    <p class="lead">No forms, no test. We'll talk for a minute. You're a person I'm getting to know — not a profile.</p>
     <div class="progress-row">
       <div class="progress-dot active"></div>
       <div class="progress-dot"></div>
@@ -20,39 +20,20 @@
     </div>
   </div>
 
-  <!-- Prompt 0: identity — Rika KYI Stage 1, "What should I call you?" -->
-  <div class="prompt">
-    <div class="prompt-question">What should I call you?</div>
-    <input class="prompt-input" id="name" type="text" placeholder="Your name…" autocomplete="given-name" />
-  </div>
+  <!-- The conversation thread — companion-led, one thing at a time. NOT a wizard. -->
+  <div id="thread" class="kyi-thread"></div>
 
-  <!-- Prompt 1: the music seed (Zac + Sven) — low-friction imprint. A song carries tempo→energy, genre→identity, lyrics→values. Kid-answerable. -->
-  <div class="prompt">
-    <div class="prompt-question">What song are you into right now? 🎵</div>
-    <textarea class="prompt-input" id="q1" placeholder="Artist + track, or just the vibe…"></textarea>
-  </div>
+  <!-- Single conversational input (replaces the labeled form fields) -->
+  <form class="say-row" id="say-form" autocomplete="off">
+    <input class="say-input" id="say-input" type="text" placeholder="say a little…" aria-label="Reply">
+    <button class="say-send" type="submit" aria-label="Send">→</button>
+  </form>
 
-  <!-- Prompt 2: body / present state layer (Sisyphus L2.2 #2) -->
-  <div class="prompt">
-    <div class="prompt-question">What kind of support would feel good right now — quiet, playful, focused, or reflective?</div>
-    <textarea class="prompt-input" id="q2" placeholder="A few words, or skip…"></textarea>
-  </div>
-
-  <div class="btn-row">
-    <button class="btn" id="save-btn">Save & continue</button>
-    <a href="index.html" class="btn btn-soft">Back to KYI</a>
-  </div>
-
-  <!-- Companion response appears after save -->
-  <div id="companion-response" style="display:none; margin-top:24px;">
-    <div class="companion">
-      <div class="companion-body" id="companion-text"></div>
-      <div class="companion-meta">Memory written · canon page 1 · mock CID generated</div>
-    </div>
+  <!-- Close card appears when the three gentle moments are done -->
+  <div id="done" style="display:none; margin-top:20px;">
     <div class="btn-row">
       <a href="../index.html" class="btn">Enter LifeOS →</a>
-      <a href="continue.html" class="btn btn-soft">Go deeper (optional)</a>
-      <a href="/lifeos/memory.html" class="btn btn-soft">See what was remembered</a>
+      <a href="index.html" class="btn btn-soft">Back to KYI</a>
     </div>
   </div>
 
@@ -63,28 +44,82 @@
   <script src="../js/companion.js"></script>
   <script src="../js/nav.js"></script>
   <script>
-    document.getElementById('save-btn').addEventListener('click', () => {
-      const nm = document.getElementById('name').value.trim();
-      if (nm) localStorage.setItem('lifeos.name', nm);   // custom name, set in onboarding
-      localStorage.setItem('lifeos.onboarded', '1');     // releases the first-run gate → home after KYI
-      const a1 = document.getElementById('q1').value.trim();
-      const a2 = document.getElementById('q2').value.trim();
+    // ── KYI · Arrive — Day 1 (perception). A conversation, not a form. ──
+    // Per Rika's spec: calm, relational, continuity-oriented, alive. Identity is
+    // NEVER derived from answers — we just observe continuity and remember it.
+    const thread = document.getElementById('thread');
+    const form = document.getElementById('say-form');
+    const input = document.getElementById('say-input');
+
+    function bubble(text, who) {
+      const el = document.createElement('div');
+      el.className = who === 'me' ? 'kyi-msg kyi-me' : 'companion';
+      el.innerHTML = who === 'me'
+        ? `<div class="kyi-me-body">${text}</div>`
+        : `<div class="companion-body">${text}</div>`;
+      thread.appendChild(el);
+      el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+
+    // Three gentle moments — asked conversationally, one at a time.
+    const beats = [
+      { key: 'name',  ask: () => "You made it. No forms, no test — let's just talk for a sec. What should I call you?" },
+      { key: 'music', ask: (n) => `Good to meet you${n ? ', ' + n : ''}. What song are you into right now? Even just the vibe is enough. 🎵` },
+      { key: 'body',  ask: () => "Love that. Last one for today — what would feel good right now: quiet, playful, focused, or reflective?" },
+    ];
+    const answers = {};
+    let step = 0;
+
+    function askCurrent() {
+      bubble(beats[step].ask(answers.name), 'companion');
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = input.value.trim();
+      if (!v) return;
+      bubble(v, 'me');
+      input.value = '';
+      answers[beats[step].key] = v;
+      if (beats[step].key === 'name') localStorage.setItem('lifeos.name', v); // for greeting only
+      step += 1;
+
+      if (step < beats.length) {
+        // A warm, alive, zero-LLM acknowledgement (free tier) — then the next moment.
+        const ack = (window.LifeOSCompanion && LifeOSCompanion.autonomousReply)
+          ? LifeOSCompanion.autonomousReply(v) : '';
+        setTimeout(() => { if (ack) bubble(ack, 'companion'); askCurrent(); }, 450);
+      } else {
+        finish();
+      }
+    });
+
+    function finish() {
+      // Store as CONTINUITY observations — not a derived profile. addCanonPage
+      // also flips progress.arrive_complete, unlocking Continue (gradual unlock).
       LifeOSMemory.addCanonPage({
         session: 'arrive',
         prompts_and_answers: [
-          { dimension: 'music', question: 'What song are you into right now?', answer: a1 || '(skipped)' },
-          { dimension: 'body',    question: 'What kind of support would feel good right now?',                answer: a2 || '(skipped)' }
-        ]
+          { dimension: 'music', question: 'What song are you into right now?', answer: answers.music || '(skipped)' },
+          { dimension: 'body',  question: 'What kind of support would feel good right now?', answer: answers.body || '(skipped)' },
+        ],
       });
-      document.getElementById('companion-text').textContent = LifeOSCompanion.respondAfterKYI('arrive');
-      document.getElementById('companion-response').style.display = 'block';
-      document.getElementById('save-btn').textContent = 'Saved · gentle pace ahead';
-      document.getElementById('save-btn').disabled = true;
-      // re-render nav to show Memory now unlocked
-      const nav = document.querySelector('.bottom-nav');
-      if (nav) nav.remove();
-      LifeOSNav.render('kyi');
-    });
+      localStorage.setItem('lifeos.onboarded', '1'); // releases the first-run gate
+      const close = (window.LifeOSCompanion && LifeOSCompanion.respondAfterKYI)
+        ? LifeOSCompanion.respondAfterKYI('arrive')
+        : "That's all for today. I'll remember this, and we'll pick up tomorrow.";
+      setTimeout(() => {
+        bubble(close, 'companion');
+        bubble("Nothing's locked in. You're not a profile — you're someone I'm starting to know.", 'companion');
+        form.style.display = 'none';
+        document.getElementById('done').style.display = 'block';
+        const nav = document.querySelector('.bottom-nav'); if (nav) nav.remove();
+        LifeOSNav.render('kyi');
+      }, 500);
+    }
+
+    // Open the conversation.
+    askCurrent();
     LifeOSNav.render('kyi');
   </script>
 </body>
