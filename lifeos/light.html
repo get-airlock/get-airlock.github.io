@@ -199,6 +199,11 @@
   .orb-stage:not(.listening).res-peak .orb-halo{ opacity:.92; background:radial-gradient(circle at 50% 42%, oklch(0.82 0.13 292), var(--amber) 48%, oklch(0.72 0.11 215) 70%, transparent 78%); animation-duration:3.4s; }
   .orb-stage:not(.listening).res-bright .orb{ animation-duration:5s; box-shadow:inset 0 4px 14px oklch(1 0 0 /.9), inset 0 -20px 40px -12px oklch(0.6 0.12 290 /.34), inset 0 0 0 1px oklch(1 0 0 /.5), 0 26px 50px -20px oklch(0.55 0.12 290 /.45); }
   .orb-stage:not(.listening).res-peak .orb{ animation-duration:3.3s; box-shadow:inset 0 4px 16px oklch(1 0 0 /.95), inset 0 -22px 44px -12px oklch(0.7 0.14 300 /.4), inset 0 0 0 1px oklch(1 0 0 /.6), 0 30px 60px -18px oklch(0.6 0.14 295 /.5); }
+  /* KOKO topology tint: the orb takes the hue of the dominant manifold in the person's own corpus (subtle, only when engaged) */
+  .orb-stage{ --koko-tint: var(--cyan); }
+  .orb-stage::after{ content:""; position:absolute; width:74%; height:74%; border-radius:50%; pointer-events:none; z-index:0; opacity:0; filter:blur(24px); background:radial-gradient(circle at 50% 50%, var(--koko-tint), transparent 66%); transition:opacity 1.6s ease, background 1.8s ease; }
+  .orb-stage.res-bright::after{ opacity:.20; }
+  .orb-stage.res-peak::after{ opacity:.32; }
   @media (prefers-reduced-motion: reduce){ *{ animation:none !important; } }
 </style>
 </head>
@@ -291,6 +296,8 @@
     </nav>
   </div>
 
+<!-- KOKO Topology Engine (Sven, msg 25) — deterministic, non-LLM, zero-cost. Drives the orb. -->
+<script src="koko.js"></script>
 <script>
 (function(){
   // ── One config: rename the unit here when Rika decides (she's moving off "SIS") ──
@@ -366,10 +373,24 @@
       antiloop_frequency: 0,
     });
   }
+  // the person's own words — memory titles + recent conversation. on-device, deterministic, never sent.
+  function corpus(){
+    const mems = store.memories.map(m=>m.title).join('. ');
+    const conv = history.slice(-8).map(h=>h.content).join('. ');
+    return (mems+'. '+conv).trim();
+  }
   function applyResonance(){
-    const r=computeResonance(lifeState()); const band=glowBand(r);
-    const st=document.getElementById('orbStage');
-    if(st){ st.classList.remove('res-dim','res-medium','res-bright','res-peak'); st.classList.add('res-'+band); st.dataset.res=r.toFixed(3); }
+    const K = (typeof window!=='undefined' && window.KOKO) ? window.KOKO : null;   // prefer KOKO; fall back to inline SPIRALL
+    const state = lifeState();
+    const r = K ? K.computeResonance(state) : computeResonance(state);
+    const band = K ? K.glowBand(r) : glowBand(r);
+    const st = document.getElementById('orbStage');
+    if(st){
+      st.classList.remove('res-dim','res-medium','res-bright','res-peak');
+      st.classList.add('res-'+band); st.dataset.res = r.toFixed(3);
+      // KOKO topology: tint the orb with the dominant manifold walked from the person's corpus
+      if(K){ try{ const t=K.engine(corpus(),{interactionIndex:Math.max(1,store.memories.length)}); st.style.setProperty('--koko-tint', t.color); st.dataset.manifold=t.dominant; st.dataset.depth=t.depth; }catch(_){} }
+    }
     return r;
   }
 
