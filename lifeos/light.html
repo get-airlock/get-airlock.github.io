@@ -183,6 +183,14 @@
   .nav button svg{ width:21px; height:21px; }
   .nav button .nlbl{ font-size:10px; font-weight:600; }
   .nav button.active{ color:var(--violet); }
+  /* SPIRALL resonance -> orb glow · the HEART engine (Sven). Mirror, not a number — reflected as light only. */
+  .orb-halo{ transition:opacity 1.4s ease, background 1.8s ease; }
+  .orb{ transition:transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow 1.8s ease; }
+  .orb-stage:not(.listening).res-dim .orb-halo{ opacity:.30; background:radial-gradient(circle at 50% 45%, oklch(0.75 0.05 235), oklch(0.70 0.04 250) 55%, transparent 72%); animation-duration:9s; }
+  .orb-stage:not(.listening).res-bright .orb-halo{ opacity:.74; background:radial-gradient(circle at 50% 45%, var(--cyan), var(--violet-soft) 58%, transparent 74%); animation-duration:5.4s; }
+  .orb-stage:not(.listening).res-peak .orb-halo{ opacity:.92; background:radial-gradient(circle at 50% 42%, oklch(0.82 0.13 292), var(--amber) 48%, oklch(0.72 0.11 215) 70%, transparent 78%); animation-duration:3.4s; }
+  .orb-stage:not(.listening).res-bright .orb{ animation-duration:5s; box-shadow:inset 0 4px 14px oklch(1 0 0 /.9), inset 0 -20px 40px -12px oklch(0.6 0.12 290 /.34), inset 0 0 0 1px oklch(1 0 0 /.5), 0 26px 50px -20px oklch(0.55 0.12 290 /.45); }
+  .orb-stage:not(.listening).res-peak .orb{ animation-duration:3.3s; box-shadow:inset 0 4px 16px oklch(1 0 0 /.95), inset 0 -22px 44px -12px oklch(0.7 0.14 300 /.4), inset 0 0 0 1px oklch(1 0 0 /.6), 0 30px 60px -18px oklch(0.6 0.14 295 /.5); }
   @media (prefers-reduced-motion: reduce){ *{ animation:none !important; } }
 </style>
 </head>
@@ -292,6 +300,7 @@
   function ensureCtx(){ if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(_){} } if(audioCtx && audioCtx.state==='suspended') audioCtx.resume().catch(()=>{}); return audioCtx; }
   async function brain(text){
     history.push({role:'user', content:text});
+    _convTurns++;                 // engagement feeds SPIRALL kinetic/contribution → orb brightens as you talk
     if(HELP_RE.test(text)) assist = true;
     let rep='';
     try{ const r=await fetch(SHUTTLE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history.slice(-16), companion:'carrie', assist})}); if(r.ok){ const d=await r.json(); rep=d&&d.reply; } }catch(_){}
@@ -304,6 +313,57 @@
   // play TTS through the shared AudioContext (Web Audio) so iOS doesn't kill the mic — the Safari fix
   function playBlob(blob){ return new Promise(async res=>{ try{ const ctx=ensureCtx(); if(ctx){ const buf=await blob.arrayBuffer(); const dec=await ctx.decodeAudioData(buf); const s=ctx.createBufferSource(); s.buffer=dec; s.connect(ctx.destination); curSrc=s; s.onended=()=>{ try{s.disconnect();}catch(_){}; res(); }; s.start(0); return; } }catch(_){} const u=URL.createObjectURL(blob); const a=new Audio(u); a.onended=()=>{URL.revokeObjectURL(u);res();}; a.onerror=()=>res(); a.play().catch(()=>res()); }); }
   async function speak(text){ const chunks=splitChunks(text); if(!chunks.length) return; let nf=ttsBlob(chunks[0]); for(let i=0;i<chunks.length;i++){ const b=await nf; nf=(i+1<chunks.length)?ttsBlob(chunks[i+1]):null; if(b) await playBlob(b); } }
+
+  // ── SPIRALL · Hamiltonian Resonance Engine (Sven) → orb glow. The HEART engine of the substrate.
+  //    computeResonance(state) → one scalar 0–1. Reflected purely as light (mirror, not a score).
+  //    Layers: meaning-space coords (X) · momentum (P) · potential V · kinetic K · antiloop · contribution. ──
+  const MASS={relevance:1.0,stance:3.0,openness:1.0,structure:2.0,context_coupling:3.0,closure_pressure:2.0};
+  const IDEAL={relevance:0.8,stance:0.5,openness:0.7,structure:0.5,context_coupling:0.7,closure_pressure:0.3};
+  function _V(s){ let V=0; for(const d in IDEAL){ const diff=(s[d]??0.5)-IDEAL[d]; V+=0.5*diff*diff; } return V; }
+  const _MOM=['momentum_relevance','momentum_stance','momentum_openness','momentum_structure','momentum_context','momentum_closure'];
+  const _MK=['relevance','stance','openness','structure','context_coupling','closure_pressure'];
+  function _K(s){ let K=0; for(let i=0;i<_MOM.length;i++){ const p=s[_MOM[i]]??0; K+=0.5*(p*p)/MASS[_MK[i]]; } return K; }
+  function _stability(s){ const v=_MOM.map(k=>Math.abs(s[k]??0)); const mean=v.reduce((a,b)=>a+b,0)/v.length; const varr=v.reduce((a,x)=>a+(x-mean)**2,0)/v.length; return Math.max(0,1-varr*4); }
+  function _contrib(s){ const sc=(s.posts_count??0)*0.10+(s.replies_count??0)*0.15+(s.volunteers_count??0)*0.20+(s.events_participated??0)*0.25+(s.support_given??0)*0.20+(s.support_received??0)*0.10; return Math.min(1,sc/5); }
+  function _antiloop(s){ return Math.max(0,1-(s.antiloop_frequency??0)*0.2); }
+  function _flow(K){ if(K<0.001) return 0.2; return Math.max(0,1-Math.abs(K-0.15)*5); }
+  function computeResonance(s){ if(!s) return 0.3; const V=_V(s),K=_K(s),stab=_stability(s),con=_contrib(s),al=_antiloop(s); const align=Math.max(0,1-V*3),flow=_flow(K); const r=align*0.25+flow*0.15+stab*0.15+con*0.30+al*0.15; return Math.max(0,Math.min(1,r)); }
+  function glowBand(r){ if(r>=0.85)return'peak'; if(r>=0.60)return'bright'; if(r>=0.30)return'medium'; return'dim'; }
+
+  // map the person's real LifeOS state → SPIRALL coordinates. Honest proxies, ephemeral — never stored as a trait.
+  let _lastCoords=null, _convTurns=0;
+  function lifeState(){
+    const mems=store.memories, n=mems.length, now=Date.now();
+    const validated=mems.filter(m=>m.value>0), vN=validated.length;
+    const today=mems.filter(m=>m.day==='today'), tN=today.length;
+    const timed=mems.filter(m=>m.hm).length;
+    const recent=mems.filter(m=>now-(m.created||0)<36e5).length;        // last hour = staying in the thread
+    const coords={
+      relevance: n? Math.min(1, 0.4 + (timed/n)*0.5) : 0.5,             // concrete (timed) memories = relevant
+      stance: 0.5,                                                       // balanced by default
+      openness: Math.min(1, 0.4 + Math.min(_convTurns,6)*0.06),         // conversation = exploring
+      structure: n? Math.min(1, 0.3 + (vN/n)*0.5) : 0.4,                // validated/planned ratio = ordered
+      context_coupling: Math.min(1, 0.4 + Math.min(recent,6)*0.06),     // recent activity = coupled
+      closure_pressure: (tN && vN<tN)? Math.min(0.8, 0.2 + (tN-vN)*0.06) : 0.2,  // open items, gentle
+    };
+    const mom={};
+    if(_lastCoords) for(let i=0;i<_MK.length;i++){ mom[_MOM[i]] = coords[_MK[i]]-_lastCoords[_MK[i]]; }
+    _lastCoords=coords;
+    return Object.assign({}, coords, mom, {
+      posts_count: n,                                  // creations
+      replies_count: _convTurns,                       // engaging
+      volunteers_count: vN,                            // showing up / validating
+      events_participated: today.filter(m=>m.value>0).length,
+      support_given: 0, support_received: 0,
+      antiloop_frequency: 0,
+    });
+  }
+  function applyResonance(){
+    const r=computeResonance(lifeState()); const band=glowBand(r);
+    const st=document.getElementById('orbStage');
+    if(st){ st.classList.remove('res-dim','res-medium','res-bright','res-peak'); st.classList.add('res-'+band); st.dataset.res=r.toFixed(3); }
+    return r;
+  }
 
   // ── On-device local graph (sovereign — the person's memory lives here, starts empty) ──
   const blank = { name:'', char:'drop', model:'Deep', memory:'Requested', screen:'Note', memories:[] };
@@ -406,7 +466,7 @@
     document.querySelectorAll('#chars .char').forEach(c=>c.classList.toggle('sel', c.dataset.c===store.char));
     document.querySelectorAll('.seg').forEach(seg=>{ const k=seg.dataset.seg; seg.querySelectorAll('button').forEach(b=>b.classList.toggle('sel', b.dataset.v===store[k])); });
   }
-  function renderAll(){ renderHome(); renderMemory(); renderWallet(); renderYou(); }
+  function renderAll(){ renderHome(); renderMemory(); renderWallet(); renderYou(); applyResonance(); }
   function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
   // ── nav ──
@@ -460,7 +520,7 @@
       if(looksMem){ addMemory(p); if(sheet.classList.contains('show')) closeSheet(); orbStatus.textContent='Tap to talk'; await speak('Held — '+p.title+(p.timeLabel?(' at '+p.timeLabel):'')+'.'); return; }
       // otherwise it's a conversation — Carrie answers in voice
       orbLine.innerHTML='“'+esc(text)+'”'; orbStatus.textContent='Thinking…';
-      const rep=await brain(text);
+      const rep=await brain(text); applyResonance();
       orbLine.innerHTML='<b>'+esc(rep)+'</b>'; orbStatus.textContent='Speaking…';
       await speak(rep);
       orbStatus.textContent='Tap to talk';
@@ -496,6 +556,7 @@
   (function tick(){ const d=new Date(); document.getElementById('clock').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); setTimeout(tick,20000); })();
 
   renderAll();
+  setInterval(applyResonance, 12000);   // the heart re-samples — momentum settles, the orb breathes back to calm after a burst
   go(localStorage.getItem('lifeos.tab')||'home');
 })();
 </script>
