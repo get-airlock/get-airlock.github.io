@@ -284,6 +284,27 @@
   const KEY = 'lifeos.v2';
   const SHUTTLE = 'https://lifeos-shuttle.vercel.app';
 
+  // ── Carrie's brain + voice (merged from the working home surface) ──
+  const orbLine = document.getElementById('orbLine');
+  let history = [], assist = false;
+  const HELP_RE = /\b(help|plan|find|organi[sz]e|schedule|study|tutor|homework|remind|fix|figure|decide|build|make|write|draft)\b/i;
+  let audioCtx = null, curSrc = null;
+  function ensureCtx(){ if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(_){} } if(audioCtx && audioCtx.state==='suspended') audioCtx.resume().catch(()=>{}); return audioCtx; }
+  async function brain(text){
+    history.push({role:'user', content:text});
+    if(HELP_RE.test(text)) assist = true;
+    let rep='';
+    try{ const r=await fetch(SHUTTLE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history.slice(-16), companion:'carrie', assist})}); if(r.ok){ const d=await r.json(); rep=d&&d.reply; } }catch(_){}
+    rep = rep || 'I’m here with you.';
+    history.push({role:'assistant', content:rep});
+    return rep;
+  }
+  function splitChunks(t){ const parts=(''+t).match(/[^.!?\n]+[.!?]*\s*/g)||[t]; const out=[]; let cur=''; for(const p of parts){ cur+=p; const lim=out.length===0?0:140; if(cur.trim().length>lim){ out.push(cur.trim()); cur=''; } } if(cur.trim()) out.push(cur.trim()); return out; }
+  function ttsBlob(t){ return fetch(SHUTTLE+'/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t})}).then(r=>r.ok?r.blob():Promise.reject()).catch(()=>null); }
+  // play TTS through the shared AudioContext (Web Audio) so iOS doesn't kill the mic — the Safari fix
+  function playBlob(blob){ return new Promise(async res=>{ try{ const ctx=ensureCtx(); if(ctx){ const buf=await blob.arrayBuffer(); const dec=await ctx.decodeAudioData(buf); const s=ctx.createBufferSource(); s.buffer=dec; s.connect(ctx.destination); curSrc=s; s.onended=()=>{ try{s.disconnect();}catch(_){}; res(); }; s.start(0); return; } }catch(_){} const u=URL.createObjectURL(blob); const a=new Audio(u); a.onended=()=>{URL.revokeObjectURL(u);res();}; a.onerror=()=>res(); a.play().catch(()=>res()); }); }
+  async function speak(text){ const chunks=splitChunks(text); if(!chunks.length) return; let nf=ttsBlob(chunks[0]); for(let i=0;i<chunks.length;i++){ const b=await nf; nf=(i+1<chunks.length)?ttsBlob(chunks[i+1]):null; if(b) await playBlob(b); } }
+
   // ── On-device local graph (sovereign — the person's memory lives here, starts empty) ──
   const blank = { name:'', char:'drop', model:'Deep', memory:'Requested', screen:'Note', memories:[] };
   let store;
@@ -433,15 +454,19 @@
       const r=await fetch(SHUTTLE+'/api/stt',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({audio:b64,mime:blob.type})});
       if(!r.ok) throw new Error('stt'+r.status);
       const d=await r.json(); const text=(d.text||'').trim();
-      orbStatus.textContent='Tap to talk';
-      if(!text){ toast('Didn’t catch that — try again or type it.'); return; }
+      if(!text){ orbStatus.textContent='Tap to talk'; toast('Didn’t catch that — try again or type.'); return; }
       const p=parse(text);
-      if(p && (p.hm || /\b(at|am|pm|tomorrow|today|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i.test(text))){ addMemory(p); if(sheet.classList.contains('show')) closeSheet(); }
-      else { // not a memory — just echo it into the add box so they can confirm
-        openSheet(); addInput.value=text; addInput.dispatchEvent(new Event('input')); toast('Heard you — does this look right?'); }
+      const looksMem = p && (p.hm || /^(remind me|add|schedule|put down|i have|i’ve got|i got)\b/i.test(text.trim()));
+      if(looksMem){ addMemory(p); if(sheet.classList.contains('show')) closeSheet(); orbStatus.textContent='Tap to talk'; await speak('Held — '+p.title+(p.timeLabel?(' at '+p.timeLabel):'')+'.'); return; }
+      // otherwise it's a conversation — Carrie answers in voice
+      orbLine.innerHTML='“'+esc(text)+'”'; orbStatus.textContent='Thinking…';
+      const rep=await brain(text);
+      orbLine.innerHTML='<b>'+esc(rep)+'</b>'; orbStatus.textContent='Speaking…';
+      await speak(rep);
+      orbStatus.textContent='Tap to talk';
     }catch(err){
       orbStatus.textContent='Tap to talk';
-      toast('Voice needs one switch flipped — type it for now.');  // ElevenLabs speech_to_text scope
+      toast('Voice needs the STT key — type it for now.');
       if(!sheet.classList.contains('show')) openSheet();
     }
   }
