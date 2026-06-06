@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>LifeOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:        oklch(0.32 0.02 280);
+    --ink-soft:   oklch(0.52 0.02 280);
+    --ink-faint:  oklch(0.68 0.015 280);
+    --ink-ghost:  oklch(0.80 0.012 280);
+    --violet:      oklch(0.55 0.17 290);
+    --violet-soft: oklch(0.62 0.14 290);
+    --violet-wash: oklch(0.95 0.03 290);
+    --green:       oklch(0.60 0.12 165);
+    --green-deep:  oklch(0.52 0.11 165);
+    --green-wash:  oklch(0.95 0.03 165);
+    --amber:       oklch(0.74 0.12 75);
+    --sky:   oklch(0.70 0.12 235);
+    --cyan:  oklch(0.72 0.11 215);
+    --line:   oklch(0.32 0.02 280 / 0.08);
+    --line-2: oklch(0.32 0.02 280 / 0.14);
+    --fill:   oklch(0.32 0.02 280 / 0.035);
+    --paper:  oklch(0.995 0.002 280);
+    --font: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --serif: "Instrument Serif", Georgia, serif;
+  }
+  *{ box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html,body{ height: 100%; }
+  body{
+    font-family: var(--font); color: var(--ink);
+    background:
+      radial-gradient(100% 60% at 50% -8%, oklch(0.97 0.022 290), transparent 60%),
+      radial-gradient(90% 50% at 100% 8%, oklch(0.97 0.02 200), transparent 55%),
+      radial-gradient(90% 60% at 0% 100%, oklch(0.97 0.022 150), transparent 55%),
+      oklch(0.985 0.004 280);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100dvh;
+  }
+  /* full-bleed on real devices; framed preview only on wide screens */
+  .device{ position: relative; width: 100%; min-height: 100dvh; background: transparent; display: flex; flex-direction: column; overflow: hidden; }
+  @media (min-width: 520px){
+    body{ display:flex; align-items:center; justify-content:center; padding: 26px 16px; }
+    .device{ width: 402px; height: 858px; min-height:0; border-radius: 46px; background: var(--paper);
+      box-shadow: 0 1px 0 0 oklch(1 0 0) inset, 0 40px 90px -44px oklch(0.4 0.04 280 / 0.5), 0 0 0 1px var(--line); }
+  }
+  .statusbar{ flex: 0 0 auto; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 26px; padding-top: env(safe-area-inset-top); font-size: 14px; font-weight: 600; color: var(--ink); }
+  .statusbar .ic{ display:flex; align-items:center; gap:6px; }
+  .brandrow{ flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 4px 24px 10px; }
+  .brand{ display:inline-flex; align-items:center; gap:8px; font-size:17px; font-weight:600; color:var(--ink); }
+  .brand .spark{ width:20px; height:20px; }
+  .brand .badge{ font-size:9.5px; font-weight:600; letter-spacing:0.14em; color:var(--violet); padding:3px 7px; border-radius:999px; background:var(--violet-wash); }
+  .flowerbtn{ width:34px; height:34px; border-radius:50%; display:grid; place-items:center; border:0; background:transparent; color:var(--violet-soft); cursor:pointer; transition:background .2s; }
+  .flowerbtn:active{ background:var(--violet-wash); }
+  .body{ flex:1 1 auto; overflow-y:auto; overflow-x:hidden; }
+  .body::-webkit-scrollbar{ width:0; }
+  .screen{ display:none; flex-direction:column; padding: 6px 24px 132px; }
+  .screen.active{ display:flex; animation: fade .5s cubic-bezier(.2,.8,.2,1); }
+  @keyframes fade{ from{ transform: translateY(10px); opacity:0; } to{ transform:none; opacity:1; } }
+  .h-serif{ font-family:var(--serif); font-weight:400; line-height:1.0; color:var(--ink); }
+  .lead{ color:var(--ink-soft); font-weight:300; font-size:15.5px; line-height:1.5; }
+  .eyebrow{ font-size:11.5px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:var(--violet-soft); }
+  .name-accent{ color:var(--violet); font-style:italic; }
+  .section-gap{ height:30px; flex:0 0 auto; }
+  .greet{ text-align:center; margin-top:10px; }
+  .greet h1{ font-family:var(--serif); font-weight:400; font-size:39px; line-height:1.12; color:var(--ink); }
+  .greet p{ margin-top:12px; color:var(--ink-soft); font-weight:300; font-size:16px; }
+  .orb-stage{ position:relative; width:264px; height:264px; margin:22px auto 4px; display:grid; place-items:center; cursor:pointer; }
+  .orb-halo{ position:absolute; width:92%; height:92%; border-radius:50%; filter:blur(26px); opacity:0.55; background:radial-gradient(circle at 50% 45%, var(--cyan), var(--sky) 55%, transparent 72%); animation:halo 7s ease-in-out infinite; }
+  @keyframes halo{ 0%,100%{ transform:scale(0.96); opacity:0.45; } 50%{ transform:scale(1.06); opacity:0.7; } }
+  .orb-ring{ position:absolute; width:100%; height:100%; pointer-events:none; }
+  .orb{ position:relative; width:58%; height:58%; border-radius:50%; overflow:hidden; z-index:2;
+    background:radial-gradient(circle at 36% 28%, oklch(1 0 0), oklch(0.97 0.01 230 / 0.5) 34%, oklch(0.9 0.02 230 / 0.1) 62%);
+    box-shadow: inset 0 4px 14px oklch(1 0 0 / 0.9), inset 0 -20px 36px -12px oklch(0.6 0.08 230 / 0.28), inset 0 0 0 1px oklch(1 0 0 / 0.5), 0 22px 44px -20px oklch(0.5 0.08 240 / 0.4);
+    animation:breathe 6s ease-in-out infinite; transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes breathe{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.03); } }
+  .orb-spec{ position:absolute; left:26%; top:18%; width:30%; height:24%; border-radius:50%; background:radial-gradient(circle at 40% 40%, oklch(1 0 0 / 0.95), transparent 70%); filter:blur(2px); z-index:3; }
+  .orb-tap{ position:absolute; inset:0; border:0; background:transparent; cursor:pointer; z-index:4; border-radius:50%; }
+  .orb-stage.listening .orb{ animation-duration:2.8s; }
+  .orb-stage.listening .orb-halo{ animation-duration:2.8s; opacity:0.8; }
+  .orb-stage.boop .orb{ transform:scale(0.9); }
+  .orb-ripple{ position:absolute; width:58%; height:58%; border-radius:50%; border:1.5px solid var(--cyan); opacity:0.6; pointer-events:none; z-index:1; animation:orbripple .8s ease-out forwards; }
+  @keyframes orbripple{ to{ transform:scale(1.7); opacity:0; } }
+  .orb-status{ display:flex; align-items:center; justify-content:center; gap:7px; margin-top:6px; font-size:15px; font-weight:500; color:var(--violet); }
+  .orb-status .spark{ width:15px; height:15px; }
+  .orb-line{ text-align:center; margin-top:14px; min-height:24px; font-weight:300; color:var(--green-deep); font-size:15.5px; line-height:1.55; transition:opacity .4s; padding:0 6px; }
+  .orb-line b{ color:var(--violet); font-weight:400; }
+  .agenda-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:2px; }
+  .agenda-head .t{ font-size:13px; font-weight:600; letter-spacing:0.04em; color:var(--ink-soft); }
+  .link{ font-size:13px; font-weight:500; color:var(--violet); text-decoration:none; cursor:pointer; background:none; border:0; font-family:var(--font); }
+  .agenda{ display:flex; flex-direction:column; }
+  .ag{ display:grid; grid-template-columns:58px 1fr auto; align-items:baseline; gap:12px; padding:13px 0; border-top:1px solid var(--line); }
+  .ag:first-child{ border-top:0; }
+  .ag .time{ font-size:13.5px; font-weight:500; color:var(--violet-soft); font-variant-numeric:tabular-nums; }
+  .ag .what{ font-size:15.5px; color:var(--ink); font-weight:400; }
+  .ag .when{ font-size:12.5px; color:var(--ink-ghost); font-weight:300; }
+  .ag.next .what::after{ content:"next"; margin-left:9px; font-size:10.5px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--green-deep); vertical-align:1px; }
+  .empty{ padding:22px 2px; color:var(--ink-faint); font-weight:300; font-size:15px; line-height:1.55; }
+  .empty b{ color:var(--ink-soft); font-weight:500; }
+  .mem{ display:flex; flex-direction:column; }
+  .mrow{ display:grid; grid-template-columns:54px 1fr auto; align-items:baseline; gap:14px; padding:16px 0; border-top:1px solid var(--line); cursor:pointer; }
+  .mrow:first-child{ border-top:0; }
+  .mrow .time{ font-size:13.5px; font-weight:500; color:var(--violet-soft); font-variant-numeric:tabular-nums; padding-top:1px; }
+  .mrow .mid .title{ font-size:16px; color:var(--ink); font-weight:400; }
+  .mrow .mid .status{ display:inline-flex; align-items:center; gap:7px; margin-top:5px; font-size:12.5px; font-weight:300; color:var(--ink-faint); }
+  .sdot{ width:7px; height:7px; border-radius:50%; flex:0 0 auto; }
+  .sdot.v{ background:var(--green); }
+  .sdot.p{ background:var(--amber); box-shadow:0 0 0 3px var(--green-wash); animation:soft 2s ease-in-out infinite; }
+  .sdot.n{ background:var(--ink-ghost); }
+  @keyframes soft{ 0%,100%{ opacity:1; } 50%{ opacity:0.4; } }
+  .mrow .val{ text-align:right; font-size:15px; font-weight:500; color:var(--green-deep); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .mrow .val .u{ font-size:11px; font-weight:600; letter-spacing:0.04em; color:var(--green); margin-left:2px; }
+  .mrow .val.pending{ color:var(--ink-ghost); font-weight:300; }
+  .mem-foot{ display:flex; align-items:baseline; justify-content:space-between; margin-top:22px; padding-top:16px; border-top:1px solid var(--line-2); }
+  .mem-foot .l{ font-size:14px; color:var(--ink-soft); font-weight:400; }
+  .mem-foot .r{ font-family:var(--serif); font-size:26px; color:var(--green-deep); }
+  .mem-foot .r .u{ font-size:13px; font-family:var(--font); font-weight:600; color:var(--green); }
+  .wtotal{ margin-top:18px; text-align:center; }
+  .wtotal .lbl{ font-size:13px; font-weight:500; letter-spacing:0.04em; color:var(--ink-soft); }
+  .wtotal .big{ font-family:var(--serif); font-size:68px; line-height:1; color:var(--ink); margin-top:6px; }
+  .wtotal .big .u{ font-family:var(--font); font-size:22px; font-weight:600; color:var(--green); }
+  .wtotal .sub{ margin-top:12px; font-size:14.5px; color:var(--ink-soft); font-weight:300; }
+  .wtotal .sub b{ color:var(--ink); font-weight:500; }
+  .wtotal .conv{ margin-top:4px; font-size:12.5px; color:var(--ink-ghost); font-weight:300; }
+  .winline{ display:flex; justify-content:center; gap:34px; margin-top:24px; }
+  .wstat{ text-align:center; }
+  .wstat .n{ font-size:22px; font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums; }
+  .wstat .c{ margin-top:2px; font-size:12px; color:var(--ink-faint); font-weight:300; }
+  .wlist-head{ font-size:13px; font-weight:600; color:var(--ink-soft); margin-top:24px; }
+  .wc{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 0; border-top:1px solid var(--line); }
+  .wc:first-of-type{ border-top:0; }
+  .wc .wl{ font-size:15.5px; color:var(--ink); font-weight:400; }
+  .wc .wr{ display:inline-flex; align-items:center; gap:8px; font-size:15px; font-weight:500; color:var(--green-deep); font-variant-numeric:tabular-nums; }
+  .wabout{ margin-top:22px; font-size:13.5px; line-height:1.6; color:var(--ink-faint); font-weight:300; }
+  .wabout b{ color:var(--ink-soft); font-weight:500; }
+  .field{ padding:20px 0; border-top:1px solid var(--line); }
+  .field:first-of-type{ border-top:0; padding-top:6px; }
+  .field .flabel{ display:flex; align-items:baseline; justify-content:space-between; }
+  .field .flabel .k{ font-size:13px; font-weight:600; letter-spacing:0.06em; color:var(--ink-soft); }
+  .field .flabel .hint{ font-size:12.5px; color:var(--ink-faint); font-weight:300; }
+  .you-name{ display:flex; align-items:center; justify-content:space-between; margin-top:8px; }
+  .you-name .nm{ font-family:var(--serif); font-size:38px; color:var(--violet); }
+  .clearbtn{ font-family:var(--font); font-size:13px; font-weight:500; color:var(--violet); padding:8px 16px; border-radius:999px; border:1px solid var(--line-2); background:transparent; cursor:pointer; }
+  .clearbtn:active{ background:var(--violet-wash); }
+  .chars{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:14px; }
+  .char{ aspect-ratio:1; border-radius:18px; border:1px solid var(--line); background:var(--fill); font-size:30px; display:grid; place-items:center; cursor:pointer; transition:border-color .2s, background .2s, transform .2s; }
+  .char:active{ transform:scale(0.94); }
+  .char.sel{ border-color:var(--violet); background:var(--violet-wash); }
+  .seg{ display:flex; gap:4px; margin-top:14px; padding:4px; border-radius:14px; background:var(--fill); }
+  .seg button{ flex:1; padding:11px 8px; border:0; border-radius:10px; background:transparent; font-family:var(--font); font-size:13.5px; font-weight:500; color:var(--ink-soft); cursor:pointer; transition:color .2s, background .2s, box-shadow .2s; white-space:nowrap; }
+  .seg button.sel{ color:var(--violet); background:var(--paper); box-shadow:0 1px 2px oklch(0.4 0.04 280 / 0.06), 0 4px 10px -6px oklch(0.4 0.04 280 / 0.25); font-weight:600; }
+  .field .desc{ margin-top:12px; font-size:13px; line-height:1.55; color:var(--ink-faint); font-weight:300; }
+  /* add button (memory-first, voice-primary) */
+  .addbtn{ display:inline-flex; align-items:center; gap:6px; font-family:var(--font); font-size:13px; font-weight:600; color:var(--violet); background:var(--violet-wash); border:0; border-radius:999px; padding:6px 12px; cursor:pointer; }
+  .addbtn svg{ width:14px; height:14px; }
+  /* add sheet */
+  .scrim{ position:absolute; inset:0; z-index:50; background:oklch(0.4 0.04 280 / 0.22); backdrop-filter:blur(3px); opacity:0; pointer-events:none; transition:opacity .25s; }
+  .scrim.show{ opacity:1; pointer-events:auto; }
+  .sheet{ position:absolute; left:0; right:0; bottom:0; z-index:51; background:var(--paper); border-radius:28px 28px 0 0; padding:22px 22px calc(26px + env(safe-area-inset-bottom)); transform:translateY(110%); transition:transform .3s cubic-bezier(.2,.8,.2,1); box-shadow:0 -10px 40px -10px oklch(0.4 0.04 280 / 0.35); }
+  .sheet.show{ transform:none; }
+  .sheet h3{ font-family:var(--serif); font-weight:400; font-size:26px; color:var(--ink); }
+  .sheet .sub{ margin-top:6px; color:var(--ink-soft); font-weight:300; font-size:14px; }
+  .sheet .ti{ width:100%; margin-top:16px; padding:14px 16px; border-radius:16px; border:1px solid var(--line-2); background:var(--fill); color:var(--ink); font-size:16px; font-family:var(--font); }
+  .sheet .ti:focus{ outline:none; border-color:var(--violet-soft); }
+  .sheet .ex{ margin-top:10px; font-size:12.5px; color:var(--ink-faint); font-weight:300; }
+  .sheet .row{ display:flex; gap:10px; margin-top:16px; }
+  .sheet .mic{ flex:0 0 auto; width:52px; height:52px; border-radius:50%; border:0; background:var(--violet-wash); color:var(--violet); display:grid; place-items:center; cursor:pointer; }
+  .sheet .mic.rec{ background:var(--violet); color:#fff; animation:soft 1.2s ease-in-out infinite; }
+  .sheet .mic svg{ width:22px; height:22px; }
+  .sheet .save{ flex:1; border:0; border-radius:16px; background:var(--violet); color:#fff; font-family:var(--font); font-size:16px; font-weight:600; cursor:pointer; }
+  .sheet .save:disabled{ opacity:.4; }
+  .toast{ position:absolute; left:50%; transform:translateX(-50%) translateY(14px); bottom:96px; z-index:60; background:var(--ink); color:oklch(0.98 0 0); font-size:14px; padding:11px 18px; border-radius:14px; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; max-width:80%; text-align:center; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .nav{ position:absolute; left:50%; transform:translateX(-50%); bottom:calc(22px + env(safe-area-inset-bottom)); z-index:30; display:flex; gap:2px; padding:6px; border-radius:999px; background:oklch(1 0 0 / 0.7); backdrop-filter:blur(20px) saturate(1.3); -webkit-backdrop-filter:blur(20px) saturate(1.3); box-shadow:0 1px 0 oklch(1 0 0) inset, 0 14px 34px -16px oklch(0.4 0.04 280 / 0.4), 0 0 0 1px var(--line); }
+  .nav button{ display:flex; flex-direction:column; align-items:center; gap:3px; width:64px; padding:8px 0 6px; border:0; background:transparent; color:var(--ink-faint); cursor:pointer; border-radius:999px; transition:color .2s; }
+  .nav button svg{ width:21px; height:21px; }
+  .nav button .nlbl{ font-size:10px; font-weight:600; }
+  .nav button.active{ color:var(--violet); }
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; } }
+</style>
+</head>
+<body>
+  <div class="device">
+    <div class="statusbar"><span id="clock">10:10</span>
+      <span class="ic">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="2.6" height="4" rx="1"/><rect x="3.8" y="5" width="2.6" height="6" rx="1"/><rect x="7.6" y="2.6" width="2.6" height="8.4" rx="1"/><rect x="11.4" y="0" width="2.6" height="11" rx="1"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity="0.45"/><rect x="2" y="2" width="16" height="8" rx="1.8" fill="currentColor"/></svg>
+      </span>
+    </div>
+    <div class="brandrow">
+      <span class="brand">
+        <svg class="spark" viewBox="0 0 24 24" fill="none"><defs><linearGradient id="sg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5aa6ff"/><stop offset="1" stop-color="#9b6dff"/></linearGradient></defs><path d="M12 2c.7 4.8 4.5 8.5 9.3 9.3-4.8.8-8.6 4.5-9.3 9.3-.7-4.8-4.5-8.5-9.3-9.3C7.5 10.5 11.3 6.8 12 2Z" fill="url(#sg)"/></svg>
+        LifeOS <span class="badge">DEEP</span>
+      </span>
+      <button class="flowerbtn" id="flowerBtn" aria-label="Memory"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="2.6"/><path d="M12 3.2a3 3 0 0 0 0 5.9M12 14.9a3 3 0 0 0 0 5.9M20.6 7a3 3 0 0 0-5.1 3M8.5 14a3 3 0 0 0-5.1 3M20.6 17a3 3 0 0 1-5.1-3M8.5 10a3 3 0 0 1-5.1-3"/></svg></button>
+    </div>
+
+    <div class="body">
+      <!-- HOME -->
+      <section class="screen active" id="home">
+        <div class="greet">
+          <h1 id="greetH">Good morning.</h1>
+          <p id="greetP">Tap the orb and tell me what's on today.</p>
+        </div>
+        <div class="orb-stage" id="orbStage">
+          <div class="orb-halo"></div>
+          <canvas class="orb-ring" id="ring" width="528" height="528"></canvas>
+          <div class="orb"><div class="orb-spec"></div></div>
+          <button class="orb-tap" id="orbTap" type="button" aria-label="Talk to LifeOS"></button>
+        </div>
+        <div class="orb-status"><svg class="spark" viewBox="0 0 24 24" fill="none"><path d="M12 2c.7 4.8 4.5 8.5 9.3 9.3-4.8.8-8.6 4.5-9.3 9.3-.7-4.8-4.5-8.5-9.3-9.3C7.5 10.5 11.3 6.8 12 2Z" fill="#9b6dff"/></svg><span id="orbStatus">Tap to talk</span></div>
+        <div class="orb-line" id="orbLine">Tell me something like <b>“French at 2:30 tomorrow”</b> and I'll hold it for you.</div>
+        <div class="section-gap"></div>
+        <div class="agenda-head"><span class="t">Today</span><button class="addbtn" id="addHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Add</button></div>
+        <div class="agenda" id="agenda"></div>
+      </section>
+
+      <!-- MEMORY -->
+      <section class="screen" id="memory">
+        <div style="margin-top:8px;"><div class="eyebrow">Memory</div><h1 class="h-serif" style="font-size:40px; margin-top:8px;">Held lightly.</h1><p class="lead" style="margin-top:10px;">Everything LifeOS is keeping for you — one line each, on this device, yours.</p></div>
+        <div class="section-gap"></div>
+        <div class="agenda-head" style="margin-bottom:14px;"><span class="t" id="memCount">Nothing yet</span><button class="addbtn" id="addMem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Add</button></div>
+        <div class="mem" id="memList"></div>
+        <div class="mem-foot"><span class="l">Validated so far</span><span class="r" id="memValidated">0.00 <span class="u" id="u1">SIS</span></span></div>
+      </section>
+
+      <!-- WALLET -->
+      <section class="screen" id="wallet">
+        <div style="margin-top:8px;"><div class="eyebrow">Wallet</div><h1 class="h-serif" style="font-size:40px; margin-top:8px;">Your value.</h1><p class="lead" style="margin-top:10px;">What your creations and reflections came to. Calm, and yours.</p></div>
+        <div class="wtotal"><div class="lbl">Total value</div><div class="big" id="wTotal">0.00<span class="u" id="u2"> SIS</span></div><div class="sub" id="wProj">Grows as you create and reflect.</div><div class="conv" id="wConv"></div></div>
+        <div class="winline"><div class="wstat"><div class="n" id="wContrib">0</div><div class="c">contributions</div></div><div class="wstat"><div class="n" id="wWeek">0</div><div class="c">this week</div></div><div class="wstat"><div class="n" id="wToday">0</div><div class="c">validated today</div></div></div>
+        <div class="wlist-head">Recent contributions</div>
+        <div id="wList"></div>
+        <div class="wabout"><b id="u3">SIS</b> is your proof-of-creation — earned when something you make or reflect on is validated. Values are a preview, not money.</div>
+      </section>
+
+      <!-- YOU -->
+      <section class="screen" id="you">
+        <div style="margin-top:8px;"><div class="eyebrow">You</div><h1 class="h-serif" style="font-size:40px; margin-top:8px;">Tune the support.</h1><p class="lead" style="margin-top:10px;">Lighter by default. Nothing here is a test.</p></div>
+        <div class="section-gap"></div>
+        <div class="field"><div class="flabel"><span class="k">NAME</span><span class="hint">Set via conversation</span></div><div class="you-name"><span class="nm" id="youName">—</span><button class="clearbtn" id="clearName">Clear</button></div></div>
+        <div class="field"><div class="flabel"><span class="k">CHARACTER</span><span class="hint">Choose your vibe</span></div><div class="chars" id="chars"><button class="char" data-c="cloud">☁️</button><button class="char" data-c="drop">💧</button><button class="char" data-c="flame">🔥</button><button class="char" data-c="sprout">🌱</button></div></div>
+        <div class="field"><div class="flabel"><span class="k">MODEL</span><span class="hint">How deeply to think</span></div><div class="seg" data-seg="model"><button data-v="Fast">Fast</button><button data-v="Mid">Mid</button><button data-v="Deep">Deep</button><button data-v="Max">Max</button></div><p class="desc">Fast is snappy. Deep and Max take longer but reason over more.</p></div>
+        <div class="field"><div class="flabel"><span class="k">MEMORY</span><span class="hint">What to keep</span></div><div class="seg" data-seg="memory"><button data-v="Nothing">Nothing</button><button data-v="Requested">Only requested</button><button data-v="All">All</button></div></div>
+        <div class="field"><div class="flabel"><span class="k">SCREEN</span><span class="hint">Your workspace</span></div><div class="seg" data-seg="screen"><button data-v="Note">Note space</button><button data-v="Draw">Drawing space</button><button data-v="Voice">Voice only</button></div></div>
+      </section>
+    </div>
+
+    <!-- add sheet -->
+    <div class="scrim" id="scrim"></div>
+    <div class="sheet" id="sheet">
+      <h3>Tell me about your day.</h3>
+      <p class="sub">Say it or type it — “French at 2:30 tomorrow”, “Art project at 4”.</p>
+      <input class="ti" id="addInput" placeholder="What, and when?" autocomplete="off" enterkeyhint="done" />
+      <p class="ex" id="addParsed"></p>
+      <div class="row">
+        <button class="mic" id="micBtn" aria-label="Speak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+        <button class="save" id="saveBtn" disabled>Hold this for me</button>
+      </div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <nav class="nav" id="nav">
+      <button data-tab="home" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h12v-9"/></svg><span class="nlbl">Home</span></button>
+      <button data-tab="memory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.4"/><path d="M12 3.2a3 3 0 0 0 0 5.9M12 14.9a3 3 0 0 0 0 5.9M20.6 7a3 3 0 0 0-5.1 3M8.5 14a3 3 0 0 0-5.1 3M20.6 17a3 3 0 0 1-5.1-3M8.5 10a3 3 0 0 1-5.1-3"/></svg><span class="nlbl">Memory</span></button>
+      <button data-tab="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="3.2"/><path d="M3 10h18M16.5 14.5h.01"/></svg><span class="nlbl">Wallet</span></button>
+      <button data-tab="you"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.4" r="3.4"/><path d="M5.5 19a6.5 6.5 0 0 1 13 0"/></svg><span class="nlbl">You</span></button>
+    </nav>
+  </div>
+
+<script>
+(function(){
+  // ── One config: rename the unit here when Rika decides (she's moving off "SIS") ──
+  const UNIT = 'SIS';
+  const PER_VALIDATION = 1.0;            // value granted when a memory is validated (placeholder economy)
+  const BTC_PER_UNIT = 0.000010;         // preview anchor only — not money
+  const KEY = 'lifeos.v2';
+  const SHUTTLE = 'https://lifeos-shuttle.vercel.app';
+
+  // ── On-device local graph (sovereign — the person's memory lives here, starts empty) ──
+  const blank = { name:'', char:'drop', model:'Deep', memory:'Requested', screen:'Note', memories:[] };
+  let store;
+  try { store = Object.assign({}, blank, JSON.parse(localStorage.getItem(KEY) || '{}')); }
+  catch(_){ store = Object.assign({}, blank); }
+  const save = () => localStorage.setItem(KEY, JSON.stringify(store));
+  const uid = () => 'm' + Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36);
+
+  document.querySelectorAll('#u1,#u2,#u3').forEach(e => e.textContent = (e.id==='u2'?' ':'') + UNIT);
+
+  // ── light, offline parser: "French at 2:30 tomorrow" → {title, hm, day} ──
+  const DAYS = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+  function parse(text){
+    if(!text || !text.trim()) return null;
+    let s = text.trim().replace(/^\s*(i\s+(have|have got|got|need|need to|should)|remind me( to)?|add|schedule|put down)\s+/i,'');
+    let day = null, dayLabel = '';
+    const dm = s.match(/\b(today|tomorrow|tonight|mon|tue|tues|wed|thu|thur|thurs|fri|sat|sun|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i);
+    if(dm){ const w = dm[1].toLowerCase();
+      if(w==='today'||w==='tonight'){ day='today'; dayLabel='today'; }
+      else if(w==='tomorrow'){ day='tomorrow'; dayLabel='tomorrow'; }
+      else { const idx = DAYS.findIndex(d=>d.startsWith(w.slice(0,3))); if(idx>=0){ day='d'+idx; dayLabel=DAYS[idx][0].toUpperCase()+DAYS[idx].slice(1); } }
+      s = s.replace(dm[0],'').trim();
+    } else { day='today'; dayLabel='today'; }
+    let hm = null, timeLabel='';
+    const tm = s.match(/\b(at\s+)?(\d{1,2})([:.](\d{2}))?\s*(am|pm|a\.m\.|p\.m\.)?\b/i);
+    if(tm){ let h = parseInt(tm[2],10); const min = tm[4]?parseInt(tm[4],10):0; const ap=(tm[5]||'').toLowerCase().replace(/\./g,'');
+      if(ap==='pm' && h<12) h+=12; if(ap==='am' && h===12) h=0;
+      if(!ap && h<8 && tm[4]===undefined) {/* bare small number, leave as given */}
+      hm = String(h).padStart(2,'0')+':'+String(min).padStart(2,'0');
+      timeLabel = fmt(hm);
+      s = s.replace(tm[0],'').trim();
+    }
+    s = s.replace(/\b(at|on|for|the)\b\s*$/i,'').replace(/\s{2,}/g,' ').trim();
+    const title = s ? s[0].toUpperCase()+s.slice(1) : 'Something';
+    return { title, hm, day, dayLabel, timeLabel };
+  }
+  function fmt(hm){ if(!hm) return ''; let [h,m]=hm.split(':').map(Number); const ap=h>=12?'pm':'am'; let hh=h%12; if(hh===0)hh=12; return hh+(m?':'+String(m).padStart(2,'0'):'')+ap; }
+
+  // ── add a memory to the graph ──
+  function addMemory(p){
+    if(!p) return;
+    store.memories.push({ id:uid(), title:p.title, hm:p.hm||null, day:p.day||'today', dayLabel:p.dayLabel||'today', status:'planned', value:0, created:Date.now() });
+    save(); renderAll(); toast('Held — “'+p.title+'”'+(p.timeLabel?' at '+p.timeLabel:'')+'.');
+  }
+  function cycleStatus(id){
+    const m = store.memories.find(x=>x.id===id); if(!m) return;
+    // planned → validated (earns value) → none(cleared of value) → planned
+    if(m.status==='validated'){ m.status='planned'; m.value=0; toast('Set back to planned.'); }
+    else { m.status='validated'; m.value=PER_VALIDATION; toast('Validated · +'+PER_VALIDATION.toFixed(2)+' '+UNIT); }
+    save(); renderAll();
+  }
+
+  // ── renders ──
+  function todayMems(){ return store.memories.filter(m=>m.day==='today').sort((a,b)=>(a.hm||'99').localeCompare(b.hm||'99')); }
+  function renderHome(){
+    const h = new Date().getHours();
+    document.getElementById('greetH').innerHTML = (h<12?'Good morning':h<18?'Good afternoon':'Good evening') + (store.name?', <span class="name-accent">'+esc(store.name)+'</span>':'') + '.';
+    const ag = document.getElementById('agenda'); const tm = todayMems();
+    if(!tm.length){ ag.innerHTML = '<div class="empty">Nothing on today yet.<br>Tap <b>Add</b> or the orb and tell me — “Art at 4”.</div>'; return; }
+    const now = new Date().getHours()*60 + new Date().getMinutes();
+    let nextSet=false;
+    ag.innerHTML = tm.map(m=>{
+      const mins = m.hm ? (+m.hm.split(':')[0]*60 + +m.hm.split(':')[1]) : null;
+      const isNext = !nextSet && mins!=null && mins>=now; if(isNext) nextSet=true;
+      return `<div class="ag${isNext?' next':''}"><span class="time">${m.hm?fmt(m.hm):'—'}</span><span class="what">${esc(m.title)}</span><span class="when">${rel(m)}</span></div>`;
+    }).join('');
+  }
+  function rel(m){ if(!m.hm) return ''; const now=new Date().getHours()*60+new Date().getMinutes(); const t=+m.hm.split(':')[0]*60+ +m.hm.split(':')[1]; const d=t-now; if(d<0) return 'earlier'; if(d<60) return 'in '+d+' min'; return 'in '+Math.floor(d/60)+'h '+(d%60||''); }
+  function renderMemory(){
+    const list = document.getElementById('memList');
+    const ms = store.memories.slice().sort((a,b)=>a.created-b.created);
+    document.getElementById('memCount').textContent = ms.length ? ms.length+' held' : 'Nothing yet';
+    if(!ms.length){ list.innerHTML = '<div class="empty">Your memory starts empty — that’s on purpose.<br>Tell me about your day and I’ll keep it, <b>light</b>.</div>'; }
+    else { list.innerHTML = ms.map(m=>{
+      const sd = m.status==='validated'?'v':(m.status==='in_progress'?'p':'n');
+      const st = m.status==='validated'?'Validated':(m.status==='in_progress'?'In progress':'Planned · tap to validate');
+      const val = m.value>0 ? `<span class="val">${m.value.toFixed(2)}<span class="u">${UNIT}</span></span>` : '<span class="val pending">—</span>';
+      return `<div class="mrow" data-id="${m.id}"><span class="time">${m.hm?fmt(m.hm):(m.dayLabel||'')}</span><span class="mid"><div class="title">${esc(m.title)}</div><div class="status"><span class="sdot ${sd}"></span> ${st}</div></span>${val}</div>`;
+    }).join(''); }
+    const total = store.memories.reduce((s,m)=>s+(m.value||0),0);
+    document.getElementById('memValidated').innerHTML = total.toFixed(2)+' <span class="u">'+UNIT+'</span>';
+  }
+  function renderWallet(){
+    const validated = store.memories.filter(m=>m.value>0);
+    const total = validated.reduce((s,m)=>s+m.value,0);
+    document.getElementById('wTotal').innerHTML = total.toFixed(2)+'<span class="u"> '+UNIT+'</span>';
+    document.getElementById('wProj').innerHTML = total>0 ? 'Projected <b>~'+(total*BTC_PER_UNIT).toFixed(7)+' BTC</b>' : 'Grows as you create and reflect.';
+    document.getElementById('wConv').textContent = total>0 ? UNIT+'BTC anchored to Bitcoin · 1 '+UNIT+' ≈ '+BTC_PER_UNIT.toFixed(6)+' BTC' : '';
+    const wk = Date.now()-7*864e5;
+    document.getElementById('wContrib').textContent = validated.length;
+    document.getElementById('wWeek').textContent = validated.filter(m=>m.created>=wk).length;
+    document.getElementById('wToday').textContent = validated.filter(m=>m.day==='today').length;
+    const wl = document.getElementById('wList');
+    wl.innerHTML = validated.length ? validated.slice().reverse().map(m=>`<div class="wc"><span class="wl">${esc(m.title)}</span><span class="wr">+${m.value.toFixed(2)} ${UNIT}</span></div>`).join('')
+      : '<div class="empty">No contributions yet. Validate something in <b>Memory</b> and it shows up here.</div>';
+  }
+  function renderYou(){
+    document.getElementById('youName').textContent = store.name || '—';
+    document.querySelectorAll('#chars .char').forEach(c=>c.classList.toggle('sel', c.dataset.c===store.char));
+    document.querySelectorAll('.seg').forEach(seg=>{ const k=seg.dataset.seg; seg.querySelectorAll('button').forEach(b=>b.classList.toggle('sel', b.dataset.v===store[k])); });
+  }
+  function renderAll(){ renderHome(); renderMemory(); renderWallet(); renderYou(); }
+  function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  // ── nav ──
+  const screens=document.querySelectorAll('.screen'), navBtns=document.querySelectorAll('.nav button'), bodyEl=document.querySelector('.body');
+  function go(tab){ screens.forEach(s=>s.classList.toggle('active', s.id===tab)); navBtns.forEach(b=>b.classList.toggle('active', b.dataset.tab===tab)); bodyEl.scrollTop=0; localStorage.setItem('lifeos.tab',tab); if(tab==='home') startRing(); }
+  navBtns.forEach(b=>b.addEventListener('click',()=>go(b.dataset.tab)));
+  document.getElementById('flowerBtn').addEventListener('click',()=>go('memory'));
+
+  // ── add sheet ──
+  const scrim=document.getElementById('scrim'), sheet=document.getElementById('sheet'), addInput=document.getElementById('addInput'), saveBtn=document.getElementById('saveBtn'), parsedEl=document.getElementById('addParsed');
+  let pending=null;
+  function openSheet(){ scrim.classList.add('show'); sheet.classList.add('show'); setTimeout(()=>addInput.focus(),200); }
+  function closeSheet(){ scrim.classList.remove('show'); sheet.classList.remove('show'); addInput.value=''; parsedEl.textContent=''; saveBtn.disabled=true; pending=null; }
+  document.getElementById('addHome').addEventListener('click',openSheet);
+  document.getElementById('addMem').addEventListener('click',openSheet);
+  scrim.addEventListener('click',closeSheet);
+  addInput.addEventListener('input',()=>{ pending=parse(addInput.value); if(pending){ saveBtn.disabled=false; parsedEl.innerHTML='I’ll hold: <b style="color:var(--violet)">'+esc(pending.title)+'</b>'+(pending.timeLabel?' at '+pending.timeLabel:'')+(pending.dayLabel&&pending.dayLabel!=='today'?' · '+pending.dayLabel:''); } else { saveBtn.disabled=true; parsedEl.textContent=''; } });
+  addInput.addEventListener('keydown',e=>{ if(e.key==='Enter'&&pending){ addMemory(pending); closeSheet(); } });
+  saveBtn.addEventListener('click',()=>{ if(pending){ addMemory(pending); closeSheet(); } });
+
+  // ── memory rows: tap to validate (the Creation→Validation→Value loop, real) ──
+  document.getElementById('memList').addEventListener('click',e=>{ const r=e.target.closest('.mrow'); if(r) cycleStatus(r.dataset.id); });
+
+  // ── voice: orb tap + sheet mic. Records → shuttle STT → parse → hold.
+  //    Voice-primary in intent; falls back to typing the moment STT is unavailable (key scope). ──
+  const orbTap=document.getElementById('orbTap'), stage=document.getElementById('orbStage'), orbStatus=document.getElementById('orbStatus'), micBtn=document.getElementById('micBtn');
+  let mediaRec=null, chunks=[], recording=false, recTarget='orb';
+  const supMp4 = window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/mp4');
+  const MIME = supMp4 ? 'audio/mp4' : (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '');
+  async function startRec(target){
+    recTarget=target;
+    try{
+      const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+      chunks=[]; mediaRec = MIME?new MediaRecorder(stream,{mimeType:MIME}):new MediaRecorder(stream);
+      mediaRec.ondataavailable=e=>{ if(e.data&&e.data.size>0) chunks.push(e.data); };
+      mediaRec.onstop=async()=>{ stream.getTracks().forEach(t=>t.stop()); await transcribe(); };
+      mediaRec.start(); recording=true;
+      if(target==='orb'){ stage.classList.add('listening'); orbStatus.textContent='Listening…'; } else micBtn.classList.add('rec');
+    }catch(_){ toast('Allow the mic to talk, or type it below.'); if(target==='orb') openSheet(); }
+  }
+  function stopRec(){ if(mediaRec&&recording){ recording=false; try{mediaRec.stop();}catch(_){} if(recTarget==='orb'){ stage.classList.remove('listening'); orbStatus.textContent='Thinking…'; } else micBtn.classList.remove('rec'); } }
+  async function transcribe(){
+    try{
+      const blob=new Blob(chunks,{type:MIME||'audio/webm'}); const b64=await toB64(blob);
+      const r=await fetch(SHUTTLE+'/api/stt',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({audio:b64,mime:blob.type})});
+      if(!r.ok) throw new Error('stt'+r.status);
+      const d=await r.json(); const text=(d.text||'').trim();
+      orbStatus.textContent='Tap to talk';
+      if(!text){ toast('Didn’t catch that — try again or type it.'); return; }
+      const p=parse(text);
+      if(p && (p.hm || /\b(at|am|pm|tomorrow|today|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i.test(text))){ addMemory(p); if(sheet.classList.contains('show')) closeSheet(); }
+      else { // not a memory — just echo it into the add box so they can confirm
+        openSheet(); addInput.value=text; addInput.dispatchEvent(new Event('input')); toast('Heard you — does this look right?'); }
+    }catch(err){
+      orbStatus.textContent='Tap to talk';
+      toast('Voice needs one switch flipped — type it for now.');  // ElevenLabs speech_to_text scope
+      if(!sheet.classList.contains('show')) openSheet();
+    }
+  }
+  function toB64(blob){ return new Promise(r=>{ const fr=new FileReader(); fr.onloadend=()=>r((''+fr.result).split(',')[1]||''); fr.readAsDataURL(blob); }); }
+  orbTap.addEventListener('click',()=>{ stage.classList.add('boop'); setTimeout(()=>stage.classList.remove('boop'),180); const rp=document.createElement('div'); rp.className='orb-ripple'; stage.appendChild(rp); setTimeout(()=>rp.remove(),820); if(navigator.vibrate)navigator.vibrate(8); if(recording) stopRec(); else startRec('orb'); });
+  micBtn.addEventListener('click',()=>{ if(recording) stopRec(); else startRec('sheet'); });
+
+  // ── you: edits ──
+  document.querySelectorAll('#chars .char').forEach(c=>c.addEventListener('click',()=>{ store.char=c.dataset.c; save(); renderYou(); }));
+  document.querySelectorAll('.seg').forEach(seg=>{ const k=seg.dataset.seg; seg.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ store[k]=b.dataset.v; save(); renderYou(); })); });
+  document.getElementById('clearName').addEventListener('click',()=>{ store.name=''; save(); renderAll(); });
+
+  // ── toast ──
+  let toastT=null; const toastEl=document.getElementById('toast');
+  function toast(msg){ toastEl.textContent=msg; toastEl.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>toastEl.classList.remove('show'),2600); }
+
+  // ── orb waveform (calm) ──
+  const canvas=document.getElementById('ring'), cx2=canvas.getContext('2d'), DPR=Math.min(window.devicePixelRatio||1,2);
+  (function(){ const s=264; canvas.width=s*DPR; canvas.height=s*DPR; canvas.style.width=s+'px'; canvas.style.height=s+'px'; })();
+  const BARS=64, phase=Array.from({length:BARS},(_,i)=>i*0.5); let amp=0.10, t=0, raf=null;
+  function draw(){ t+=0.014; const target = recording?0.8:0.12; amp+=(target-amp)*0.07; const w=canvas.width,h=canvas.height,cx=w/2,cy=h/2; cx2.clearRect(0,0,w,h); const base=w*0.355,maxLen=w*0.075;
+    for(let i=0;i<BARS;i++){ const a=(i/BARS)*Math.PI*2-Math.PI/2; const n=Math.sin(t*1.5+phase[i])*0.5+Math.sin(t*0.85+phase[i]*1.7)*0.5; const len=maxLen*(0.16+(n*0.5+0.5)*amp*1.5); const x1=cx+Math.cos(a)*base,y1=cy+Math.sin(a)*base,x2=cx+Math.cos(a)*(base+len),y2=cy+Math.sin(a)*(base+len); const hue=225+Math.sin(t*0.5+i*0.12)*30; cx2.strokeStyle=`oklch(0.72 0.10 ${hue} / ${0.30+amp*0.5})`; cx2.lineWidth=w*0.007; cx2.lineCap='round'; cx2.beginPath(); cx2.moveTo(x1,y1); cx2.lineTo(x2,y2); cx2.stroke(); }
+    raf=requestAnimationFrame(draw); }
+  function startRing(){ if(!raf) draw(); } startRing();
+
+  // clock
+  (function tick(){ const d=new Date(); document.getElementById('clock').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); setTimeout(tick,20000); })();
+
+  renderAll();
+  go(localStorage.getItem('lifeos.tab')||'home');
+})();
+</script>
+</body>
+</html>
