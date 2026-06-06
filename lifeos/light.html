@@ -38,15 +38,18 @@
       radial-gradient(90% 50% at 100% 8%, oklch(0.97 0.02 200), transparent 55%),
       radial-gradient(90% 60% at 0% 100%, oklch(0.97 0.022 150), transparent 55%),
       oklch(0.985 0.004 280);
+    background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
     min-height: 100dvh;
   }
-  /* full-bleed on real devices; framed preview only on wide screens */
+  /* Responsive: full-bleed on phones, one calm centred column on desktop — no fake bezel. */
   .device{ position: relative; width: 100%; min-height: 100dvh; background: transparent; display: flex; flex-direction: column; overflow: hidden; }
-  @media (min-width: 520px){
-    body{ display:flex; align-items:center; justify-content:center; padding: 26px 16px; }
-    .device{ width: 402px; height: 858px; min-height:0; border-radius: 46px; background: var(--paper);
-      box-shadow: 0 1px 0 0 oklch(1 0 0) inset, 0 40px 90px -44px oklch(0.4 0.04 280 / 0.5), 0 0 0 1px var(--line); }
+  .statusbar, .brandrow{ width: 100%; max-width: 640px; margin-inline: auto; }
+  .screen{ width: 100%; max-width: 640px; margin-inline: auto; }
+  @media (min-width: 640px){
+    .statusbar{ display: none; }      /* iOS status chrome belongs on phones only */
+    .brandrow{ padding-top: 18px; }
+    .screen{ padding-bottom: 150px; }
   }
   .statusbar{ flex: 0 0 auto; height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 26px; padding-top: env(safe-area-inset-top); font-size: 14px; font-weight: 600; color: var(--ink); }
   .statusbar .ic{ display:flex; align-items:center; gap:6px; }
@@ -160,8 +163,8 @@
   /* add sheet */
   .scrim{ position:absolute; inset:0; z-index:50; background:oklch(0.4 0.04 280 / 0.22); backdrop-filter:blur(3px); opacity:0; pointer-events:none; transition:opacity .25s; }
   .scrim.show{ opacity:1; pointer-events:auto; }
-  .sheet{ position:absolute; left:0; right:0; bottom:0; z-index:51; background:var(--paper); border-radius:28px 28px 0 0; padding:22px 22px calc(26px + env(safe-area-inset-bottom)); transform:translateY(110%); transition:transform .3s cubic-bezier(.2,.8,.2,1); box-shadow:0 -10px 40px -10px oklch(0.4 0.04 280 / 0.35); }
-  .sheet.show{ transform:none; }
+  .sheet{ position:absolute; left:50%; bottom:0; width:100%; max-width:640px; z-index:51; background:var(--paper); border-radius:28px 28px 0 0; padding:22px 22px calc(26px + env(safe-area-inset-bottom)); transform:translate(-50%,110%); transition:transform .3s cubic-bezier(.2,.8,.2,1); box-shadow:0 -10px 40px -10px oklch(0.4 0.04 280 / 0.35); }
+  .sheet.show{ transform:translate(-50%,0); }
   .sheet h3{ font-family:var(--serif); font-weight:400; font-size:26px; color:var(--ink); }
   .sheet .sub{ margin-top:6px; color:var(--ink-soft); font-weight:300; font-size:14px; }
   .sheet .ti{ width:100%; margin-top:16px; padding:14px 16px; border-radius:16px; border:1px solid var(--line-2); background:var(--fill); color:var(--ink); font-size:16px; font-family:var(--font); }
