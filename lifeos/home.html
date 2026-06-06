@@ -271,7 +271,26 @@
       return fetch(SHUTTLE + '/api/tts', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text }) })
         .then(r => r.ok ? r.blob() : Promise.reject()).catch(() => null);
     }
-    function playBlob(blob){ return new Promise((res) => {
+    // Play TTS through the SAME capture AudioContext (Web Audio), NOT a separate <audio> element.
+    // On iOS, a separate <audio> element tears down the getUserMedia session — the mic goes deaf
+    // after one turn. One unified audio graph (decode → BufferSource → destination) keeps the
+    // capture alive while Carrie speaks. This is the Jitsi-grade Safari fix.
+    let curSrc = null;
+    function playBlob(blob){ return new Promise(async (res) => {
+      try {
+        if (audioCtx) {
+          if (audioCtx.state !== 'running') { try { await audioCtx.resume(); } catch(_){} }
+          const buf = await blob.arrayBuffer();
+          const decoded = await audioCtx.decodeAudioData(buf);
+          const src = audioCtx.createBufferSource();
+          src.buffer = decoded; src.connect(audioCtx.destination);
+          curSrc = src;
+          src.onended = () => { try { src.disconnect(); } catch(_){}; if(curSrc===src) curSrc=null; res(); };
+          src.start(0);
+          return;
+        }
+      } catch(_) { /* decode/play failed → fall through to element playback */ }
+      // Fallback (no capture context yet, e.g. typed input before the mic is on): plain <audio>.
       const u = URL.createObjectURL(blob);
       if(audio) audio.pause(); audio = new Audio(u);
       audio.onended = () => { URL.revokeObjectURL(u); res(); };
@@ -310,8 +329,7 @@
       const rep = await brain(userText);
       replyBody.textContent = rep; showEl(reply);
       await speak(rep);
-      // iOS suspends the capture context while the TTS <audio> plays — wake it back up
-      // so the analyser hears the next turn instead of reading flatline forever.
+      // Safety net: if iOS still parked the context, wake it so the analyser hears the next turn.
       try { if(audioCtx && audioCtx.state!=='running') await audioCtx.resume(); } catch(_){}
       speechOn=false; silenceAt=0;
       setState('idle'); busy = false;
