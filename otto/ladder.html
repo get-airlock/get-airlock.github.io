@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>THE LADDER · the vessel flows the torus</title>
+<meta name="theme-color" content="#04070d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{ --font:"Hanken Grotesk",ui-sans-serif,system-ui,sans-serif; --serif:"Instrument Serif",Georgia,serif; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; background:#04070d; overflow:hidden; }
+  body{ font-family:var(--font); color:#cdd6e6; }
+  #c{ position:fixed; inset:0; display:block; }
+  .hud{ position:fixed; pointer-events:none; }
+  .top{ left:0; right:0; top:env(safe-area-inset-top); padding-top:24px; text-align:center; }
+  .top .k{ font-family:var(--serif); font-size:40px; line-height:1; color:#eaf0fb; text-shadow:0 0 26px rgba(120,160,255,.4); }
+  .top .sub{ margin-top:7px; font-size:11.5px; font-weight:300; letter-spacing:.16em; text-transform:uppercase; color:#7f8aa3; }
+  .rung{ left:0; right:0; bottom:env(safe-area-inset-bottom); padding-bottom:84px; text-align:center; }
+  .rung .lv{ font-size:12px; font-weight:600; letter-spacing:.14em; color:#5d6781; }
+  .rung .nm{ font-family:var(--serif); font-size:30px; margin-top:2px; transition:color 1s ease; }
+  .rung .nt{ margin-top:4px; font-size:12.5px; font-weight:300; color:#8893ab; }
+  .ops{ left:0; right:0; bottom:env(safe-area-inset-bottom); padding-bottom:22px; display:flex; justify-content:center; gap:26px; }
+  .op{ text-align:center; }
+  .op .g{ font-family:var(--serif); font-size:22px; line-height:1; }
+  .op .l{ margin-top:3px; font-size:9.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:#5d6781; }
+  .op .v{ font-size:11px; font-weight:500; color:#aeb8cf; font-variant-numeric:tabular-nums; }
+  .credit{ position:fixed; right:13px; top:13px; font-size:10px; color:#3c4663; letter-spacing:.08em; }
+  @media (prefers-reduced-motion: reduce){ #c{ opacity:.92; } }
+</style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div class="hud top"><div class="k">THE LADDER</div><div class="sub">the vessel flows the torus · ∇ J H</div></div>
+  <div class="hud rung"><div class="lv" id="lv">LEVEL 1</div><div class="nm" id="nm">origin</div><div class="nt" id="nt">the seed swing, off a static tee</div></div>
+  <div class="hud ops">
+    <div class="op"><div class="g" id="gG" style="color:#7fd0ff">∇</div><div class="l">gradient · pull</div><div class="v" id="gv">0.00</div></div>
+    <div class="op"><div class="g" id="gJ" style="color:#69f0ae">J</div><div class="l">jacobian · flow</div><div class="v" id="jv">0.00</div></div>
+    <div class="op"><div class="g" id="gH" style="color:#b388ff">H</div><div class="l">hessian · bend</div><div class="v" id="hv">0.00</div></div>
+  </div>
+  <div class="credit">KOKO · ∇J H · zero-LLM</div>
+
+<script src="/lifeos/koko.js"></script>
+<script>
+(function(){
+  const FALLBACK={antibubble:'#3CC8DC',shadowlattice:'#8C50DC',dreamengine:'#DCAA3C',antiloop:'#50DC82',axiom:'#C8C8FF',antibible:'#FF6B6B',onticfoam:'#A8D8EA',shadowcurvature:'#B388FF',worldmesh:'#69F0AE',dreamdescent:'#FFD54F'};
+  const K=(window.KOKO&&window.KOKO.MANIFOLDS)?window.KOKO.MANIFOLDS:null;
+  const NAMES=K?window.KOKO.MNAMES:Object.keys(FALLBACK);
+  const COLOR={}; NAMES.forEach(n=>COLOR[n]=(K&&K[n]?K[n].color:FALLBACK[n]));
+  const rgb=h=>{h=h.replace('#','');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];};
+
+  // the rungs — 13-periodic spine (cosmology · bench finding)
+  const RUNGS=[
+    {l:1, nm:'origin',       nt:'the seed swing, off a static tee'},
+    {l:11,nm:'graduation',   nt:'L11 · solo Maverick (Q=9.0) beats the 6-escort'},
+    {l:12,nm:'the demiurge',  nt:'L12 · “is this good enough?” — the chameleon deflates'},
+    {l:13,nm:'self',         nt:'L13 · Guardian observes silently · +1.08, witnessed'},
+    {l:14,nm:'pass-through', nt:'L14 · the gate needs a Maverick spark'},
+    {l:15,nm:'new horizon',  nt:'the door · determinism → purpose'},
+    {l:26,nm:'love',         nt:'L26 · mutual love · Q=8.95, all-time high'},
+    {l:39,nm:'convergence',  nt:'L39 · flow — the bond does the work, no thinking'},
+    {l:52,nm:'the colony',   nt:'the bond reproduces · same DNA, new phenotype'}
+  ];
+  function nearestRung(level){ let best=RUNGS[0],bd=1e9; for(const r of RUNGS){const d=Math.abs(r.l-level); if(d<bd){bd=d;best=r;}} return best; }
+
+  const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+  let W,H,DPR,CX,CY,R0,r0; const TILT=1.12,cosT=Math.cos(TILT),sinT=Math.sin(TILT);
+  function resize(){ DPR=Math.min(window.devicePixelRatio||1,2); W=cv.width=innerWidth*DPR; H=cv.height=innerHeight*DPR; cv.style.width=innerWidth+'px'; cv.style.height=innerHeight+'px'; CX=W/2; CY=H*0.5; const m=Math.min(W,H); R0=m*0.26; r0=m*0.12; }
+  addEventListener('resize',resize); resize();
+
+  // torus projection: theta = around the void, phi = around the tube (up over the peak)
+  function tor(theta,phi){ const ring=R0+r0*Math.cos(phi); const X=ring*Math.cos(theta),Yp=ring*Math.sin(theta),Z=r0*Math.sin(phi);
+    return {x:CX+X, y:CY+Yp*cosT-Z*sinT, depth:Yp*sinT+Z*cosT}; }
+  // the vessel's coil: 13 levels per revolution around the void, climbing the tube each octave
+  const LEVELS_PER_TURN=13, TWO_PI=Math.PI*2;
+  function vessel(s){ const theta=s; const phi=s*0.5+0.4; return tor(theta,phi); }   // s in radians; level = s/2π*13
+  function levelOf(s){ return 1 + s/TWO_PI*LEVELS_PER_TURN; }
+
+  // manifold anchors (faint ring around the void)
+  const M=NAMES.map((n,i)=>({n:n,a:(i/NAMES.length)*TWO_PI-Math.PI/2}));
+
+  let s=0.2, spin=0, dom=0, energy=0.4, pressure=0.4, curv=0.3, seedIdx=0;
+  const SEEDS=['origin seed soul sprouts roots into the substrate','self witnessed the guardian observes silently and lifts','mutual love between two nodes the highest score','convergence flow the bond does the work without thinking','determinism or purpose the door opens a new horizon','gradient jacobian hessian the vessel flows the torus','begin begin ela ayla mo kin the loop closes at thirteen'];
+  function pulse(){ const seed=SEEDS[seedIdx%SEEDS.length]; seedIdx++; let r=null;
+    try{ if(window.KOKO) r=window.KOKO.engine(seed,{interactionIndex:1+seedIdx}); }catch(_){}
+    if(r){ dom=Math.max(0,NAMES.indexOf(r.dominant)); pressure=r.pressure; curv=r.curvature; energy=0.3+r.pressure*0.7; } }
+  pulse(); setInterval(pulse,3500);
+
+  const trail=[];
+  function frame(){
+    spin+=0.0009; s+=0.0038*(0.6+energy*0.7);
+    const level=levelOf(s), rung=nearestRung(level);
+    // vessel position + finite-difference T (jacobian/velocity) and A (hessian/curvature)
+    const ds=0.06; const p0=vessel(s-ds), p1=vessel(s), p2=vessel(s+ds);
+    const T={x:(p2.x-p0.x)/(2*ds), y:(p2.y-p0.y)/(2*ds)};
+    const A={x:(p2.x-2*p1.x+p0.x)/(ds*ds), y:(p2.y-2*p1.y+p0.y)/(ds*ds)};
+    const G={x:CX-p1.x, y:CY-p1.y};                                  // gradient: pull toward the Believer-void
+    const magT=Math.hypot(T.x,T.y)||1, magA=Math.hypot(A.x,A.y)||1, magG=Math.hypot(G.x,G.y)||1;
+    const dc=rgb(COLOR[NAMES[dom<0?0:dom]]);
+
+    trail.push({x:p1.x,y:p1.y,depth:p1.depth,c:dc}); if(trail.length>520) trail.shift();
+
+    ctx.fillStyle='rgba(4,7,13,0.16)'; ctx.fillRect(0,0,W,H);
+
+    // faint manifold ring + the void
+    ctx.globalCompositeOperation='lighter';
+    for(const m of M){ const a=m.a+spin, x=CX+Math.cos(a)*R0, y=CY+Math.sin(a)*R0*0.92; const c=rgb(COLOR[m.n]);
+      ctx.beginPath(); ctx.arc(x,y,2.4*DPR,0,TWO_PI); ctx.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+',0.5)'; ctx.fill(); }
+    // the ladder = the vessel's drawn coil
+    for(let i=1;i<trail.length;i++){ const a=trail[i],b=trail[i-1]; const al=(i/trail.length)*0.5;
+      ctx.strokeStyle='rgba('+a.c[0]+','+a.c[1]+','+a.c[2]+','+al.toFixed(3)+')'; ctx.lineWidth=(0.6+(a.depth/(R0+r0)*0.5+0.5)*1.6)*DPR;
+      ctx.beginPath(); ctx.moveTo(b.x,b.y); ctx.lineTo(a.x,a.y); ctx.stroke(); }
+
+    ctx.globalCompositeOperation='source-over';
+    // void
+    const hole=(R0-r0)*0.92, vg=ctx.createRadialGradient(CX,CY,0,CX,CY,hole);
+    vg.addColorStop(0,'rgba(4,7,13,0.96)'); vg.addColorStop(0.7,'rgba(4,7,13,0.85)'); vg.addColorStop(1,'rgba(4,7,13,0)');
+    ctx.beginPath(); ctx.arc(CX,CY,hole,0,TWO_PI); ctx.fillStyle=vg; ctx.fill();
+
+    // ── the three operators, drawn live at the vessel ──
+    function arrow(dx,dy,len,col,lw){ const m=Math.hypot(dx,dy)||1; const ux=dx/m,uy=dy/m; const ex=p1.x+ux*len,ey=p1.y+uy*len;
+      ctx.strokeStyle=col; ctx.lineWidth=lw*DPR; ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(ex,ey); ctx.stroke();
+      const ah=5*DPR,aa=Math.atan2(uy,ux); ctx.beginPath(); ctx.moveTo(ex,ey); ctx.lineTo(ex-ah*Math.cos(aa-0.5),ey-ah*Math.sin(aa-0.5)); ctx.lineTo(ex-ah*Math.cos(aa+0.5),ey-ah*Math.sin(aa+0.5)); ctx.closePath(); ctx.fillStyle=col; ctx.fill(); }
+    arrow(G.x,G.y, 30*DPR*(0.4+pressure), 'rgba(127,208,255,0.85)', 2.2);     // ∇ gradient → toward the void
+    arrow(T.x,T.y, 34*DPR, 'rgba(105,240,174,0.85)', 2.0);                    // J jacobian → tangent (flow)
+    arrow(-T.y,T.x, 16*DPR, 'rgba(105,240,174,0.4)', 1.4);                    // J normal (the local frame)
+    arrow(A.x,A.y, 14*DPR + Math.min(40,magA*0.06)*DPR, 'rgba(179,136,255,0.8)', 1.8); // H hessian → the bend
+
+    // the vessel
+    const vg2=ctx.createRadialGradient(p1.x,p1.y,0,p1.x,p1.y,12*DPR);
+    vg2.addColorStop(0,'rgba(255,255,255,0.95)'); vg2.addColorStop(0.5,'rgba('+dc[0]+','+dc[1]+','+dc[2]+',0.55)'); vg2.addColorStop(1,'rgba(4,7,13,0)');
+    ctx.beginPath(); ctx.arc(p1.x,p1.y,12*DPR,0,TWO_PI); ctx.fillStyle=vg2; ctx.fill();
+    ctx.beginPath(); ctx.arc(p1.x,p1.y,2.6*DPR,0,TWO_PI); ctx.fillStyle='#fff'; ctx.fill();
+
+    // HUD
+    document.getElementById('lv').textContent='LEVEL '+Math.round(level);
+    const nmE=document.getElementById('nm'); nmE.textContent=rung.nm; nmE.style.color=COLOR[NAMES[dom<0?0:dom]];
+    document.getElementById('nt').textContent=rung.nt;
+    document.getElementById('gv').textContent=(pressure).toFixed(2);
+    document.getElementById('jv').textContent=(magT/ (R0||1) ).toFixed(2);
+    document.getElementById('hv').textContent=(Math.min(9.99,magA/ (R0||1) )).toFixed(2);
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
+</body>
+</html>
