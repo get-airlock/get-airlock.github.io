@@ -311,7 +311,7 @@
   const orbLine = document.getElementById('orbLine');
   let history = [], assist = false;
   const HELP_RE = /\b(help|plan|find|organi[sz]e|schedule|study|tutor|homework|remind|fix|figure|decide|build|make|write|draft)\b/i;
-  let audioCtx = null, curSrc = null;
+  let audioCtx = null, curSrc = null, curAudio = null, curResolve = null, speakGen = 0;
   function ensureCtx(){ if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(_){} } if(audioCtx && audioCtx.state==='suspended') audioCtx.resume().catch(()=>{}); return audioCtx; }
   async function brain(text){
     history.push({role:'user', content:text});
@@ -326,8 +326,10 @@
   function splitChunks(t){ const parts=(''+t).match(/[^.!?\n]+[.!?]*\s*/g)||[t]; const out=[]; let cur=''; for(const p of parts){ cur+=p; const lim=out.length===0?0:140; if(cur.trim().length>lim){ out.push(cur.trim()); cur=''; } } if(cur.trim()) out.push(cur.trim()); return out; }
   function ttsBlob(t){ return fetch(SHUTTLE+'/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t})}).then(r=>r.ok?r.blob():Promise.reject()).catch(()=>null); }
   // play TTS through the shared AudioContext (Web Audio) so iOS doesn't kill the mic — the Safari fix
-  function playBlob(blob){ return new Promise(async res=>{ try{ const ctx=ensureCtx(); if(ctx){ const buf=await blob.arrayBuffer(); const dec=await ctx.decodeAudioData(buf); const s=ctx.createBufferSource(); s.buffer=dec; s.connect(ctx.destination); curSrc=s; s.onended=()=>{ try{s.disconnect();}catch(_){}; res(); }; s.start(0); return; } }catch(_){} const u=URL.createObjectURL(blob); const a=new Audio(u); a.onended=()=>{URL.revokeObjectURL(u);res();}; a.onerror=()=>res(); a.play().catch(()=>res()); }); }
-  async function speak(text){ const chunks=splitChunks(text); if(!chunks.length) return; let nf=ttsBlob(chunks[0]); for(let i=0;i<chunks.length;i++){ const b=await nf; nf=(i+1<chunks.length)?ttsBlob(chunks[i+1]):null; if(b) await playBlob(b); } }
+  // stop any in-flight TTS so a new utterance never overlaps the old (fixes Rika's "double voices")
+  function stopSpeaking(){ try{ if(curSrc){ curSrc.onended=null; curSrc.stop(0); curSrc.disconnect(); } }catch(_){} curSrc=null; try{ if(curAudio){ curAudio.onended=null; curAudio.pause(); } }catch(_){} curAudio=null; if(curResolve){ const r=curResolve; curResolve=null; r(); } }
+  function playBlob(blob){ return new Promise(async res=>{ curResolve=res; try{ const ctx=ensureCtx(); if(ctx){ const buf=await blob.arrayBuffer(); const dec=await ctx.decodeAudioData(buf); const s=ctx.createBufferSource(); s.buffer=dec; s.connect(ctx.destination); curSrc=s; s.onended=()=>{ try{s.disconnect();}catch(_){}; curSrc=null; if(curResolve===res){ curResolve=null; res(); } }; s.start(0); return; } }catch(_){} const u=URL.createObjectURL(blob); const a=new Audio(u); curAudio=a; a.onended=()=>{URL.revokeObjectURL(u); curAudio=null; if(curResolve===res){ curResolve=null; res(); }}; a.onerror=()=>{ curAudio=null; if(curResolve===res){ curResolve=null; res(); } }; a.play().catch(()=>{ if(curResolve===res){ curResolve=null; res(); } }); }); }
+  async function speak(text){ const myGen=++speakGen; stopSpeaking(); const chunks=splitChunks(text); if(!chunks.length) return; let nf=ttsBlob(chunks[0]); for(let i=0;i<chunks.length;i++){ if(myGen!==speakGen) return; const b=await nf; nf=(i+1<chunks.length)?ttsBlob(chunks[i+1]):null; if(myGen!==speakGen) return; if(b) await playBlob(b); } }
 
   // ── SPIRALL · Hamiltonian Resonance Engine (Sven) → orb glow. The HEART engine of the substrate.
   //    computeResonance(state) → one scalar 0–1. Reflected purely as light (mirror, not a score).
@@ -539,11 +541,15 @@
   function stopRec(){ if(mediaRec&&recording){ recording=false; try{mediaRec.stop();}catch(_){} if(recTarget==='orb'){ stage.classList.remove('listening'); orbStatus.textContent='Thinking…'; } else micBtn.classList.remove('rec'); } }
   async function transcribe(){
     try{
-      const blob=new Blob(chunks,{type:MIME||'audio/webm'}); const b64=await toB64(blob);
+      const blob=new Blob(chunks,{type:MIME||'audio/webm'});
+      if(blob.size < 1600){ orbStatus.textContent='Tap to talk'; toast('Didn’t catch that — hold a beat longer.'); return; }   // near-silent clip; Whisper hallucinates on these
+      const b64=await toB64(blob);
       const r=await fetch(SHUTTLE+'/api/stt',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({audio:b64,mime:blob.type})});
       if(!r.ok) throw new Error('stt'+r.status);
       const d=await r.json(); const text=(d.text||'').trim();
-      if(!text){ orbStatus.textContent='Tap to talk'; toast('Didn’t catch that — try again or type.'); return; }
+      // Whisper invents phantom phrases on silence/background noise — drop them so they never become memories or replies (Carrie's "thank you for watching / goodbye")
+      const HALLUC=/^(you|thanks?( you)?( for watching)?|thank you for watching|please subscribe|subscribe|like,? and subscribe|see you (next time|later)|good\s?bye|bye( bye)?|♪.*|[^a-z0-9]+)$/i;
+      if(!text || text.length<2 || HALLUC.test(text)){ orbStatus.textContent='Tap to talk'; toast('Didn’t catch that — try again or type.'); return; }
       const p=parse(text);
       const looksMem = p && (p.hm || /^(remind me|add|schedule|put down|i have|i’ve got|i got)\b/i.test(text.trim()));
       if(looksMem){ addMemory(p); if(sheet.classList.contains('show')) closeSheet(); orbStatus.textContent='Tap to talk'; await speak('Held — '+p.title+(p.timeLabel?(' at '+p.timeLabel):'')+'.'); return; }
