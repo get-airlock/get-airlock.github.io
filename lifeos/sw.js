@@ -1,29 +1,25 @@
 // LifeOS service worker — PWA shell, network-first for pages so the UI is never stale.
-// v0.2.0 (new design): HTML = network-first (fresh always), static = cache-first (offline).
+// v0.3.0: light.html is the one true app. Precache the LIGHT shell + icons so an installed,
+// offline launch (e.g. flaky bar wifi) opens the app instead of a blank redirect chain.
 
-const CACHE_VERSION = 'lifeos-v0.2.0';
+const CACHE_VERSION = 'lifeos-v0.3.0';
+const APP = '/lifeos/light.html';
 const SHELL_ASSETS = [
   '/lifeos/',
   '/lifeos/index.html',
-  '/lifeos/create.html',
-  '/lifeos/memory.html',
-  '/lifeos/wallet.html',
-  '/lifeos/you.html',
-  '/lifeos/kyi/arrive.html',
-  '/lifeos/kyi/continue.html',
-  '/lifeos/kyi/contribute.html',
-  '/lifeos/css/lifeos.css',
-  '/lifeos/js/store.js',
-  '/lifeos/js/ui.js',
-  '/lifeos/js/memory.js',
-  '/lifeos/js/companion.js',
+  '/lifeos/light.html',
   '/lifeos/manifest.json',
+  '/lifeos/icons/icon-180.png',
+  '/lifeos/icons/icon-192.png',
+  '/lifeos/icons/icon-512.png',
+  '/lifeos/icons/icon.svg',
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_VERSION)
-      .then((cache) => cache.addAll(SHELL_ASSETS).catch(() => {})) // tolerate any 404 in list
+      // add each asset independently — one 404 can't stop the rest (addAll is all-or-nothing)
+      .then((cache) => Promise.all(SHELL_ASSETS.map((u) => cache.add(u).catch(() => {}))))
       .then(() => self.skipWaiting())
   );
 });
@@ -44,6 +40,7 @@ self.addEventListener('fetch', (event) => {
 
   if (isHTML) {
     // Network-first: always serve fresh pages; fall back to cache only when offline.
+    // Offline fallback is the APP (light.html), never the redirect-only index.
     event.respondWith(
       fetch(req)
         .then((response) => {
@@ -53,7 +50,7 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         })
-        .catch(() => caches.match(req).then((c) => c || caches.match('/lifeos/index.html')))
+        .catch(() => caches.match(req).then((c) => c || caches.match(APP) || caches.match('/lifeos/index.html')))
     );
     return;
   }

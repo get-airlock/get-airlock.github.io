@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>LifeOS</title>
+<!-- PWA: installable, standalone, real icons (Rika adds to Home Screen → opens like a native app) -->
+<meta name="theme-color" content="#f6f3fb">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="LifeOS">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
@@ -558,6 +566,7 @@
   renderAll();
   setInterval(applyResonance, 12000);   // the heart re-samples — momentum settles, the orb breathes back to calm after a burst
   go(localStorage.getItem('lifeos.tab')||'home');
+  if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }  // PWA shell (offline-safe)
 })();
 </script>
 </body>
