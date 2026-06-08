@@ -551,10 +551,15 @@
       if(!r.ok) throw new Error('stt'+r.status);
       const d=await r.json(); const text=(d.text||'').trim();
       // Whisper invents phantom phrases on silence/background noise — drop them so they never become memories or replies (Carrie's "thank you for watching / goodbye")
-      const HALLUC=/^(you|thanks?( you)?( for watching)?|thank you for watching|please subscribe|subscribe|like,? and subscribe|see you (next time|later)|good\s?bye|bye( bye)?|♪.*|[^a-z0-9]+)$/i;
-      if(!text || text.length<2 || HALLUC.test(text)){ toast('Didn’t catch that — try again or type.'); doneTurn(); return; }
+      const clean=text.toLowerCase().replace(/^[^a-z0-9♪]+/,'').replace(/[^a-z0-9♪]+$/,'').trim();   // strip caps/punctuation so "Thank you for watching." is caught too
+      const HALLUC=/^(you|thanks?( you)?( so much)?( for watching)?|thank you( so much)?( for watching)?|thanks for watching|please subscribe|subscribe|like,? and subscribe|see you (next time|later|in the next \w+)|good\s?bye|bye( bye)?|♪.*|[mh]*m+|u+h+|u+m+|a+h+|e+g*h+|o+h*|hmm+)$/i;
+      const allFiller=clean.length>0 && clean.split(/\s+/).every(w=>/^[aeiouhmg]+$/i.test(w));   // "eghhh ooo ahhh" garbage replies/transcripts
+      if(!text || clean.length<2 || HALLUC.test(clean) || allFiller){ toast('Didn’t catch that — try again or type.'); doneTurn(); return; }
       const p=parse(text);
-      const looksMem = p && (p.hm || /^(remind me|add|schedule|put down|i have|i’ve got|i got)\b/i.test(text.trim()));
+      // questions + math must never become schedule items (Carrie's "7456 x 8" → "7am" bug) — route them to conversation
+      const isQ = /\?\s*$/.test(text) || /^(what|whats?|what'?s|how|why|who|when|where|which|is|are|am|can|could|would|should|do|does|did|tell me|calculate|solve)\b/i.test(text.trim());
+      const isMath = /\d[\s,]*[x×*+\/=\-]\s*\d/i.test(text) || /\d.*\b(times|plus|minus|divided|multiplied|equals|squared)\b/i.test(text) || /\b(times|plus|minus|divided by|multiplied by)\b.*\d/i.test(text);
+      const looksMem = !isQ && !isMath && p && (p.hm || /^(remind me|add|schedule|put down|i have|i’ve got|i got)\b/i.test(text.trim()));
       if(looksMem){ addMemory(p); if(sheet.classList.contains('show')) closeSheet(); await speak('Held — '+p.title+(p.timeLabel?(' at '+p.timeLabel):'')+'.'); doneTurn(); return; }
       // otherwise it's a conversation — Carrie answers in voice
       orbLine.innerHTML='“'+esc(text)+'”'; orbStatus.textContent='Thinking…';
