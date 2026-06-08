@@ -550,7 +550,9 @@
       const blob=new Blob(chunks,{type:MIME||'audio/webm'});
       if(blob.size < 1600){ toast('Didn’t catch that — hold a beat longer.'); doneTurn(); return; }   // near-silent clip; Whisper hallucinates on these
       const b64=await toB64(blob);
-      const r=await fetch(SHUTTLE+'/api/stt',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({audio:b64,mime:blob.type})});
+      // Force Whisper's language instead of auto-detect — Japanese-accented English garbles on auto-detect (Rika/Carrie). Override per-user via localStorage 'lifeos.lang' (e.g. 'ja').
+      const sttLang=(function(){try{return (localStorage.getItem('lifeos.lang')||'en').slice(0,2);}catch(_){return 'en';}})();
+      const r=await fetch(SHUTTLE+'/api/stt',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({audio:b64,mime:blob.type,language:sttLang})});
       if(!r.ok) throw new Error('stt'+r.status);
       const d=await r.json(); const text=(d.text||'').trim();
       // Whisper invents phantom phrases on silence/background noise — drop them so they never become memories or replies (Carrie's "thank you for watching / goodbye")
