@@ -19,6 +19,13 @@ const Voice = {
   _errStreak: 0,
   greeting: "Hi, I'm right here. What's on your mind?",
 
+  // Smart endpointing — end the turn on COMPLETION + her rhythm, not raw silence.
+  _utterance: '',        // accumulated final transcript for the current turn
+  _endpointTimer: null,  // fires when she's genuinely finished a thought
+  _lastResultAt: 0,
+  _baseEndpoint: 1400,   // ms of grace before ending a turn; adapts to the speaker
+  _pauseEMA: 0,          // learned average mid-thought pause length
+
   supportsSTT() {
     return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
   },
@@ -40,6 +47,14 @@ const Voice = {
       window.speechSynthesis.getVoices();
       window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     }
+    // Restore her learned speaking rhythm so endpointing fits this person from the start.
+    try {
+      const p = parseInt(localStorage.getItem('lifeos.voice.pauseMs') || '0', 10);
+      if (p > 400 && p < 4000) {
+        this._pauseEMA = p;
+        this._baseEndpoint = Math.max(1100, Math.min(2600, Math.round(p * 1.35)));
+      }
+    } catch (_) {}
   },
 
   // ── Hands-free conversation ────────────────────────────────
@@ -47,6 +62,8 @@ const Voice = {
   startConversation() {
     this.conversationMode = true;
     this._errStreak = 0;
+    this._clearEndpoint();
+    this._utterance = '';
     this.speak(this.greeting);   // greeting ends → _afterSpeak → auto-listen
   },
 
@@ -82,9 +99,11 @@ const Voice = {
     }
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     const rec = new SR();
-    rec.lang = 'en-US';
+    rec.lang = window.LIFEOS_LANG
+      || (function () { try { return localStorage.getItem('lifeos.lang'); } catch (_) { return null; } })()
+      || 'en-US';
     rec.interimResults = true;
-    rec.continuous = false;
+    rec.continuous = true;       // keep the ear open across pauses; WE decide when she's done
     rec.maxAlternatives = 1;
 
     rec.onstart = () => {
@@ -99,10 +118,22 @@ const Voice = {
         const t = e.results[i][0].transcript;
         if (e.results[i].isFinal) final += t; else interim += t;
       }
-      const shown = (final || interim).trim();
-      if (shown && this.cb.onTranscript) this.cb.onTranscript(shown, !!final);
-      this.level = Math.min(1, 0.5 + shown.length / 60);
-      if (final) { this._gotResult = true; this._errStreak = 0; this._handleFinal(final.trim()); }
+      // Learn her rhythm: a gap she paused through but recovered from is a pause
+      // that should NEVER have ended her turn. Calibrate toward it.
+      const now = Date.now();
+      const gap = this._lastResultAt ? (now - this._lastResultAt) : 0;
+      this._lastResultAt = now;
+      if (gap > 500 && gap < 4000) {
+        this._pauseEMA = this._pauseEMA ? (this._pauseEMA * 0.8 + gap * 0.2) : gap;
+        this._baseEndpoint = Math.max(1100, Math.min(2600, Math.round(this._pauseEMA * 1.35)));
+        try { localStorage.setItem('lifeos.voice.pauseMs', String(Math.round(this._pauseEMA))); } catch (_) {}
+      }
+      // Accumulate finals across pauses instead of firing a reply on each one.
+      if (final) { this._utterance = (this._utterance + ' ' + final).trim(); this._errStreak = 0; }
+      const live = (this._utterance + ' ' + interim).trim();
+      if (live && this.cb.onTranscript) this.cb.onTranscript(live, false); // interim → UI; final fires on flush
+      this.level = Math.min(1, 0.5 + live.length / 60);
+      this._scheduleEndpoint(interim);   // any activity resets the clock; it only fires once she stops
     };
     rec.onerror = (e) => {
       this.listening = false;
@@ -133,10 +164,51 @@ const Voice = {
   },
 
   stop() {
+    this._clearEndpoint();
+    this._utterance = '';
+    this._lastResultAt = 0;
     if (this.rec) { try { this.rec.stop(); } catch (_) {} }
     this.listening = false;
     this._rampLevel(0);
     this._status('idle');
+  },
+
+  // ── Smart endpointing ──────────────────────────────────────
+  // Fire the turn only after she's been quiet long enough AND the thought looks
+  // complete. Mid-sentence pauses (and trailing "and…/because…") extend the wait.
+  _scheduleEndpoint(interim) {
+    this._clearEndpoint();
+    const text = (this._utterance + ' ' + (interim || '')).trim();
+    if (!text) return;
+    const wait = this._looksComplete(text) ? this._baseEndpoint : (this._baseEndpoint + 800);
+    this._endpointTimer = setTimeout(() => this._flush(), wait);
+  },
+
+  _looksComplete(text) {
+    const words = text.toLowerCase().replace(/[^\w'\s]/g, ' ').split(/\s+/).filter(Boolean);
+    if (words.length < 2) return false;             // too short — probably just getting started
+    const CONT = new Set(['and','but','so','because','or','with','to','the','a','an','of','for','i',
+      'we','my','our','um','uh','er','like','that','if','when','then','as','is','are','was','were',
+      'at','in','on','it','this','these','those','you','your','its','about','into','over','than',
+      'also','still','just','really','very','gonna','wanna','want','need','have','had','what','which']);
+    return !CONT.has(words[words.length - 1]);       // trailing connector → she's mid-thought, wait
+  },
+
+  _flush() {
+    this._clearEndpoint();
+    const text = (this._utterance || '').trim();
+    this._utterance = '';
+    this._lastResultAt = 0;
+    if (!text) return;
+    this._gotResult = true; this._errStreak = 0;     // onend won't re-arm; a reply is coming
+    if (this.cb.onTranscript) this.cb.onTranscript(text, true);  // now it's final for the UI
+    if (this.rec) { try { this.rec.stop(); } catch (_) {} }      // close the ear so we don't hear Carrie
+    this.listening = false;
+    this._handleFinal(text);
+  },
+
+  _clearEndpoint() {
+    if (this._endpointTimer) { clearTimeout(this._endpointTimer); this._endpointTimer = null; }
   },
 
   // Route a final utterance (voice OR typed) through the companion and speak back.
