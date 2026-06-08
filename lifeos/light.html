@@ -326,7 +326,7 @@
   function splitChunks(t){ const parts=(''+t).match(/[^.!?\n]+[.!?]*\s*/g)||[t]; const out=[]; let cur=''; for(const p of parts){ cur+=p; const lim=out.length===0?0:140; if(cur.trim().length>lim){ out.push(cur.trim()); cur=''; } } if(cur.trim()) out.push(cur.trim()); return out; }
   // Keep Carrie's voice even: strip markdown emphasis and de-SHOUT long ALL-CAPS words before TTS,
   // so the engine stops randomly dramatizing words mid-sentence ("MUCH MORE…"). Keeps short acronyms (AI, US, CEO).
-  function ttsClean(t){ return String(t||'').replace(/[*_`#~]+/g,'').replace(/\b([A-Z]{4,})\b/g,(m)=>m.charAt(0)+m.slice(1).toLowerCase()).replace(/\s{2,}/g,' ').trim(); }
+  function ttsClean(t){ return String(t||'').replace(/[*_`#~]+/g,'').replace(/\b([A-Z]{4,})\b/g,(m)=>m.charAt(0)+m.slice(1).toLowerCase()).replace(/!+/g,'.').replace(/\s{2,}/g,' ').trim(); }
   function ttsBlob(t){ return fetch(SHUTTLE+'/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:ttsClean(t)})}).then(r=>r.ok?r.blob():Promise.reject()).catch(()=>null); }
   // play TTS through the shared AudioContext (Web Audio) so iOS doesn't kill the mic — the Safari fix
   // stop any in-flight TTS so a new utterance never overlaps the old (fixes Rika's "double voices")
@@ -562,9 +562,14 @@
       const d=await r.json(); const text=(d.text||'').trim();
       // Whisper invents phantom phrases on silence/background noise — drop them so they never become memories or replies (Carrie's "thank you for watching / goodbye")
       const clean=text.toLowerCase().replace(/^[^a-z0-9♪]+/,'').replace(/[^a-z0-9♪]+$/,'').trim();   // strip caps/punctuation so "Thank you for watching." is caught too
-      const HALLUC=/^(you|thanks?( you)?( so much)?( for watching)?|thank you( so much)?( for watching)?|thanks for watching|please subscribe|subscribe|like,? and subscribe|see you (next time|later|in the next \w+)|good\s?bye|bye( bye)?|♪.*|[mh]*m+|u+h+|u+m+|a+h+|e+g*h+|o+h*|hmm+)$/i;
+      // HARD phantoms: always junk (YouTube-caption hallucinations, music, pure filler). SOFT phantoms:
+      // polite tokens ("thank you", "bye", "you", "ok") that Whisper invents on silence BUT are also real
+      // closings — only drop them on a short/near-silent clip; a real "yes that's great thank you" runs long.
+      const HARD=/^(thanks?( you)?( so much)? for watching|thank you( so much)? for watching|thanks for watching|please subscribe|subscribe|like,? and subscribe|♪.*|[mh]*m+|u+h+|u+m+|a+h+|e+g*h+|o+h*|hmm+)$/i;
+      const SOFT=/^(you|thanks?( you)?( so much)?|thank you( so much)?|see you (next time|later|in the next \w+)|good\s?bye|bye( bye)?|ok|okay)$/i;
+      const shortClip = blob.size < 9000;   // hallucinations live in the near-silence regime; real speech is bigger
       const allFiller=clean.length>0 && clean.split(/\s+/).every(w=>/^[aeiouhmg]+$/i.test(w));   // "eghhh ooo ahhh" garbage replies/transcripts
-      if(!text || clean.length<2 || HALLUC.test(clean) || allFiller){ toast('Didn’t catch that — try again or type.'); doneTurn(); return; }
+      if(!text || clean.length<2 || HARD.test(clean) || (shortClip && SOFT.test(clean)) || allFiller){ toast('Didn’t catch that — try again or type.'); doneTurn(); return; }
       // Stitch across pauses: if she's mid-thought (trailing connector) and hands-free, keep the
       // turn open and wait for the next segment instead of interrupting her with a reply.
       const full=(_turnText?(_turnText+' '):'')+text;
