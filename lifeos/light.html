@@ -324,7 +324,10 @@
     return rep;
   }
   function splitChunks(t){ const parts=(''+t).match(/[^.!?\n]+[.!?]*\s*/g)||[t]; const out=[]; let cur=''; for(const p of parts){ cur+=p; const lim=out.length===0?0:140; if(cur.trim().length>lim){ out.push(cur.trim()); cur=''; } } if(cur.trim()) out.push(cur.trim()); return out; }
-  function ttsBlob(t){ return fetch(SHUTTLE+'/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t})}).then(r=>r.ok?r.blob():Promise.reject()).catch(()=>null); }
+  // Keep Carrie's voice even: strip markdown emphasis and de-SHOUT long ALL-CAPS words before TTS,
+  // so the engine stops randomly dramatizing words mid-sentence ("MUCH MORE…"). Keeps short acronyms (AI, US, CEO).
+  function ttsClean(t){ return String(t||'').replace(/[*_`#~]+/g,'').replace(/\b([A-Z]{4,})\b/g,(m)=>m.charAt(0)+m.slice(1).toLowerCase()).replace(/\s{2,}/g,' ').trim(); }
+  function ttsBlob(t){ return fetch(SHUTTLE+'/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:ttsClean(t)})}).then(r=>r.ok?r.blob():Promise.reject()).catch(()=>null); }
   // play TTS through the shared AudioContext (Web Audio) so iOS doesn't kill the mic — the Safari fix
   // stop any in-flight TTS so a new utterance never overlaps the old (fixes Rika's "double voices")
   function stopSpeaking(){ try{ if(curSrc){ curSrc.onended=null; curSrc.stop(0); curSrc.disconnect(); } }catch(_){} curSrc=null; try{ if(curAudio){ curAudio.onended=null; curAudio.pause(); } }catch(_){} curAudio=null; if(curResolve){ const r=curResolve; curResolve=null; r(); } }
@@ -527,6 +530,7 @@
   let mediaRec=null, chunks=[], recording=false, recTarget='orb';
   // ── hands-free conversation (VAD): tap orb once → mic stays awake, ~1s of silence ends a turn, reply, auto-resume. Rika's loop, in-browser. ──
   let convo=false, vadStream=null, vadAnalyser=null, vadData=null, vadRAF=0, segActive=false, speechSeen=false, silenceAt=0, segAt=0;
+  let _sttFails=0;   // consecutive STT failures — keep the flow, fall back to typing only after a few
   const SPEAK_TH=0.020, MIN_SPEECH=250, MAX_SEG=15000;
   // End-of-turn silence is adaptive: base + a learned per-speaker rhythm (Rika: pauses vary by person).
   let END_SIL=1350; try{ const s=parseInt(localStorage.getItem('lifeos.voice.endSil')||'0',10); if(s>=1100&&s<=2400) END_SIL=s; }catch(_){}
@@ -554,6 +558,7 @@
       const sttLang=(function(){try{return (localStorage.getItem('lifeos.lang')||'en').slice(0,2);}catch(_){return 'en';}})();
       const r=await fetch(SHUTTLE+'/api/stt',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({audio:b64,mime:blob.type,language:sttLang})});
       if(!r.ok) throw new Error('stt'+r.status);
+      _sttFails=0;   // STT recovered — reset the flow guard
       const d=await r.json(); const text=(d.text||'').trim();
       // Whisper invents phantom phrases on silence/background noise — drop them so they never become memories or replies (Carrie's "thank you for watching / goodbye")
       const clean=text.toLowerCase().replace(/^[^a-z0-9♪]+/,'').replace(/[^a-z0-9♪]+$/,'').trim();   // strip caps/punctuation so "Thank you for watching." is caught too
@@ -582,15 +587,20 @@
       await speak(rep);
       doneTurn();
     }catch(err){
+      // Don't break a flow-state talker on a single STT hiccup — keep the ear open; fall back to typing only after repeated failures.
+      _sttFails++;
+      if(convo && _sttFails < 3){ toast('one sec — didn’t catch that, keep going'); doneTurn(); return; }
+      _sttFails = 0;
       if(convo) stopConvo();
       orbStatus.textContent='Tap to talk';
-      toast('Voice needs the STT key — type it for now.');
+      toast('Voice is having a moment — type it here for now.');
       if(!sheet.classList.contains('show')) openSheet();
     }
   }
   function toB64(blob){ return new Promise(r=>{ const fr=new FileReader(); fr.onloadend=()=>r((''+fr.result).split(',')[1]||''); fr.readAsDataURL(blob); }); }
   // True when the utterance trails on a connector/filler → she's mid-thought, don't end her turn.
-  function _endsOpen(t){ const w=(t||'').toLowerCase().replace(/[^a-z0-9'\s]/g,' ').trim().split(/\s+/).filter(Boolean); if(!w.length) return false; return /^(and|but|so|because|or|with|to|the|a|an|of|for|i|we|my|our|um|uh|like|that|if|when|then|as|is|are|at|in|on|it|this|you|your|also|just|really|very|gonna|wanna|want|need|have|what|which)$/.test(w[w.length-1]); }
+  // Trailing CONNECTOR = mid-thought, keep waiting. Words that are commonly sentence-final (you, that, is, it, what…) are EXCLUDED so polite closings like "thank you" finalize immediately.
+  function _endsOpen(t){ const w=(t||'').toLowerCase().replace(/[^a-z0-9'\s]/g,' ').trim().split(/\s+/).filter(Boolean); if(!w.length) return false; return /^(and|but|so|because|or|with|to|the|a|an|of|for|i|we|my|our|um|uh|like|if|when|then|as|at|in|on|also|just|really|very|gonna|wanna|want|need|have)$/.test(w[w.length-1]); }
 
   // ── hands-free conversation engine: one persistent mic stream + Web Audio VAD drives turn-taking, no per-turn tapping ──
   function startConvo(){
