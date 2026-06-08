@@ -527,7 +527,10 @@
   let mediaRec=null, chunks=[], recording=false, recTarget='orb';
   // ── hands-free conversation (VAD): tap orb once → mic stays awake, ~1s of silence ends a turn, reply, auto-resume. Rika's loop, in-browser. ──
   let convo=false, vadStream=null, vadAnalyser=null, vadData=null, vadRAF=0, segActive=false, speechSeen=false, silenceAt=0, segAt=0;
-  const SPEAK_TH=0.020, END_SIL=950, MIN_SPEECH=250, MAX_SEG=15000;
+  const SPEAK_TH=0.020, MIN_SPEECH=250, MAX_SEG=15000;
+  // End-of-turn silence is adaptive: base + a learned per-speaker rhythm (Rika: pauses vary by person).
+  let END_SIL=1350; try{ const s=parseInt(localStorage.getItem('lifeos.voice.endSil')||'0',10); if(s>=1100&&s<=2400) END_SIL=s; }catch(_){}
+  let _turnText='';   // stitch fragments across pauses so a mid-thought pause never triggers a reply
   const supMp4 = window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/mp4');
   const MIME = supMp4 ? 'audio/mp4' : (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '');
   async function startRec(target){
@@ -555,15 +558,24 @@
       const HALLUC=/^(you|thanks?( you)?( so much)?( for watching)?|thank you( so much)?( for watching)?|thanks for watching|please subscribe|subscribe|like,? and subscribe|see you (next time|later|in the next \w+)|good\s?bye|bye( bye)?|♪.*|[mh]*m+|u+h+|u+m+|a+h+|e+g*h+|o+h*|hmm+)$/i;
       const allFiller=clean.length>0 && clean.split(/\s+/).every(w=>/^[aeiouhmg]+$/i.test(w));   // "eghhh ooo ahhh" garbage replies/transcripts
       if(!text || clean.length<2 || HALLUC.test(clean) || allFiller){ toast('Didn’t catch that — try again or type.'); doneTurn(); return; }
-      const p=parse(text);
+      // Stitch across pauses: if she's mid-thought (trailing connector) and hands-free, keep the
+      // turn open and wait for the next segment instead of interrupting her with a reply.
+      const full=(_turnText?(_turnText+' '):'')+text;
+      if(convo && _endsOpen(text)){
+        _turnText=full; END_SIL=Math.min(2400,END_SIL+150);              // she pauses longer → give her room, and learn it
+        try{ localStorage.setItem('lifeos.voice.endSil',String(END_SIL)); }catch(_){}
+        orbLine.innerHTML='“'+esc(full)+'…”'; orbStatus.textContent='…'; armSegment(); return;
+      }
+      _turnText='';
+      const p=parse(full);
       // questions + math must never become schedule items (Carrie's "7456 x 8" → "7am" bug) — route them to conversation
-      const isQ = /\?\s*$/.test(text) || /^(what|whats?|what'?s|how|why|who|when|where|which|is|are|am|can|could|would|should|do|does|did|tell me|calculate|solve)\b/i.test(text.trim());
-      const isMath = /\d[\s,]*[x×*+\/=\-]\s*\d/i.test(text) || /\d.*\b(times|plus|minus|divided|multiplied|equals|squared)\b/i.test(text) || /\b(times|plus|minus|divided by|multiplied by)\b.*\d/i.test(text);
-      const looksMem = !isQ && !isMath && p && (p.hm || /^(remind me|add|schedule|put down|i have|i’ve got|i got)\b/i.test(text.trim()));
+      const isQ = /\?\s*$/.test(full) || /^(what|whats?|what'?s|how|why|who|when|where|which|is|are|am|can|could|would|should|do|does|did|tell me|calculate|solve)\b/i.test(full.trim());
+      const isMath = /\d[\s,]*[x×*+\/=\-]\s*\d/i.test(full) || /\d.*\b(times|plus|minus|divided|multiplied|equals|squared)\b/i.test(full) || /\b(times|plus|minus|divided by|multiplied by)\b.*\d/i.test(full);
+      const looksMem = !isQ && !isMath && p && (p.hm || /^(remind me|add|schedule|put down|i have|i’ve got|i got)\b/i.test(full.trim()));
       if(looksMem){ addMemory(p); if(sheet.classList.contains('show')) closeSheet(); await speak('Held — '+p.title+(p.timeLabel?(' at '+p.timeLabel):'')+'.'); doneTurn(); return; }
       // otherwise it's a conversation — Carrie answers in voice
-      orbLine.innerHTML='“'+esc(text)+'”'; orbStatus.textContent='Thinking…';
-      const rep=await brain(text); applyResonance();
+      orbLine.innerHTML='“'+esc(full)+'”'; orbStatus.textContent='Thinking…';
+      const rep=await brain(full); applyResonance();
       orbLine.innerHTML='<b>'+esc(rep)+'</b>'; orbStatus.textContent='Speaking…';
       await speak(rep);
       doneTurn();
@@ -575,6 +587,8 @@
     }
   }
   function toB64(blob){ return new Promise(r=>{ const fr=new FileReader(); fr.onloadend=()=>r((''+fr.result).split(',')[1]||''); fr.readAsDataURL(blob); }); }
+  // True when the utterance trails on a connector/filler → she's mid-thought, don't end her turn.
+  function _endsOpen(t){ const w=(t||'').toLowerCase().replace(/[^a-z0-9'\s]/g,' ').trim().split(/\s+/).filter(Boolean); if(!w.length) return false; return /^(and|but|so|because|or|with|to|the|a|an|of|for|i|we|my|our|um|uh|like|that|if|when|then|as|is|are|at|in|on|it|this|you|your|also|just|really|very|gonna|wanna|want|need|have|what|which)$/.test(w[w.length-1]); }
 
   // ── hands-free conversation engine: one persistent mic stream + Web Audio VAD drives turn-taking, no per-turn tapping ──
   function startConvo(){
@@ -613,7 +627,7 @@
     if(speechSeen && now-segAt>MAX_SEG) endSegment();
   }
   function stopConvo(){
-    convo=false; segActive=false; if(vadRAF) cancelAnimationFrame(vadRAF); vadRAF=0;
+    convo=false; segActive=false; _turnText=''; if(vadRAF) cancelAnimationFrame(vadRAF); vadRAF=0;
     if(mediaRec&&recording){ recording=false; try{ mediaRec.onstop=null; mediaRec.stop(); }catch(_){} }
     if(vadStream){ try{vadStream.getTracks().forEach(t=>t.stop());}catch(_){} vadStream=null; }
     vadAnalyser=null; stopSpeaking();
