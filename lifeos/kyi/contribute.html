@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#9ed1c6">
+  <link rel="stylesheet" href="../css/lifeos.css">
+  <title>Contribute · LifeOS</title>
+</head>
+<body>
+
+  <div class="page-header">
+    <div class="page-header-eyebrow">KYI · Contribute (day 3 of 3)</div>
+    <h1>One more.</h1>
+    <p class="lead">No expectation, no obligation. Just a thought for today.</p>
+    <div class="progress-row">
+      <div class="progress-dot done"></div>
+      <div class="progress-dot done"></div>
+      <div class="progress-dot active"></div>
+    </div>
+  </div>
+
+  <div id="thread" class="kyi-thread"></div>
+
+  <form class="say-row" id="say-form" autocomplete="off">
+    <input class="say-input" id="say-input" type="text" placeholder="say a little…" aria-label="Reply">
+    <button class="say-send" type="submit" aria-label="Send">→</button>
+  </form>
+
+  <div id="done" style="display:none; margin-top:20px;">
+    <div class="btn-row">
+      <a href="../index.html" class="btn">Enter LifeOS →</a>
+      <a href="/lifeos/memory.html" class="btn btn-soft">See what was remembered</a>
+    </div>
+  </div>
+
+  <div id="bottom-nav"></div>
+
+  <script src="../js/memory.js"></script>
+  <script src="../js/imprint.js"></script>
+  <script src="../js/companion.js"></script>
+  <script src="../js/nav.js"></script>
+  <script>
+    // ── KYI · Contribute — Day 3 (creation). In-the-moment play, not a productivity ask. ──
+    if (!LifeOSMemory.load().progress.continue_complete) { window.location.href = 'continue.html'; }
+    const thread = document.getElementById('thread');
+    const form = document.getElementById('say-form');
+    const input = document.getElementById('say-input');
+    const name = localStorage.getItem('lifeos.name') || '';
+
+    function bubble(text, who) {
+      const el = document.createElement('div');
+      el.className = who === 'me' ? 'kyi-msg kyi-me' : 'companion';
+      el.innerHTML = who === 'me' ? `<div class="kyi-me-body">${text}</div>` : `<div class="companion-body">${text}</div>`;
+      thread.appendChild(el);
+      el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+
+    // "if you could mess around with anything" — play, escapable. Not "what would you like to make/help with" (a task ask).
+    const beats = [
+      { key: 'play', ask: () => `Last one${name ? ', ' + name : ''}. If you could mess around with anything right now — make it, build it, draw it, whatever — what'd it be?` },
+    ];
+    const answers = {};
+    let step = 0;
+    function askCurrent() { bubble(beats[step].ask(), 'companion'); }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = input.value.trim();
+      if (!v) return;
+      bubble(v, 'me'); input.value = '';
+      answers[beats[step].key] = v;
+      step += 1;
+      if (step < beats.length) {
+        const ack = (window.LifeOSCompanion && LifeOSCompanion.autonomousReply) ? LifeOSCompanion.autonomousReply(v) : '';
+        setTimeout(() => { if (ack) bubble(ack, 'companion'); askCurrent(); }, 450);
+      } else { finish(); }
+    });
+
+    function finish() {
+      LifeOSMemory.addCanonPage({
+        session: 'contribute',
+        prompts_and_answers: [
+          { dimension: 'creation', question: 'If you could mess around with anything right now, what?', answer: answers.play || '(skipped)' },
+        ],
+      });
+      const close = (window.LifeOSCompanion && LifeOSCompanion.respondAfterKYI)
+        ? LifeOSCompanion.respondAfterKYI('contribute') : "That's a great place to start. Welcome — everything's open now.";
+      setTimeout(() => {
+        bubble(close, 'companion');
+        bubble("That's KYI done. You're not a profile — you're someone I'm getting to know. Everything's unlocked.", 'companion');
+        form.style.display = 'none';
+        document.getElementById('done').style.display = 'block';
+        const nav = document.querySelector('.bottom-nav'); if (nav) nav.remove();
+        LifeOSNav.render('kyi');
+      }, 500);
+    }
+
+    askCurrent();
+    LifeOSNav.render('kyi');
+  </script>
+</body>
+</html>

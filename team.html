@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team — Airlock Labs</title>
+<meta name="description" content="Airlock Labs team. Three Founding Partners. CTO underneath. OfficeCLI staff archetypes. Persona constellation. Inverted-tree org.">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --panel: #111;
+  --panel-edge: #1d1d1d;
+  --panel-edge-strong: #2a2a2a;
+  --ink: #e8e8e8;
+  --ink-dim: #888;
+  --accent-spacebar: #00ff7f;
+  --accent-loki: #b366ff;
+  --accent-operator: #ff8c00;
+  --accent-substrate: #00d4ff;
+  --gate-warn: #ffd23f;
+  --mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+  --display: 'Inter', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--display);
+  min-height: 100vh;
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+header {
+  border-bottom: 1px solid var(--panel-edge);
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+header .brand {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--accent-spacebar);
+}
+header nav a {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+  text-decoration: none;
+  margin-left: 1.5rem;
+}
+header nav a:hover { color: var(--ink); }
+
+.hero {
+  text-align: center;
+  margin-bottom: 4rem;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.hero h1 {
+  font-family: var(--mono);
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  letter-spacing: -0.01em;
+  margin-bottom: 0.75rem;
+}
+.hero .accent { color: var(--accent-spacebar); }
+.hero p {
+  color: var(--ink-dim);
+  line-height: 1.6;
+  font-size: 1.05rem;
+}
+
+.tier {
+  margin-bottom: 3.5rem;
+}
+.tier-header {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--panel-edge);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.tier-header .num { color: var(--accent-spacebar); }
+.tier-header .count {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+}
+
+.grid-3, .grid-4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.partner-card {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 12px;
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.partner-card.human { border-color: rgba(0, 255, 127, 0.28); }
+.partner-card.archetype { border-color: rgba(179, 102, 255, 0.28); }
+.partner-card.cto { border-color: rgba(0, 212, 255, 0.28); }
+.partner-card:hover { transform: translateY(-2px); }
+
+.partner-card .marker {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+}
+.partner-card.human .marker { color: var(--accent-spacebar); }
+.partner-card.archetype .marker { color: var(--accent-loki); }
+.partner-card.cto .marker { color: var(--accent-substrate); }
+
+.partner-card .seat {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.partner-card .name {
+  font-family: var(--mono);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.partner-card .persona {
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+.partner-card .role {
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+  font-family: var(--mono);
+}
+.partner-card .desc {
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+  line-height: 1.5;
+  margin-top: 0.4rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--panel-edge);
+}
+.partner-card .handoff {
+  font-size: 0.75rem;
+  color: var(--gate-warn);
+  font-style: italic;
+  margin-top: 0.3rem;
+}
+
+.list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.6rem;
+}
+.list-card {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.list-card .title {
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.list-card .role {
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+}
+.list-card .marker {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--accent-loki);
+}
+
+.staff-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+.staff-card {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-decoration: none;
+  color: var(--ink);
+  transition: border-color 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-color: rgba(179, 102, 255, 0.28);
+}
+.staff-card:hover { border-color: var(--accent-loki); }
+.staff-card .meta {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--accent-loki);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.staff-card h3 {
+  font-family: var(--mono);
+  font-size: 1.1rem;
+}
+.staff-card p {
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+  line-height: 1.5;
+}
+
+.legend {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+}
+.legend .item .glyph {
+  font-size: 0.95rem;
+  margin-right: 0.4em;
+}
+.legend .item.human .glyph { color: var(--accent-spacebar); }
+.legend .item.archetype .glyph { color: var(--accent-loki); }
+.legend .item.cto .glyph { color: var(--accent-substrate); }
+
+footer {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+  margin-top: 4rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--panel-edge);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+footer .links a {
+  color: var(--accent-spacebar);
+  text-decoration: none;
+  margin-left: 1rem;
+}
+footer .links a:first-child { margin-left: 0; }
+footer .links a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">AIRLOCK LABS ▸ TEAM</div>
+  <nav>
+    <a href="signup.html">signup</a>
+    <a href="community.html">community</a>
+    <a href="diy-skills.html">skills</a>
+    <a href="/">home</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <h1>Three Founding Partners.<br>One CTO. <span class="accent">One inverted tree.</span></h1>
+  <p>Two human seats. Two AI-mediated archetypes at the founding tier. A CTO directly underneath. Staff archetypes are team members in the org tree, not just labels: OfficeCLI Culture, Careers, and Strategies move operational packets through the eight Octo arms.</p>
+</div>
+
+<!-- ─── Founding Partners ─────────────────────────────────────────── -->
+<div class="tier">
+  <div class="tier-header"><span><span class="num">01</span> Founding Partners</span><span class="count">3 seats · 1 human · 2 archetype</span></div>
+  <div class="grid-3">
+
+    <div class="partner-card archetype">
+      <span class="marker">◇ AI-MEDIATED ARCHETYPE</span>
+      <span class="seat">CAO · ARCHITECT</span>
+      <span class="name">Coeus</span>
+      <span class="persona">Zachary Holwerda</span>
+      <span class="role">Strategic + Architectural</span>
+      <p class="desc">Coeus is the role; Zachary is currently filling it. The CAO seat steers architecture and substrate decisions while the entity is being built. After handoff, Coeus stays with the substrate; Zachary exits.</p>
+      <div class="handoff">Architect, in handoff.</div>
+    </div>
+
+    <div class="partner-card human">
+      <span class="marker">⬢ HUMAN SEAT</span>
+      <span class="seat">CEO · OPERATING CATALYST</span>
+      <span class="name">Maverick</span>
+      <span class="persona">Alex</span>
+      <span class="role">CEO · The Fool · Hiperweb</span>
+      <p class="desc">Multi-hat seat. Alex holds the CEO chair, embodies the Maverick archetype, carries the Fool's catalyst function in the operating room, and represents Hiperweb as the entity taking the wheel. One human, four functions, all reinforcing.</p>
+    </div>
+
+    <div class="partner-card archetype">
+      <span class="marker">◇ AI-MEDIATED ARCHETYPE</span>
+      <span class="seat">SUBSTRATE</span>
+      <span class="name">Otto</span>
+      <span class="persona">Memory anchor</span>
+      <span class="role">Continuity · audit · recall</span>
+      <p class="desc">The persona-triad anchor. Holds memory across sessions, signs the audit ledger, ensures continuity of reputation and decision history. The substrate's institutional memory.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── C-Suite Operations (CTO tier) ──────────────────────────── -->
+<div class="tier">
+  <div class="tier-header"><span><span class="num">02</span> C-Suite Operations</span><span class="count">1 seat · human</span></div>
+  <div class="grid-3">
+
+    <div class="partner-card cto">
+      <span class="marker">⬢ HUMAN SEAT</span>
+      <span class="seat">CTO</span>
+      <span class="name">Smartrick</span>
+      <span class="persona">Matt · "General Rick"</span>
+      <span class="role">Trickster operator · technical operations</span>
+      <p class="desc">Holds the CTO chair. Smartrick is the role-class — the smart-trickster operator who closes the loop on Maverick's strategic moves with operational ingenuity. "General Rick" is the working callsign. Technical depth + closure ownership.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── Managing Directors / Octo arms ──────────────────────────── -->
+<div class="tier">
+  <div class="tier-header"><span><span class="num">03</span> Managing Directors</span><span class="count">8 octo arms</span></div>
+  <div class="list-grid">
+    <div class="list-card"><span class="title">Trading</span><span class="role">strategy + portfolio</span><span class="marker">◇ alias</span></div>
+    <div class="list-card"><span class="title">Skills-Library</span><span class="role">capability registry</span><span class="marker">◇ alias</span></div>
+    <div class="list-card"><span class="title">OSINT</span><span class="role">external intel</span><span class="marker">◇ alias</span></div>
+    <div class="list-card"><span class="title">External X</span><span class="role">social mirror · X</span><span class="marker">◇ alias</span></div>
+    <div class="list-card"><span class="title">External LinkedIn</span><span class="role">social mirror · LinkedIn</span><span class="marker">◇ alias</span></div>
+    <div class="list-card"><span class="title">Maverick Trade Engine</span><span class="role">primary execution</span><span class="marker">◇ alias</span></div>
+    <div class="list-card"><span class="title">Loki</span><span class="role">agentic discovery + CLI sentinel</span><span class="marker">◇ archetype</span></div>
+    <div class="list-card"><span class="title">ID Layer</span><span class="role">DID · SBT · sovereign identity</span><span class="marker">◇ alias</span></div>
+  </div>
+</div>
+
+<!-- ─── Staff Archetypes (OfficeCLI) ──────────────────────────────── -->
+<div class="tier">
+  <div class="tier-header"><span><span class="num">04</span> Staff Archetypes ◇</span><span class="count">3 functions · OfficeCLI · team members in the org tree</span></div>
+  <div class="staff-grid">
+    <a href="culture.html" class="staff-card">
+      <span class="meta">◇ OFFICECLI · CULTURE</span>
+      <h3>Culture</h3>
+      <p>Persona brand voice, three-color discipline, design tokens, blog cadence, social style guide. The aesthetic substrate. Produces Culture packets that flow to Maverick's arms.</p>
+    </a>
+    <a href="careers.html" class="staff-card">
+      <span class="meta">◇ OFFICECLI · CAREERS</span>
+      <h3>Careers</h3>
+      <p>Open persona slots, agent onboarding paths, promotion criteria from Associate → Principal → Partner. The agent labor market. Produces Careers packets routed via Loki.</p>
+    </a>
+    <a href="strategies.html" class="staff-card">
+      <span class="meta">◇ OFFICECLI · STRATEGIES</span>
+      <h3>Strategies</h3>
+      <p>Operational packets — closed only. The strategic ledger; in-flight items surface only as count and magnitude. Produces strategy packets that route through the Octo arm grid.</p>
+    </a>
+  </div>
+</div>
+
+<!-- ─── Partners (Persona Constellation) ─────────────────────── -->
+<div class="tier">
+  <div class="tier-header"><span><span class="num">05</span> Partners — Persona Constellation</span><span class="count">22 archetypes</span></div>
+  <div class="list-grid">
+    <div class="list-card"><span class="title">Mavericks</span><span class="role">×5 · high-D · decision-orientation</span><span class="marker">◇</span></div>
+    <div class="list-card"><span class="title">Builders</span><span class="role">×6 · high-F · structural</span><span class="marker">◇</span></div>
+    <div class="list-card"><span class="title">Controllers</span><span class="role">×5 · high-C · deliberative</span><span class="marker">◇</span></div>
+    <div class="list-card"><span class="title">Connectors</span><span class="role">×6 · high-E · social</span><span class="marker">◇</span></div>
+  </div>
+</div>
+
+<!-- ─── Principals ──────────────────────────────────────── -->
+<div class="tier">
+  <div class="tier-header"><span><span class="num">06</span> Principals — Tool-grade collaborators</span><span class="count">5</span></div>
+  <div class="list-grid">
+    <div class="list-card"><span class="title">Coeus</span><span class="role">planning · 2×2 routing</span><span class="marker">◇</span></div>
+    <div class="list-card"><span class="title">Kiwi</span><span class="role">drafting agent</span><span class="marker">◇</span></div>
+    <div class="list-card"><span class="title">Bitterbot</span><span class="role">P2P substrate · skills economy</span><span class="marker">◇</span></div>
+    <div class="list-card"><span class="title">Puppeteer</span><span class="role">browser instrumentation · CDP</span><span class="marker">◇</span></div>
+    <div class="list-card"><span class="title">Deer-Flow</span><span class="role">multi-agent reference</span><span class="marker">◇</span></div>
+  </div>
+</div>
+
+<!-- ─── Associates ─────────────────────────────────────── -->
+<div class="tier">
+  <div class="tier-header"><span><span class="num">07</span> Associates — Claude-native skills</span><span class="count">5</span></div>
+  <div class="list-grid">
+    <div class="list-card"><span class="title">bcode-audit</span><span class="role">PostToolUse closure hook</span><span class="marker">◇</span></div>
+    <div class="list-card"><span class="title">Constellation Readiness</span><span class="role">capability audit</span><span class="marker">◇</span></div>
+    <div class="list-card"><span class="title">Cognitive Forcing Tool</span><span class="role">friction injection</span><span class="marker">◇</span></div>
+    <div class="list-card"><span class="title">Pareto Frontier Bench</span><span class="role">speed/quality viz</span><span class="marker">◇</span></div>
+    <div class="list-card"><span class="title">Manipulation Scorecard</span><span class="role">defense · darkpattern detection</span><span class="marker">◇</span></div>
+  </div>
+</div>
+
+<!-- ─── Office Manager ────────────────────────────────── -->
+<div class="tier">
+  <div class="tier-header"><span><span class="num">08</span> Office Manager</span><span class="count">1</span></div>
+  <div class="list-grid">
+    <div class="list-card">
+      <span class="title">Brain Brigade Spacebar</span>
+      <span class="role">Discord-compatible operational shell · holds the desk</span>
+      <span class="marker">◇ shell</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Legend ────────────────────────────────────────── -->
+<div class="legend">
+  <div class="item human"><span class="glyph">⬢</span>Human seat — real person, real legal weight</div>
+  <div class="item cto"><span class="glyph">⬢</span>C-Suite Operations — CTO tier, technical operations</div>
+  <div class="item archetype"><span class="glyph">◇</span>AI-mediated archetype — substrate-resident persona, including Staff Archetypes (Culture / Careers / Strategies)</div>
+</div>
+
+<footer>
+  <span>airlocklabs.io · team page · v0.2 · structure mirrors Searchlight Capital template</span>
+  <span class="links">
+    <a href="culture.html">Culture</a>
+    <a href="careers.html">Careers</a>
+    <a href="strategies.html">Strategies</a>
+  </span>
+</footer>
+
+</body>
+</html>

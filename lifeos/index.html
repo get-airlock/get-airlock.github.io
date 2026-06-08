@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+<meta name="theme-color" content="#eaf2ef">
+<title>LifeOS</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="LifeOS">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/lifeos.css">
+<style>
+  .land{ min-height:100dvh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:32px 24px; gap:6px; }
+  .land .mark{ width:84px; height:84px; border-radius:50%; position:relative; overflow:hidden; margin-bottom:18px;
+    background:radial-gradient(circle at 34% 28%, rgba(255,255,255,0.95), rgba(255,255,255,0.2) 32%, rgba(255,255,255,0.04) 58%);
+    box-shadow:inset 0 4px 12px rgba(255,255,255,0.9), inset 0 -16px 30px -8px rgba(60,120,110,0.4), 0 18px 40px -14px rgba(50,110,100,0.5); animation:breathe 6s ease-in-out infinite; }
+  .land .mark::before{ content:""; position:absolute; inset:-30%;
+    background:radial-gradient(circle at 30% 30%, var(--teal), transparent 60%), radial-gradient(circle at 70% 65%, var(--lav), transparent 60%), radial-gradient(circle at 55% 82%, var(--peach), transparent 60%);
+    filter:blur(8px); animation:swirlmark 9s ease-in-out infinite; }
+  @keyframes breathe{ 0%,100%{ transform:scale(1) } 50%{ transform:scale(1.04) } }
+  @keyframes swirlmark{ 0%,100%{ transform:rotate(0deg) scale(1) } 50%{ transform:rotate(40deg) scale(1.12) } }
+  .land h1{ font-family:var(--font-display); font-weight:400; font-size:clamp(40px,13vw,60px); line-height:1.0; color:var(--ink-strong); letter-spacing:0.3px; }
+  .land .tag{ margin-top:14px; font-size:17px; line-height:1.5; color:var(--ink-soft); max-width:30ch; }
+  .land .start{ margin-top:30px; display:inline-flex; align-items:center; gap:10px; padding:16px 34px; border:0; border-radius:999px; cursor:pointer;
+    font-family:var(--font-body); font-size:17px; font-weight:600; color:#fff; background:linear-gradient(150deg,var(--accent),var(--accent-deep)); box-shadow:0 12px 30px -8px rgba(60,140,120,0.7); transition:transform .25s cubic-bezier(.2,.8,.2,1); }
+  .land .start:active{ transform:scale(0.96); }
+  .land .start svg{ width:18px; height:18px; }
+  .land .fine{ margin-top:26px; font-size:12.5px; color:var(--ink-faint); line-height:1.7; max-width:32ch; }
+  .land .fine b{ color:var(--ink-soft); font-weight:600; }
+</style>
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <main class="land">
+    <div class="mark"></div>
+    <h1>LifeOS</h1>
+    <p class="tag">A calm companion that runs <i>on your device</i>. Your memory stays yours.</p>
+
+    <button class="start" id="start">
+      Get started
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+    </button>
+
+    <p class="fine"><b>Starts local, here on this device.</b> No accounts. Nothing leaves your phone. Add to Home Screen to keep it.</p>
+  </main>
+
+  <script>
+    // "Get started" = cross from the public web into your own local instance.
+    // We mark the device as started, then enter the local-first app (which gates
+    // to arrival the first time, then home). Memory + graph live on this device.
+    document.getElementById('start').addEventListener('click', function(){
+      try { localStorage.setItem('lifeos.started', '1'); } catch(e){}
+      // Light is the one true LifeOS now — it talks (Carrie) and remembers (local graph),
+      // and KYI rides under the conversation rather than a separate onboarding screen.
+      location.href = 'light.html';
+    });
+  </script>
+</body>
+</html>

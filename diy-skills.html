@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DIY Skills — Claude plugins for operators</title>
+<meta name="description" content="Open-source Claude skills + plugins you can install today. The same toolchain Brain Brigade runs.">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --panel: #111;
+  --panel-edge: #1d1d1d;
+  --ink: #e8e8e8;
+  --ink-dim: #888;
+  --accent-spacebar: #00ff7f;
+  --accent-loki: #b366ff;
+  --accent-operator: #ff8c00;
+  --accent-substrate: #00d4ff;
+  --mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+  --display: 'Inter', system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--display);
+  min-height: 100vh;
+  padding: 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+header {
+  border-bottom: 1px solid var(--panel-edge);
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+header .brand {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--accent-spacebar);
+  letter-spacing: 0.08em;
+}
+header nav a {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+  text-decoration: none;
+  margin-left: 1.5rem;
+}
+header nav a:hover { color: var(--ink); }
+
+.intro {
+  margin-bottom: 2.5rem;
+  max-width: 64ch;
+}
+.intro h1 {
+  font-family: var(--mono);
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+.intro p { line-height: 1.6; color: var(--ink-dim); margin-bottom: 0.6rem; }
+.intro .accent { color: var(--ink); }
+
+.section-title {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 2rem 0 1rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+.section-title .num { color: var(--accent-spacebar); }
+
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+.skill {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: border-color 0.15s;
+}
+.skill:hover { border-color: var(--accent-spacebar); }
+.skill h3 {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.skill .desc { font-size: 0.88rem; color: var(--ink-dim); line-height: 1.5; }
+.skill .meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+  margin-top: 0.25rem;
+}
+.skill .meta .tag {
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--panel-edge);
+  border-radius: 4px;
+}
+.skill .meta .tag.loki { color: var(--accent-loki); border-color: rgba(179, 102, 255, 0.35); }
+.skill .meta .tag.osint { color: var(--accent-operator); border-color: rgba(255, 140, 0, 0.35); }
+.skill .meta .tag.skills { color: var(--accent-spacebar); border-color: rgba(0, 255, 127, 0.35); }
+.skill .meta .tag.substrate { color: var(--accent-substrate); border-color: rgba(0, 212, 255, 0.35); }
+.skill .install {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  background: #050505;
+  border-radius: 6px;
+  padding: 0.5rem 0.65rem;
+  color: var(--accent-spacebar);
+  overflow-x: auto;
+}
+.skill a {
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-family: var(--mono);
+  border-top: 1px solid var(--panel-edge);
+  padding-top: 0.6rem;
+  margin-top: 0.25rem;
+  display: flex;
+  justify-content: space-between;
+}
+.skill a:hover { color: var(--accent-spacebar); }
+.skill a .arrow { color: var(--ink-dim); }
+
+footer {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+  border-top: 1px solid var(--panel-edge);
+  padding-top: 1rem;
+  margin-top: 3rem;
+  text-align: center;
+}
+footer a { color: var(--accent-spacebar); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="brand">DIY SKILLS · CLAUDE PLUGINS</span>
+  <nav>
+    <a href="signup.html">signup</a>
+    <a href="orbitwithotto.html">help</a>
+    <a href="/">home</a>
+  </nav>
+</header>
+
+<div class="intro">
+  <h1>Skills you can install today.</h1>
+  <p>This is the open-source toolchain Brain Brigade runs on. Every entry below is a self-contained Claude skill, plugin, or tool you can install, fork, or eval against your own workflow. <span class="accent">No paywall. No invite. No middleman.</span></p>
+  <p>Tags map each skill to one of the Octo Agent arms — that's how we route them internally. You don't have to use the routing; the skills work standalone.</p>
+</div>
+
+<!-- ─── Section 1 ──────────────────────────────────────────── -->
+<div class="section-title"><span class="num">01</span> Agentic AI</div>
+<div class="skill-grid">
+
+  <div class="skill">
+    <h3>Bitterbot</h3>
+    <p class="desc">Local-first AI desktop with a peer-to-peer skills economy. The reference architecture for sovereign agentic compute that doesn't phone home.</p>
+    <div class="meta">
+      <span class="tag skills">skills-library</span>
+      <span class="tag">P2P</span>
+      <span class="tag">desktop</span>
+    </div>
+    <div class="install">git clone github.com/Bitterbot-AI/bitterbot-desktop</div>
+    <a href="https://github.com/Bitterbot-AI/bitterbot-desktop" target="_blank" rel="noopener">github <span class="arrow">↗</span></a>
+  </div>
+
+  <div class="skill">
+    <h3>Deer-Flow</h3>
+    <p class="desc">Multi-agent orchestration framework from ByteDance. Battle-tested patterns for coordinating downstream agents. Use as design reference; eval license carefully.</p>
+    <div class="meta">
+      <span class="tag loki">loki</span>
+      <span class="tag">orchestration</span>
+    </div>
+    <div class="install">git clone github.com/bytedance/deer-flow</div>
+    <a href="https://github.com/bytedance/deer-flow" target="_blank" rel="noopener">github <span class="arrow">↗</span></a>
+  </div>
+
+</div>
+
+<!-- ─── Section 2 ──────────────────────────────────────────── -->
+<div class="section-title"><span class="num">02</span> CLI / Developer Tools</div>
+<div class="skill-grid">
+
+  <div class="skill">
+    <h3>Puppeteer</h3>
+    <p class="desc">Headless Chromium with full Chrome DevTools Protocol access. The actual Loki substrate — exposes <code>Console.messageAdded</code>, <code>Network.requestWillBeSent</code>, and <code>Runtime.evaluate()</code> for instrumenting both dev-server logs and rendered DOM. Active, Google-backed.</p>
+    <div class="meta">
+      <span class="tag loki">loki</span>
+      <span class="tag osint">osint</span>
+      <span class="tag">CDP</span>
+    </div>
+    <div class="install">npm install puppeteer</div>
+    <a href="https://pptr.dev" target="_blank" rel="noopener">docs <span class="arrow">↗</span></a>
+  </div>
+
+  <div class="skill">
+    <h3>Carbonyl <span style="color: var(--gate-warn); font-size: 0.7rem; font-weight: 400;">⚠ archive</span></h3>
+    <p class="desc">Chromium-in-terminal — technically impressive (custom Skia shim, 60 FPS Unicode-block rendering) but <strong>abandoned since Feb 2023</strong>. View-only; no CDP, no programmatic hooks. Interesting demo, not a Loki substrate. Use Puppeteer instead.</p>
+    <div class="meta">
+      <span class="tag" style="color: var(--gate-warn); border-color: rgba(255, 210, 63, 0.35);">unmaintained</span>
+      <span class="tag">terminal</span>
+    </div>
+    <div class="install">// not recommended for production</div>
+    <a href="https://github.com/fathyb/carbonyl" target="_blank" rel="noopener">github (archive) <span class="arrow">↗</span></a>
+  </div>
+
+  <div class="skill">
+    <h3>OfficeCLI</h3>
+    <p class="desc">Office suite for AI agents. Word, Excel, PDF generation from the terminal. Plug-in candidate for any workflow that ends in a deliverable document.</p>
+    <div class="meta">
+      <span class="tag skills">skills-library</span>
+      <span class="tag osint">osint</span>
+    </div>
+    <div class="install">git clone github.com/iOfficeAI/OfficeCLI</div>
+    <a href="https://github.com/iOfficeAI/OfficeCLI" target="_blank" rel="noopener">github <span class="arrow">↗</span></a>
+  </div>
+
+</div>
+
+<!-- ─── Section 3 — Claude-native skills ─────────────────── -->
+<div class="section-title"><span class="num">03</span> Claude-Native Skills (free, ship today)</div>
+<div class="skill-grid">
+
+  <div class="skill">
+    <h3>Constellation Readiness</h3>
+    <p class="desc">Audit your tooling coverage across 10 operational categories. Reads a manifest, scores each capability, outputs a gap list with copy-paste install commands.</p>
+    <div class="meta">
+      <span class="tag substrate">substrate</span>
+      <span class="tag">audit</span>
+    </div>
+    <div class="install">/readiness</div>
+    <a href="https://huggingface.co/datasets/AirlockLabs/constellation-bench" target="_blank" rel="noopener">dataset <span class="arrow">↗</span></a>
+  </div>
+
+  <div class="skill">
+    <h3>Cognitive Forcing Tool</h3>
+    <p class="desc">The Pre-Analysis Prompt friction event. Forces System-2 thinking before high-stakes outputs. Inline browser tool, no install.</p>
+    <div class="meta">
+      <span class="tag loki">loki</span>
+      <span class="tag">friction</span>
+    </div>
+    <div class="install">browser-only · zero install</div>
+    <a href="cognitive-forcing-tool.html">open tool <span class="arrow">→</span></a>
+  </div>
+
+  <div class="skill">
+    <h3>Pareto Frontier Bench</h3>
+    <p class="desc">Visualize the speed/quality tradeoff across 22 models in the constellation. Pick the right model for your latency budget.</p>
+    <div class="meta">
+      <span class="tag substrate">substrate</span>
+      <span class="tag">bench</span>
+    </div>
+    <div class="install">browser-only · zero install</div>
+    <a href="pareto-frontier-bench.html">open bench <span class="arrow">→</span></a>
+  </div>
+
+  <div class="skill">
+    <h3>Manipulation Scorecard</h3>
+    <p class="desc">Score the manipulation pressure on any piece of content. Identifies dark patterns, urgency hooks, and synthetic urgency. Read-only — protects your gate.</p>
+    <div class="meta">
+      <span class="tag loki">loki</span>
+      <span class="tag">defense</span>
+    </div>
+    <div class="install">browser-only · zero install</div>
+    <a href="blog-manipulation-scorecard.html">open scorecard <span class="arrow">→</span></a>
+  </div>
+
+</div>
+
+<!-- ─── Section 4 — Loki components ─────────────────────── -->
+<div class="section-title"><span class="num">04</span> Loki Components (work in progress)</div>
+<div class="skill-grid">
+
+  <div class="skill">
+    <h3>Loki Native Host</h3>
+    <p class="desc">Browser-extension stdin/stdout protocol bridge. Lets a Chrome/Firefox extension talk to a local Python process for high-trust intent routing.</p>
+    <div class="meta">
+      <span class="tag loki">loki</span>
+      <span class="tag">native-messaging</span>
+    </div>
+    <div class="install">python3 loki_host.py</div>
+    <a href="https://github.com/get-airlock/get-airlock.github.io/tree/main/loki" target="_blank" rel="noopener">repo <span class="arrow">↗</span></a>
+  </div>
+
+  <div class="skill">
+    <h3>Asset Indexer</h3>
+    <p class="desc">Junk-leg passive sift. Walks a folder of mixed-format documents (PDF / MD / TXT / EML / HTML) and emits a card-shaped JSON index. Pairs with sync_assets.sh for outbound.</p>
+    <div class="meta">
+      <span class="tag loki">loki</span>
+      <span class="tag">indexing</span>
+    </div>
+    <div class="install">python3 asset_indexer.py ~/Documents</div>
+    <a href="https://github.com/get-airlock/get-airlock.github.io/tree/main/loki" target="_blank" rel="noopener">repo <span class="arrow">↗</span></a>
+  </div>
+
+  <div class="skill">
+    <h3>BCODE Bivector Closure</h3>
+    <p class="desc">Patent-grade signed-bivector trust unit operator. The substrate primitive that makes the Maybe Protocol gate measurable. Vendored into ConstellationBench.</p>
+    <div class="meta">
+      <span class="tag substrate">substrate</span>
+      <span class="tag">crypto</span>
+    </div>
+    <div class="install">pip install constellation-bench</div>
+    <a href="papers/airlock-0.1-constellationbench.md">paper <span class="arrow">→</span></a>
+  </div>
+
+</div>
+
+<footer>
+  All entries open-source · MIT/Apache where possible · no proprietary lock-in · curated for Brain Brigade ·
+  <a href="signup.html">signup</a> · <a href="orbitwithotto.html">orbitwithotto</a> · <a href="https://nerv.forum" target="_blank" rel="noopener">nerv.forum</a>
+</footer>
+
+</body>
+</html>

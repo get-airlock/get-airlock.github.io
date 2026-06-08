@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+  <meta name="theme-color" content="#eaf2ef">
+  <title>Create · LifeOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/lifeos.css">
+  <style>
+    .poc-list{ margin-top: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--ink-soft); }
+    .poc-list .row{ display: flex; align-items: center; gap: 10px; }
+    .poc-list .tick{ width: 18px; height: 18px; flex: 0 0 auto; border-radius: 50%; display: grid; place-items: center; color: white;
+      background: linear-gradient(150deg, var(--accent), var(--accent-deep)); }
+    .poc-list .tick svg{ width: 11px; height: 11px; }
+    .poc-list .pending{ color: var(--ink-faint); }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar reveal d1">
+      <a class="icon-btn" href="index.html" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      </a>
+      <div class="brand">
+        <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><defs><radialGradient id="bm" cx="35%" cy="30%"><stop offset="0%" stop-color="#bfe6dc"/><stop offset="60%" stop-color="#6fb7aa"/><stop offset="100%" stop-color="#5a93ba"/></radialGradient></defs><circle cx="12" cy="12" r="9" fill="url(#bm)"/><circle cx="9" cy="8.5" r="2.4" fill="rgba(255,255,255,0.7)"/></svg></span>
+        LifeOS
+      </div>
+      <a class="icon-btn" href="you.html" aria-label="You and settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v2.4M12 19.1v2.4M21.5 12h-2.4M4.9 12H2.5M18.7 5.3l-1.7 1.7M7 17l-1.7 1.7M18.7 18.7L17 17M7 7 5.3 5.3" stroke-linecap="round"/></svg>
+      </a>
+    </header>
+
+    <main>
+      <div class="page-header reveal d2">
+        <div class="page-header-eyebrow">Create</div>
+        <h1>Make something gentle.</h1>
+        <p class="lead">A note, a thought, a fragment. After you make it, one reflection question — and the rest is yours.</p>
+      </div>
+
+      <!-- Locked -->
+      <div id="locked-state" class="card locked reveal d3" style="display:none;">
+        <div class="lock-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+        <h3>This surface unlocks after Continue.</h3>
+        <p>Finish the Continue session in KYI to open Create.</p>
+        <div class="btn-row" style="justify-content:center;"><a href="memory.html" class="btn">Open Memory</a></div>
+      </div>
+
+      <div id="create-form-section">
+        <div class="card card-cool reveal d3">
+          <h3>Your creation</h3>
+          <textarea class="field" id="creation-body" placeholder="Write a note, dictate a thought, sketch in words…" style="margin-top:14px;"></textarea>
+          <div class="btn-row">
+            <button class="btn" id="reflect-btn">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 6"/></svg>
+              Save &amp; reflect
+            </button>
+          </div>
+        </div>
+
+        <!-- Reflection -->
+        <div id="reflect-section" style="display:none;">
+          <div class="prompt">
+            <div class="prompt-question" id="reflect-question">What does this remind you of from earlier today?</div>
+            <textarea class="field" id="reflection-body" placeholder="One sentence is enough…" style="min-height:96px; background:rgba(255,255,255,0.7);"></textarea>
+            <div class="btn-row"><button class="btn" id="complete-btn">Save reflection</button></div>
+          </div>
+        </div>
+
+        <!-- Proof of creation -->
+        <div id="poc-section" style="display:none;">
+          <div class="signal-card">
+            <div class="signal-label">Proof of Creation</div>
+            <div class="signal-value">Validated</div>
+            <div class="poc-list">
+              <div class="row"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 6"/></svg></span> Creation saved to your canon</div>
+              <div class="row"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 6"/></svg></span> Reflection completed</div>
+              <div class="row pending"><span class="tick" style="background:rgba(150,180,175,0.35);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="6"/></svg></span> Value signal: pending (demo)</div>
+              <div class="faint" id="poc-cid" style="margin-top:4px;"></div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <a href="wallet.html" class="btn">See your signals</a>
+            <button class="btn btn-soft" id="another-btn">Make another</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent -->
+      <div class="card reveal d4">
+        <h3>Recent creations</h3>
+        <div id="creation-list" style="margin-top:16px;"></div>
+      </div>
+    </main>
+  </div>
+
+  <div id="bottom-nav"></div>
+
+  <script src="js/store.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    LifeOSUI.mount('create');
+
+    if (!LifeOSStore.isUnlocked('create')) {
+      document.getElementById('locked-state').style.display = 'block';
+      document.getElementById('create-form-section').style.display = 'none';
+    }
+
+    let staged = null;
+
+    document.getElementById('reflect-btn').addEventListener('click', () => {
+      const body = document.getElementById('creation-body').value.trim();
+      if (!body) { document.getElementById('creation-body').focus(); return; }
+      staged = { kind: 'note', body };
+      document.getElementById('reflect-question').textContent = chooseQuestion(body);
+      document.getElementById('reflect-section').style.display = 'block';
+      const b = document.getElementById('reflect-btn');
+      b.textContent = 'Saved · reflect below'; b.disabled = true;
+      document.getElementById('reflection-body').focus();
+    });
+
+    document.getElementById('complete-btn').addEventListener('click', () => {
+      if (!staged) return;
+      const reflection = document.getElementById('reflection-body').value.trim();
+      const c = LifeOSStore.addCreation({ ...staged, reflection: reflection || '(skipped)' });
+      document.getElementById('poc-cid').textContent = 'Mock CID · ' + c.mock_cid;
+      document.getElementById('poc-section').style.display = 'block';
+      const b = document.getElementById('complete-btn'); b.textContent = 'Saved'; b.disabled = true;
+      renderCreations();
+    });
+
+    document.getElementById('another-btn').addEventListener('click', () => {
+      document.getElementById('creation-body').value = '';
+      document.getElementById('reflection-body').value = '';
+      document.getElementById('reflect-section').style.display = 'none';
+      document.getElementById('poc-section').style.display = 'none';
+      const rb = document.getElementById('reflect-btn'); rb.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 6"/></svg> Save &amp; reflect'; rb.disabled = false;
+      const cb = document.getElementById('complete-btn'); cb.textContent = 'Save reflection'; cb.disabled = false;
+      staged = null;
+      document.getElementById('creation-body').focus();
+    });
+
+    function chooseQuestion(body){
+      const t = body.toLowerCase();
+      if (/(family|friend|love|brother|sister|mom|dad|daughter|son)/.test(t)) return 'Who would you want to read this, even if you don’t share it?';
+      if (/(work|project|build|ship|deadline)/.test(t)) return 'What part of this matters most to keep going?';
+      if (/(tired|stress|worry|fear|anxious|sad)/.test(t)) return 'What small kindness could you offer yourself about this?';
+      return 'What does this remind you of from earlier today?';
+    }
+
+    function renderCreations(){
+      const state = LifeOSStore.load();
+      const el = document.getElementById('creation-list');
+      if (!state.creations.length){ el.innerHTML = '<p class="faint">Nothing yet.</p>'; return; }
+      el.innerHTML = state.creations.slice().reverse().map((c) => `
+        <div class="memory-item">
+          <div style="display:flex;align-items:center;gap:8px;"><span class="chip chip-lavender">${c.kind}</span> <span class="faint">${c.mock_cid}</span></div>
+          <div style="margin-top:10px;">${escapeHtml(truncate(c.body, 200))}</div>
+          ${c.reflection && c.reflection !== '(skipped)' ? `<div class="memory-item-why">Reflection · ${escapeHtml(truncate(c.reflection, 160))}</div>` : ''}
+        </div>`).join('');
+    }
+    renderCreations();
+
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function truncate(s,n){ return (s && s.length>n) ? s.slice(0,n-1)+'…' : s; }
+  </script>
+</body>
+</html>

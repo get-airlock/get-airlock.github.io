@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+  <meta name="theme-color" content="#eaf2ef">
+  <title>You · LifeOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/lifeos.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar reveal d1">
+      <a class="icon-btn" href="index.html" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      </a>
+      <div class="brand">
+        <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><defs><radialGradient id="bm" cx="35%" cy="30%"><stop offset="0%" stop-color="#bfe6dc"/><stop offset="60%" stop-color="#6fb7aa"/><stop offset="100%" stop-color="#5a93ba"/></radialGradient></defs><circle cx="12" cy="12" r="9" fill="url(#bm)"/><circle cx="9" cy="8.5" r="2.4" fill="rgba(255,255,255,0.7)"/></svg></span>
+        LifeOS
+      </div>
+      <span class="icon-btn" aria-hidden="true" style="opacity:0; pointer-events:none;"></span>
+    </header>
+
+    <main>
+      <div class="page-header center reveal d2">
+        <h1>You</h1>
+        <p class="lead">Tune how LifeOS supports you. Nothing here is a test.</p>
+      </div>
+
+      <div class="card reveal d3">
+        <div class="you-field">
+          <div class="you-field-label"><span>Name</span><a href="#" id="clear-name">Clear</a></div>
+          <input class="you-name-input" id="name-input" type="text" value="" placeholder="Your name…" aria-label="Your name">
+          <p class="faint" style="margin-top:8px;">Set via conversation — change it anytime.</p>
+        </div>
+
+        <div class="you-field">
+          <div class="you-field-label"><span>Character</span></div>
+          <div class="mascot-row" id="mascot-row">
+            <button class="mascot" data-m="cloud" title="Cloud">☁️</button>
+            <button class="mascot" data-m="drop" title="Drop">💧</button>
+            <button class="mascot" data-m="flame" title="Flame">🔥</button>
+            <button class="mascot" data-m="sprout" title="Sprout">🌱</button>
+          </div>
+        </div>
+
+        <div class="you-field">
+          <div class="you-field-label"><span>Model</span></div>
+          <div class="seg-row" id="model-row">
+            <button class="seg" data-v="FAST">Fast</button>
+            <button class="seg" data-v="MID">Mid</button>
+            <button class="seg" data-v="DEEP">Deep</button>
+            <button class="seg" data-v="PLUS">Plus</button>
+          </div>
+          <p class="faint" style="margin-top:10px;">Fast is snappy. Mid balances speed and depth. Deep and Plus take longer but reason over more context.</p>
+        </div>
+
+        <div class="you-field">
+          <div class="you-field-label"><span>Memory</span></div>
+          <div class="seg-row" id="memory-row">
+            <button class="seg" data-v="nothing">Nothing</button>
+            <button class="seg" data-v="requested">Only requested</button>
+            <button class="seg" data-v="all">All</button>
+          </div>
+        </div>
+
+        <div class="you-field">
+          <div class="you-field-label"><span>Screen</span></div>
+          <div class="seg-row" id="screen-row">
+            <button class="seg" data-v="note">Note space</button>
+            <button class="seg" data-v="draw">Drawing space</button>
+            <button class="seg" data-v="none">Not needed</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="bottom-nav"></div>
+
+  <script src="js/store.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    LifeOSUI.mount('you');
+
+    // Name
+    const nameInput = document.getElementById('name-input');
+    const st = LifeOSStore.load();
+    nameInput.value = st.name && st.name !== 'friend' ? st.name : '';
+    nameInput.addEventListener('input', () => {
+      const s = LifeOSStore.load(); s.name = nameInput.value.trim() || 'friend'; LifeOSStore.save(s);
+      localStorage.setItem('lifeos.name', s.name);
+    });
+    document.getElementById('clear-name').addEventListener('click', (e) => { e.preventDefault(); nameInput.value=''; const s=LifeOSStore.load(); s.name='friend'; LifeOSStore.save(s); nameInput.focus(); });
+
+    // Segmented helper
+    function wireSegments(rowId, getCur, onPick){
+      const row = document.getElementById(rowId);
+      const cur = getCur();
+      row.querySelectorAll('[data-v]').forEach((b) => {
+        if (b.dataset.v === cur) b.classList.add('selected');
+        b.addEventListener('click', () => {
+          row.querySelectorAll('[data-v]').forEach((x) => x.classList.remove('selected'));
+          b.classList.add('selected');
+          onPick(b.dataset.v);
+        });
+      });
+    }
+
+    // Mascot
+    document.querySelectorAll('#mascot-row .mascot').forEach((b) => {
+      if (b.dataset.m === (localStorage.getItem('lifeos.mascot') || 'drop')) b.classList.add('selected');
+      b.addEventListener('click', () => {
+        document.querySelectorAll('#mascot-row .mascot').forEach((x) => x.classList.remove('selected'));
+        b.classList.add('selected');
+        localStorage.setItem('lifeos.mascot', b.dataset.m);
+      });
+    });
+
+    wireSegments('model-row', () => (LifeOSStore.load().model || 'DEEP'), (v) => { const s=LifeOSStore.load(); s.model=v; LifeOSStore.save(s); localStorage.setItem('lifeos.model', v); });
+    wireSegments('memory-row', () => LifeOSStore.getMode(), (v) => LifeOSStore.setMode(v));
+    wireSegments('screen-row', () => (localStorage.getItem('lifeos.screen') || 'note'), (v) => localStorage.setItem('lifeos.screen', v));
+  </script>
+</body>
+</html>
