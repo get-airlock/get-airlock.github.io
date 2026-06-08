@@ -5,6 +5,14 @@
   const KEY = 'lifeos.state.v2';
   const MEM_KEY = 'lifeos.memory.v1';   // where our KYI onboarding writes
 
+  // ── DREAM (Constellation Credits) ↔ SIS (Proof-of-Creation value) — DEMO economics, TUNE THESE ──
+  // DREAM = compute fuel, debited per creation (the POMR routing cost; on-chain form of Constellation Credits). SIS = minted PoC value.
+  // The multiplier is a STUB for ConstellationBench L26-L44 depth/meaning scoring (the real exchange rate).
+  const CREDIT_ALLOWANCE = 100;          // starting demo credit grant
+  const CREDIT_COST_PER_CREATION = 3;    // fuel spent per validated creation
+  const SIS_BASE = 10;                   // base SIS minted per validated creation
+  const SIS_REFLECTION_MULT = 1.5;       // depth multiplier when a reflection is completed (L26-L44 proxy)
+
   function cap(s) { return s ? s[0].toUpperCase() + s.slice(1) : s; }
 
   // ── Real onboarding bridge ──────────────────────────────────────────────
@@ -111,8 +119,27 @@
     return c;
   }
 
+  // Constellation Credits — the fuel ledger (spent per creation).
+  function credits() {
+    const s = load();
+    const spent = s.creations.length * CREDIT_COST_PER_CREATION;
+    return { allowance: CREDIT_ALLOWANCE, spent, remaining: Math.max(0, CREDIT_ALLOWANCE - spent), costPer: CREDIT_COST_PER_CREATION };
+  }
+  // SIS — the Proof-of-Creation mint (value = base × quality multiplier, per creation).
+  function sisValue() {
+    const s = load();
+    let total = 0;
+    const per = s.creations.map((c) => {
+      const mult = (c.reflection && c.reflection !== '(skipped)') ? SIS_REFLECTION_MULT : 1.0;
+      const value = Math.round(SIS_BASE * mult);
+      total += value;
+      return { id: c.id, base: SIS_BASE, mult, value, credits: CREDIT_COST_PER_CREATION };
+    });
+    return { total, per, base: SIS_BASE };
+  }
+
   const LifeOSStore = {
-    load, save, signals, addCreation,
+    load, save, signals, addCreation, credits, sisValue,
     getMode() { return load().memoryMode; },
     setMode(m) { const s = load(); s.memoryMode = m; save(s); },
     isUnlocked(surface) { return !!(load().unlocked && load().unlocked[surface]); },

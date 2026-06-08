@@ -18,7 +18,7 @@
       </a>
       <div class="brand">
         <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><defs><radialGradient id="bm" cx="35%" cy="30%"><stop offset="0%" stop-color="#bfe6dc"/><stop offset="60%" stop-color="#6fb7aa"/><stop offset="100%" stop-color="#5a93ba"/></radialGradient></defs><circle cx="12" cy="12" r="9" fill="url(#bm)"/><circle cx="9" cy="8.5" r="2.4" fill="rgba(255,255,255,0.7)"/></svg></span>
-        LifeOS <span class="brand-badge">SIS</span>
+        LifeOS <span class="brand-badge">DREAM</span>
       </div>
       <a class="icon-btn" href="you.html" aria-label="You and settings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v2.4M12 19.1v2.4M21.5 12h-2.4M4.9 12H2.5M18.7 5.3l-1.7 1.7M7 17l-1.7 1.7M18.7 18.7L17 17M7 7 5.3 5.3" stroke-linecap="round"/></svg>
@@ -27,9 +27,9 @@
 
     <main>
       <div class="page-header reveal d2">
-        <div class="page-header-eyebrow">Wallet · SIS Preview</div>
-        <h1>Your signals.</h1>
-        <p class="lead">A gentle view of what your creations and reflections produced. This is a preview — values are demo signals, not money.</p>
+        <div class="page-header-eyebrow">Wallet · DREAM Preview</div>
+        <h1>Your dreams.</h1>
+        <p class="lead">A gentle view of the dreams your creations and reflections made real. This is a preview — values are demo signals, not money.</p>
       </div>
 
       <!-- Locked -->
@@ -55,9 +55,15 @@
         </div>
 
         <div class="signal-card reveal d4">
-          <div class="signal-label">Participation Value</div>
-          <div class="signal-value" style="font-size:30px;">pending · demo</div>
-          <p class="faint" style="margin-top:10px; line-height:1.5;">SIS values aren’t assigned in this preview. Real signal weighting comes later — for now this is a visual.</p>
+          <div class="signal-label">DREAM</div>
+          <div class="signal-value" style="font-size:30px;"><span id="cc-remaining">0</span> <span class="faint" style="font-size:15px;">/ <span id="cc-allowance">0</span> left</span></div>
+          <p class="faint" style="margin-top:10px; line-height:1.5;">Your compute fuel. <span id="cc-spent">0</span> DREAM spent powering your creations — the work that becomes proof.</p>
+        </div>
+
+        <div class="signal-card reveal d4">
+          <div class="signal-label">Dreams</div>
+          <div class="signal-value" style="font-size:30px;"><span id="sis-total">0</span> <span class="faint" style="font-size:15px;">Dreams</span></div>
+          <p class="faint" style="margin-top:10px; line-height:1.5;">What you made real. You spend DREAM to create, and each creation becomes a Dream you own — weighted by depth when you complete a reflection. Demo weighting — real ConstellationBench scoring comes later.</p>
         </div>
 
         <!-- Signal log -->
@@ -89,6 +95,15 @@
     animateCount(document.getElementById('sig-creations'), sig.creations_validated);
     animateCount(document.getElementById('sig-reflections'), sig.reflections_completed);
 
+    // Constellation Credits (fuel) + SIS (Proof-of-Creation mint)
+    const cc = LifeOSStore.credits();
+    const sis = LifeOSStore.sisValue();
+    document.getElementById('cc-allowance').textContent = cc.allowance;
+    document.getElementById('cc-spent').textContent = cc.spent;
+    animateCount(document.getElementById('cc-remaining'), cc.remaining);
+    animateCount(document.getElementById('sis-total'), sis.total);
+    const sisById = Object.fromEntries(sis.per.map((p) => [p.id, p]));
+
     const list = document.getElementById('signal-list');
     if (!state.creations.length){
       list.innerHTML = '<p class="faint">No signals yet. Make something in <a href="create.html">Create</a> to see one here.</p>';
@@ -97,7 +112,7 @@
         <div class="memory-item">
           <div style="display:flex;align-items:center;gap:8px;"><span class="chip chip-teal">${c.kind}</span> <span class="faint">${c.mock_cid}</span></div>
           <div style="margin-top:10px;">${escapeHtml(truncate(c.body, 140))}</div>
-          <div class="memory-item-why">PoC validated · reflection ${c.reflection && c.reflection !== '(skipped)' ? 'completed' : 'skipped'} · value pending</div>
+          <div class="memory-item-why">PoC validated · −${(sisById[c.id]||{}).credits||0} DREAM · +${(sisById[c.id]||{}).value||0} Dreams${(sisById[c.id]&&sisById[c.id].mult>1)?' · ×'+sisById[c.id].mult+' depth':''}</div>
         </div>`).join('');
     }
 
