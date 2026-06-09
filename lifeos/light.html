@@ -209,12 +209,6 @@
 </head>
 <body>
   <div class="device">
-    <div class="statusbar"><span id="clock">10:10</span>
-      <span class="ic">
-        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="2.6" height="4" rx="1"/><rect x="3.8" y="5" width="2.6" height="6" rx="1"/><rect x="7.6" y="2.6" width="2.6" height="8.4" rx="1"/><rect x="11.4" y="0" width="2.6" height="11" rx="1"/></svg>
-        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity="0.45"/><rect x="2" y="2" width="16" height="8" rx="1.8" fill="currentColor"/></svg>
-      </span>
-    </div>
     <div class="brandrow">
       <span class="brand">
         <svg class="spark" viewBox="0 0 24 24" fill="none"><defs><linearGradient id="sg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5aa6ff"/><stop offset="1" stop-color="#9b6dff"/></linearGradient></defs><path d="M12 2c.7 4.8 4.5 8.5 9.3 9.3-4.8.8-8.6 4.5-9.3 9.3-.7-4.8-4.5-8.5-9.3-9.3C7.5 10.5 11.3 6.8 12 2Z" fill="url(#sg)"/></svg>
@@ -237,7 +231,7 @@
           <button class="orb-tap" id="orbTap" type="button" aria-label="Talk to LifeOS"></button>
         </div>
         <div class="orb-status"><svg class="spark" viewBox="0 0 24 24" fill="none"><path d="M12 2c.7 4.8 4.5 8.5 9.3 9.3-4.8.8-8.6 4.5-9.3 9.3-.7-4.8-4.5-8.5-9.3-9.3C7.5 10.5 11.3 6.8 12 2Z" fill="#9b6dff"/></svg><span id="orbStatus">Tap to talk</span></div>
-        <div class="orb-line" id="orbLine">Tell me something like <b>“French at 2:30 tomorrow”</b> and I'll hold it for you.</div>
+        <div class="orb-line" id="orbLine">Say it or type it — I'll hold it for you.</div>
         <div class="section-gap"></div>
         <div class="agenda-head"><span class="t">Today</span><button class="addbtn" id="addHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Add</button></div>
         <div class="agenda" id="agenda"></div>
@@ -249,17 +243,17 @@
         <div class="section-gap"></div>
         <div class="agenda-head" style="margin-bottom:14px;"><span class="t" id="memCount">Nothing yet</span><button class="addbtn" id="addMem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Add</button></div>
         <div class="mem" id="memList"></div>
-        <div class="mem-foot"><span class="l">Validated so far</span><span class="r" id="memValidated">0.00 <span class="u" id="u1">SIS</span></span></div>
+        <div class="mem-foot"><span class="l">Validated so far</span><span class="r" id="memValidated">0.00 <span class="u" id="u1">DREAM</span></span></div>
       </section>
 
       <!-- WALLET -->
       <section class="screen" id="wallet">
         <div style="margin-top:8px;"><div class="eyebrow">Wallet</div><h1 class="h-serif" style="font-size:40px; margin-top:8px;">Your value.</h1><p class="lead" style="margin-top:10px;">What your creations and reflections came to. Calm, and yours.</p></div>
-        <div class="wtotal"><div class="lbl">Total value</div><div class="big" id="wTotal">0.00<span class="u" id="u2"> SIS</span></div><div class="sub" id="wProj">Grows as you create and reflect.</div><div class="conv" id="wConv"></div></div>
+        <div class="wtotal"><div class="lbl">Total value</div><div class="big" id="wTotal">0.00<span class="u" id="u2"> DREAM</span></div><div class="sub" id="wProj">Grows as you create and reflect.</div><div class="conv" id="wConv"></div></div>
         <div class="winline"><div class="wstat"><div class="n" id="wContrib">0</div><div class="c">contributions</div></div><div class="wstat"><div class="n" id="wWeek">0</div><div class="c">this week</div></div><div class="wstat"><div class="n" id="wToday">0</div><div class="c">validated today</div></div></div>
         <div class="wlist-head">Recent contributions</div>
         <div id="wList"></div>
-        <div class="wabout"><b id="u3">SIS</b> is your proof-of-creation — earned when something you make or reflect on is validated. Values are a preview, not money.</div>
+        <div class="wabout"><b id="u3">DREAM</b> is your creative currency — it grows as what you make and reflect on is validated, and it's what you spend when you choose to create. Anchored to Bitcoin underneath. A preview, not money.</div>
       </section>
 
       <!-- YOU -->
@@ -278,7 +272,7 @@
     <div class="scrim" id="scrim"></div>
     <div class="sheet" id="sheet">
       <h3>Tell me about your day.</h3>
-      <p class="sub">Say it or type it — “French at 2:30 tomorrow”, “Art project at 4”.</p>
+      <p class="sub">Say it or type it — what, and when.</p>
       <input class="ti" id="addInput" placeholder="What, and when?" autocomplete="off" enterkeyhint="done" />
       <p class="ex" id="addParsed"></p>
       <div class="row">
@@ -300,8 +294,10 @@
 <script src="koko.js"></script>
 <script>
 (function(){
-  // ── One config: rename the unit here when Rika decides (she's moving off "SIS") ──
-  const UNIT = 'SIS';
+  // ── One config: the user-facing currency. DREAM = what you hold, earn, and spend
+  //    (the currency of your choices). SIS is the Bitcoin settlement layer underneath,
+  //    not the user-facing unit. ──
+  const UNIT = 'DREAM';
   const PER_VALIDATION = 1.0;            // value granted when a memory is validated (placeholder economy)
   const BTC_PER_UNIT = 0.000010;         // preview anchor only — not money
   const KEY = 'lifeos.v2';
@@ -457,7 +453,7 @@
     const h = new Date().getHours();
     document.getElementById('greetH').innerHTML = (h<12?'Good morning':h<18?'Good afternoon':'Good evening') + (store.name?', <span class="name-accent">'+esc(store.name)+'</span>':'') + '.';
     const ag = document.getElementById('agenda'); const tm = todayMems();
-    if(!tm.length){ ag.innerHTML = '<div class="empty">Nothing on today yet.<br>Tap <b>Add</b> or the orb and tell me — “Art at 4”.</div>'; return; }
+    if(!tm.length){ ag.innerHTML = '<div class="empty">Nothing on today yet.<br>Tap <b>Add</b> or the orb and tell me.</div>'; return; }
     const now = new Date().getHours()*60 + new Date().getMinutes();
     let nextSet=false;
     ag.innerHTML = tm.map(m=>{
@@ -486,7 +482,7 @@
     const total = validated.reduce((s,m)=>s+m.value,0);
     document.getElementById('wTotal').innerHTML = total.toFixed(2)+'<span class="u"> '+UNIT+'</span>';
     document.getElementById('wProj').innerHTML = total>0 ? 'Projected <b>~'+(total*BTC_PER_UNIT).toFixed(7)+' BTC</b>' : 'Grows as you create and reflect.';
-    document.getElementById('wConv').textContent = total>0 ? UNIT+'BTC anchored to Bitcoin · 1 '+UNIT+' ≈ '+BTC_PER_UNIT.toFixed(6)+' BTC' : '';
+    document.getElementById('wConv').textContent = total>0 ? 'Anchored to Bitcoin · 1 '+UNIT+' ≈ '+BTC_PER_UNIT.toFixed(6)+' BTC' : '';
     const wk = Date.now()-7*864e5;
     document.getElementById('wContrib').textContent = validated.length;
     document.getElementById('wWeek').textContent = validated.filter(m=>m.created>=wk).length;
@@ -532,6 +528,10 @@
   let convo=false, vadStream=null, vadAnalyser=null, vadData=null, vadRAF=0, segActive=false, speechSeen=false, silenceAt=0, segAt=0;
   let _sttFails=0;   // consecutive STT failures — keep the flow, fall back to typing only after a few
   const SPEAK_TH=0.020, MIN_SPEECH=250, MAX_SEG=15000;
+  // μ-gate VAD floor: a segment only counts as a real turn if it holds ≥ MIN_VOICED ms of ACTUAL voiced audio
+  // (not just one frame crossing threshold). Kills "picks up words when I'm just thinking" — a thinking-pause /
+  // background blip never reaches Whisper, so no phantom reply (and no wasted STT call). The $0 shot before Soniox.
+  const MIN_VOICED=380; let _segVoicedMs=0, _vadLast=0;
   // End-of-turn silence is adaptive: base + a learned per-speaker rhythm (Rika: pauses vary by person).
   let END_SIL=1350; try{ const s=parseInt(localStorage.getItem('lifeos.voice.endSil')||'0',10); if(s>=1100&&s<=2400) END_SIL=s; }catch(_){}
   let _turnText='';   // stitch fragments across pauses so a mid-thought pause never triggers a reply
@@ -551,6 +551,9 @@
   function stopRec(){ if(mediaRec&&recording){ recording=false; try{mediaRec.stop();}catch(_){} if(recTarget==='orb'){ stage.classList.remove('listening'); orbStatus.textContent='Thinking…'; } else micBtn.classList.remove('rec'); } }
   async function transcribe(){
     try{
+      // μ-gate VAD floor (hands-free only): too little ACTUAL voiced audio = a thinking-pause / noise blip,
+      // not a turn. Re-arm SILENTLY (no toast — interrupting a thinker is the bug), and never call STT (no phantom, no cost).
+      if(convo && _segVoicedMs < MIN_VOICED){ doneTurn(); return; }
       const blob=new Blob(chunks,{type:MIME||'audio/webm'});
       if(blob.size < 1600){ toast('Didn’t catch that — hold a beat longer.'); doneTurn(); return; }   // near-silent clip; Whisper hallucinates on these
       const b64=await toB64(blob);
@@ -624,6 +627,7 @@
       mediaRec.ondataavailable=e=>{ if(e.data&&e.data.size>0) chunks.push(e.data); };
       mediaRec.onstop=async()=>{ await transcribe(); };
       mediaRec.start(); recording=true; segActive=true; speechSeen=false; silenceAt=0; segAt=performance.now();
+      _segVoicedMs=0; _vadLast=performance.now();   // μ-gate: reset voiced-time accumulator for this segment
       stage.classList.add('listening'); orbStatus.textContent='Listening…';
     }catch(_){ }
   }
@@ -639,7 +643,8 @@
     vadAnalyser.getByteTimeDomainData(vadData);
     let sum=0; for(let i=0;i<vadData.length;i++){ const v=(vadData[i]-128)/128; sum+=v*v; }
     const rms=Math.sqrt(sum/vadData.length), now=performance.now();
-    if(rms>SPEAK_TH){ speechSeen=true; silenceAt=0; }
+    const _dt=_vadLast?Math.min(now-_vadLast,100):0; _vadLast=now;   // frame delta (capped, guards rAF gaps)
+    if(rms>SPEAK_TH){ speechSeen=true; silenceAt=0; _segVoicedMs+=_dt; }   // accumulate ACTUAL voiced time
     else if(speechSeen){ if(!silenceAt) silenceAt=now; else if(now-silenceAt>END_SIL && now-segAt>MIN_SPEECH){ endSegment(); return; } }
     if(speechSeen && now-segAt>MAX_SEG) endSegment();
   }
@@ -674,7 +679,7 @@
   function startRing(){ if(!raf) draw(); } startRing();
 
   // clock
-  (function tick(){ const d=new Date(); document.getElementById('clock').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); setTimeout(tick,20000); })();
+  (function tick(){ const el=document.getElementById('clock'); if(el){ const d=new Date(); el.textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); setTimeout(tick,20000); } })();
 
   renderAll();
   setInterval(applyResonance, 12000);   // the heart re-samples — momentum settles, the orb breathes back to calm after a burst

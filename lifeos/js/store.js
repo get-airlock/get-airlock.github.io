@@ -1,6 +1,7 @@
 /* LifeOS — lightweight data store (localStorage-backed).
-   Reads the REAL KYI onboarding (lifeos.memory.v1) when present, and only falls
-   back to the seeded demo ("Maya") if no one has onboarded yet. */
+   CLOSED-WORLD BETA: no demo data. Reads the REAL KYI onboarding (lifeos.memory.v1)
+   when present; otherwise starts EMPTY and fills only from the user / nerve.name mint.
+   No recall theatre, no unreceipted value (per Ande's DQS closed-world contract). */
 (function () {
   const KEY = 'lifeos.state.v2';
   const MEM_KEY = 'lifeos.memory.v1';   // where our KYI onboarding writes
@@ -51,38 +52,20 @@
     };
   }
 
-  function demoSeed() {
+  // Closed-world beta: a fresh device starts EMPTY and fills only from real
+  // onboarding / nerve.name mint. No seeded persona, no fake creations, no fake
+  // family, no claimed value. The wallet shows nothing until a real receipt exists.
+  function emptyState() {
     const ln = localStorage.getItem('lifeos.name');
     return {
-      demo: true,
-      name: (ln && ln !== 'friend') ? ln : 'Maya',
+      demo: false,
+      name: (ln && ln !== 'friend') ? ln : 'friend',
       model: localStorage.getItem('lifeos.model') || 'DEEP',
-      memoryMode: 'requested',
+      memoryMode: localStorage.getItem('lifeos.memory.mode.v1') || 'requested',
       unlocked: { create: true, wallet: true },
-      canon_pages: [
-        { session: 'Arrive', ipfs_cid: 'bafy…k3q9', created_at: Date.now() - 1000 * 60 * 60 * 26,
-          prompts: [
-            { dimension: 'Meaning', question: 'What pulled you here today?', answer: 'I wanted somewhere quiet to think that wasn’t a notes app.' },
-            { dimension: 'Time', question: 'What does this season of life feel like?', answer: 'Transitional. A lot is half-finished and that’s okay.' },
-          ] },
-        { session: 'Continue', ipfs_cid: 'bafy…r7m2', created_at: Date.now() - 1000 * 60 * 60 * 5,
-          prompts: [
-            { dimension: 'Relation', question: 'Who have you been thinking about?', answer: 'My sister. We keep missing each other’s calls.' },
-            { dimension: 'Aspiration', question: 'What would “a good week” look like?', answer: 'Shipping one real thing and going for two long walks.' },
-          ] },
-      ],
-      creations: [
-        { id: 'c1', kind: 'note', mock_cid: 'cid:Qm…a1f', created_at: Date.now() - 1000 * 60 * 90,
-          body: 'A small idea: keep a “done” list next to the to-do list. Restless days look more productive in hindsight than they feel.',
-          reflection: 'It reminds me that momentum is quieter than I expect.' },
-        { id: 'c2', kind: 'note', mock_cid: 'cid:Qm…9e0', created_at: Date.now() - 1000 * 60 * 30,
-          body: 'Voice memo, transcribed: the bridge near the river at dusk — that exact light is what calm feels like to me.',
-          reflection: '(skipped)' },
-      ],
-      family_shared: [
-        { member: 'Dad', role: 'family', shared: 'Has been feeling more settled this month; enjoying morning walks.' },
-        { member: 'Sister', role: 'family', shared: 'Busy with a work deadline — would welcome a low-key check-in.' },
-      ],
+      canon_pages: [],
+      creations: [],
+      family_shared: [],
     };
   }
 
@@ -91,13 +74,15 @@
     try { cached = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
     const real = realOnboarding();
     if (cached) {
-      // Upgrade the demo seed to the real person once they've onboarded.
+      // Upgrade a real onboarding into state once it exists.
       if (real && (cached.demo || cached.name === 'Maya')) {
         return save(fromOnboarding(real, cached.creations || []));
       }
+      // Scrub any legacy demo cache from before the closed-world beta.
+      if (cached.demo || cached.name === 'Maya') return save(emptyState());
       return cached;
     }
-    return save(real ? fromOnboarding(real, []) : demoSeed());
+    return save(real ? fromOnboarding(real, []) : emptyState());
   }
   function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} return s; }
 
