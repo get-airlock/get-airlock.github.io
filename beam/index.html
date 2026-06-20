@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+<title>Beam</title>
+<meta name="theme-color" content="#0a0a12" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Beam" />
+<meta name="description" content="Beam — your airlock. Otto guards the door." />
+<style>
+  :root{
+    --bg:#0a0a12; --bg-2:#0d0e18; --panel:#12131f;
+    --line:rgba(255,255,255,0.06); --line-2:rgba(255,255,255,0.1);
+    --ink:#f4f4fa; --ink-soft:#9b9bab; --ink-faint:#62636f;
+    --violet:#8b6dff; --violet-2:#6d4bff; --violet-deep:#5a37e0;
+    --red:#ff3b5c; --rock-glow:#a98bff; --green:#4ade80;
+    --font:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,monospace;
+    --nav-h:60px; --tab-h:64px;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ height:100%; }
+  body{
+    font-family:var(--font);
+    background:radial-gradient(120% 80% at 50% -10%,#181430 0%,transparent 55%),radial-gradient(100% 60% at 50% 110%,#14112a 0%,transparent 60%),#050509;
+    color:var(--ink); display:flex; align-items:center; justify-content:center;
+    min-height:100dvh; padding:28px 16px;
+  }
+  .phone{ position:relative; width:393px; height:852px; border-radius:54px; background:#000; padding:11px;
+    box-shadow:0 0 0 2px #1c1c22,0 0 0 11px #060608,0 40px 90px -30px rgba(0,0,0,0.9),0 0 120px -40px rgba(139,109,255,0.35); }
+  .screen{ position:relative; width:100%; height:100%; border-radius:44px; overflow:hidden;
+    background:radial-gradient(130% 70% at 50% 0%,#181232 0%,transparent 42%),var(--bg); display:flex; flex-direction:column; }
+  .island{ position:absolute; top:11px; left:50%; transform:translateX(-50%); width:118px; height:34px; background:#000; border-radius:20px; z-index:60; }
+  @media (max-width:460px){
+    body{ padding:0; }
+    .phone{ width:100vw; height:100dvh; border-radius:0; padding:0; box-shadow:none; }
+    .screen{ border-radius:0; }
+    .island{ display:none; }
+  }
+  .statusbar{ flex:0 0 auto; height:46px; padding:0 30px 6px 34px; display:flex; align-items:flex-end; justify-content:space-between; position:relative; z-index:55; }
+  .statusbar .time{ font-weight:700; font-size:16px; }
+  .statusbar .icons{ display:flex; align-items:center; gap:7px; color:var(--ink); }
+  @media (max-width:460px){ .statusbar{ display:none; } }
+
+  .topbar{ flex:0 0 auto; height:var(--nav-h); position:relative; padding:0 20px; display:grid; grid-template-columns:44px 1fr 44px; align-items:center;
+    background:linear-gradient(180deg,rgba(139,109,255,0.14),rgba(139,109,255,0) 90%); border-bottom:1px solid var(--line); }
+  .topbar .chev{ width:30px; height:30px; display:grid; place-items:center; color:var(--violet); cursor:pointer; border-radius:50%; }
+  .topbar .chev[hidden]{ visibility:hidden; }
+  .topbar .title{ text-align:center; font-size:21px; font-weight:700; }
+  .topbar .nav-action{ justify-self:end; color:var(--violet); font-size:26px; font-weight:600; background:none; border:none; cursor:pointer; }
+
+  /* sign-in gate banner — calm, not an error */
+  .gate-banner{ flex:0 0 auto; text-align:center; font-size:13px; padding:7px 10px; background:rgba(139,109,255,0.14); color:#c9bcff; border-bottom:1px solid var(--line); }
+  .gate-banner b{ color:#e7e0ff; }
+
+  .body{ flex:1 1 auto; overflow-y:auto; overflow-x:hidden; position:relative; }
+  .body::-webkit-scrollbar{ display:none; }
+  .view{ display:none; min-height:100%; flex-direction:column; }
+  .view.active{ display:flex; }
+
+  .conversation-item{ margin:8px 16px; padding:12px 14px; border-radius:18px; display:flex; gap:14px; align-items:center; cursor:pointer; transition:transform .15s,background .2s; }
+  .conversation-item:active{ transform:scale(0.985); background:rgba(255,255,255,0.03); }
+  #otto-conversation{ background:linear-gradient(180deg,rgba(139,109,255,0.1),rgba(255,255,255,0.02)); border:1px solid rgba(139,109,255,0.22); margin-top:14px; }
+  .avatar{ flex:0 0 auto; width:56px; height:56px; border-radius:50%; display:grid; place-items:center; font-size:28px;
+    background:radial-gradient(circle at 35% 30%,#2a2350,#15122c); box-shadow:0 0 0 2px var(--violet),0 0 18px -4px rgba(139,109,255,0.7); }
+  .conversation-info{ flex:1 1 auto; min-width:0; }
+  .conversation-header{ display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
+  .conversation-name{ font-size:18px; font-weight:700; }
+  .conversation-time{ font-size:13px; color:var(--ink-faint); }
+  .conversation-preview{ margin-top:3px; font-size:15px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .conversation-divider{ margin:18px 18px 4px; font-size:21px; font-weight:700; }
+  .empty-state{ flex:1 1 auto; display:flex; align-items:center; justify-content:center; text-align:center; color:var(--ink-soft); font-size:17px; padding:40px 30px 120px; line-height:1.45; }
+
+  .message-bar{ flex:0 0 auto; display:flex; align-items:flex-end; gap:8px; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); border-top:1px solid var(--line); background:rgba(8,8,15,0.6); }
+  .attach-btn{ flex:0 0 auto; width:38px; height:38px; border-radius:50%; border:none; background:#222230; color:var(--violet); font-size:22px; cursor:pointer; }
+  .message-input{ flex:1 1 auto; resize:none; max-height:120px; padding:9px 14px; border-radius:18px; border:1px solid var(--line-2); background:#16161f; color:var(--ink); font-size:16px; font-family:var(--font); }
+  .send-btn{ flex:0 0 auto; width:38px; height:38px; border-radius:50%; border:none; background:linear-gradient(160deg,var(--violet),var(--violet-deep)); color:#fff; font-size:18px; cursor:pointer; }
+  .send-btn:disabled,.message-input:disabled{ opacity:0.45; }
+
+  /* sign-in hero card on the chats view */
+  .signin-card{ margin:16px; padding:22px 20px; border-radius:22px; text-align:center;
+    background:linear-gradient(180deg,rgba(139,109,255,0.12),rgba(255,255,255,0.02)); border:1px solid rgba(139,109,255,0.25); }
+  .signin-card h2{ font-size:22px; font-weight:800; margin-bottom:8px; }
+  .signin-card p{ color:var(--ink-soft); font-size:15px; line-height:1.5; max-width:30ch; margin:0 auto 16px; }
+  .signin-btn{ display:inline-flex; align-items:center; gap:9px; padding:13px 26px; border-radius:999px; border:none; cursor:pointer;
+    background:linear-gradient(150deg,var(--violet),var(--violet-deep)); color:#fff; font-size:17px; font-weight:800; box-shadow:0 12px 26px -8px rgba(109,75,255,0.8); }
+  .signin-btn:active{ transform:scale(0.96); }
+  .signin-note{ margin-top:12px; font-size:12.5px; color:var(--ink-faint); }
+
+  #view-otto{ position:relative; overflow:hidden; align-items:center; padding:8px 26px 120px; text-align:center; }
+  .pond{ position:absolute; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+  .pond i{ position:absolute; bottom:-30px; border-radius:50%; background:radial-gradient(circle at 35% 30%,rgba(169,139,255,0.5),rgba(139,109,255,0.05) 70%); animation:rise linear infinite; }
+  @keyframes rise{ 0%{ transform:translateY(0) scale(0.6); opacity:0 } 12%{ opacity:0.55 } 85%{ opacity:0.4 } 100%{ transform:translateY(-700px) scale(1.1); opacity:0 } }
+  .otto-status{ position:relative; z-index:2; margin-top:10px; display:inline-flex; align-items:center; gap:8px; padding:8px 15px; border-radius:999px; font-size:14px; color:var(--ink-soft); background:rgba(255,255,255,0.04); border:1px solid var(--line-2); }
+  .otto-status .dot{ width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 10px 1px var(--green); animation:blink 2.4s ease-in-out infinite; }
+  @keyframes blink{ 0%,100%{ opacity:1 } 50%{ opacity:0.35 } }
+  .otto-char{ position:relative; z-index:2; margin-top:26px; }
+  .otto-emoji{ font-size:92px; line-height:1; display:block; animation:bob 4.2s ease-in-out infinite; filter:drop-shadow(0 14px 18px rgba(0,0,0,0.55)); cursor:pointer; }
+  @keyframes bob{ 0%,100%{ transform:translateY(0) rotate(-2deg) } 50%{ transform:translateY(-12px) rotate(2deg) } }
+  .speech{ position:absolute; left:50%; top:-14px; transform:translate(-50%,-100%) scale(0.9); background:#1c1d2c; border:1px solid var(--line-2); color:var(--ink); padding:10px 15px; border-radius:16px; font-size:14.5px; white-space:nowrap; box-shadow:0 12px 30px -10px rgba(0,0,0,0.8); opacity:0; pointer-events:none; transition:opacity .3s,transform .3s; }
+  .speech.show{ opacity:1; transform:translate(-50%,-100%) scale(1); }
+  .rock-stage{ position:relative; z-index:2; margin-top:30px; width:240px; height:190px; display:grid; place-items:center; cursor:pointer; }
+  .rock-halo{ position:absolute; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle,rgba(169,139,255,0.55),rgba(139,109,255,0.12) 45%,transparent 70%); filter:blur(6px); animation:halo 3.6s ease-in-out infinite; }
+  @keyframes halo{ 0%,100%{ transform:scale(0.9); opacity:0.7 } 50%{ transform:scale(1.08); opacity:1 } }
+  .rock{ position:relative; width:160px; height:126px; border-radius:54% 46% 58% 42% / 64% 60% 40% 36%;
+    background:radial-gradient(60% 55% at 34% 26%,#cdbcff 0%,#9b86e6 26%,#5b4d8c 60%,#2f2950 100%);
+    box-shadow:inset 0 6px 14px rgba(255,255,255,0.35),inset 0 -14px 26px rgba(0,0,0,0.55),0 0 36px 4px rgba(169,139,255,0.6),0 0 70px 10px rgba(139,109,255,0.4); animation:pulse 3.6s ease-in-out infinite; transition:transform .18s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes pulse{ 0%,100%{ filter:brightness(1) } 50%{ filter:brightness(1.18) } }
+  .rock-stage.boop .rock{ transform:scale(0.86) rotate(-3deg); }
+  .ripple{ position:absolute; width:160px; height:126px; border-radius:54% 46% 58% 42% / 64% 60% 40% 36%; border:2px solid rgba(169,139,255,0.7); pointer-events:none; animation:ripple .7s ease-out forwards; }
+  @keyframes ripple{ 0%{ transform:scale(1); opacity:0.8 } 100%{ transform:scale(1.9); opacity:0 } }
+  .spark{ position:absolute; width:7px; height:7px; border-radius:50%; background:radial-gradient(circle,#fff,var(--rock-glow)); pointer-events:none; animation:spark .65s ease-out forwards; }
+  @keyframes spark{ 0%{ transform:translate(0,0) scale(1); opacity:1 } 100%{ transform:translate(var(--dx),var(--dy)) scale(0); opacity:0 } }
+  .rock-caption{ position:relative; z-index:2; margin-top:26px; }
+  .rock-caption .label{ font-size:23px; font-weight:700; }
+  .rock-caption .sub{ margin-top:6px; font-size:15px; color:var(--ink-soft); line-height:1.45; max-width:30ch; }
+  .boop-chip{ position:relative; z-index:2; margin-top:20px; display:inline-flex; align-items:center; gap:9px; padding:11px 20px; border-radius:999px; cursor:pointer; background:linear-gradient(150deg,var(--violet),var(--violet-deep)); color:#fff; font-size:17px; font-weight:700; box-shadow:0 12px 26px -8px rgba(109,75,255,0.8); }
+  .boop-chip:active{ transform:scale(0.94); }
+  .boop-count{ font-variant-numeric:tabular-nums; background:rgba(0,0,0,0.25); padding:2px 9px; border-radius:999px; font-size:15px; }
+
+  .tab-bar{ flex:0 0 auto; height:var(--tab-h); position:relative; z-index:40; display:grid; grid-template-columns:repeat(4,1fr); padding:8px 6px calc(6px + env(safe-area-inset-bottom)); background:rgba(8,8,15,0.72); backdrop-filter:blur(18px) saturate(1.4); -webkit-backdrop-filter:blur(18px) saturate(1.4); border-top:1px solid var(--line); }
+  .tab{ display:flex; flex-direction:column; align-items:center; gap:4px; padding:6px 0; color:var(--ink-faint); cursor:pointer; background:none; border:none; }
+  .tab .tab-icon{ font-size:21px; height:24px; }
+  .tab .tab-label{ font-size:11px; font-weight:600; }
+  .tab.active{ color:var(--violet); }
+  .toast{ position:absolute; bottom:84px; left:50%; transform:translateX(-50%) translateY(20px); z-index:90; background:#1c1d2c; border:1px solid var(--line-2); color:var(--ink); padding:11px 18px; border-radius:14px; font-size:15px; opacity:0; pointer-events:none; transition:opacity .25s,transform .25s; max-width:84%; text-align:center; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="phone"><div class="screen">
+  <div class="island"></div>
+  <div class="statusbar"><span class="time">9:41</span><span class="icons">📶 􀙱 􀛨</span></div>
+
+  <header class="topbar">
+    <div class="chev" id="nav-back" aria-label="Back" hidden>
+      <svg width="12" height="20" viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2 2 10l8 8"/></svg>
+    </div>
+    <div class="title" id="nav-title">Beam</div>
+    <button class="nav-action" aria-label="Sign in" onclick="beamSignIn()">🔗</button>
+  </header>
+
+  <div class="gate-banner">Preview · <b>sign in</b> to go live</div>
+
+  <div class="body">
+    <!-- CHATS -->
+    <section id="view-conversations" class="view active">
+      <div class="signin-card">
+        <h2>Welcome to Beam</h2>
+        <p>Your airlock. Otto guards the door — anything gets through him first. Sign in to go live and start talking.</p>
+        <button class="signin-btn" onclick="beamSignIn()">🔐 Sign in</button>
+        <div class="signin-note">Face ID · no passwords · your sovereign login</div>
+      </div>
+
+      <div id="otto-conversation" class="conversation-item" role="button" tabindex="0" onclick="beamSwitchTab('otto')">
+        <div class="avatar">🦦</div>
+        <div class="conversation-info">
+          <div class="conversation-header"><span class="conversation-name">Otto</span><span class="conversation-time">just now</span></div>
+          <div class="conversation-preview">hey. your airlock is live. anything gets through me first.</div>
+        </div>
+      </div>
+
+      <div class="conversation-divider">Conversations</div>
+      <div class="empty-state" style="padding:30px 30px 60px;">Sign in to start one.</div>
+    </section>
+
+    <!-- CALLS -->
+    <section id="view-calls" class="view"><div class="empty-state">Calls live here soon.</div></section>
+
+    <!-- OTTO hero (fully live, no backend) -->
+    <section id="view-otto" class="view">
+      <div class="pond" id="pond" aria-hidden="true"></div>
+      <div class="otto-status"><span class="dot"></span> Guarding your airlock</div>
+      <div class="otto-char">
+        <div class="speech" id="speech">boop. 💜</div>
+        <span class="otto-emoji" id="ottoEmoji" role="img" aria-label="Otto the otter">🦦</span>
+      </div>
+      <div class="rock-stage" id="rockStage" role="button" tabindex="0" aria-label="Boop Otto's glowing rock">
+        <div class="rock-halo"></div><div class="rock"></div>
+      </div>
+      <div class="rock-caption"><div class="label">Otto's lucky rock</div><div class="sub">Every otter keeps a favorite. Boop it to keep the glow alive.</div></div>
+      <div class="boop-chip" id="boopChip">boop the rock <span class="boop-count" id="boopCount">0</span></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="view-settings" class="view">
+      <div class="signin-card" style="margin-top:24px;">
+        <h2>Your Beam</h2>
+        <p>Sign in to set up Face ID, your Beam ID, and your contacts.</p>
+        <button class="signin-btn" onclick="beamSignIn()">🔐 Sign in</button>
+        <div class="signin-note">coming online soon</div>
+      </div>
+    </section>
+  </div>
+
+  <nav class="tab-bar">
+    <button class="tab active" data-tab="conversations" onclick="beamSwitchTab('conversations')"><span class="tab-icon">💬</span><span class="tab-label">Chats</span></button>
+    <button class="tab" data-tab="calls" onclick="beamSwitchTab('calls')"><span class="tab-icon">📞</span><span class="tab-label">Calls</span></button>
+    <button class="tab" data-tab="otto" onclick="beamSwitchTab('otto')"><span class="tab-icon">🦦</span><span class="tab-label">Otto</span></button>
+    <button class="tab" data-tab="settings" onclick="beamSwitchTab('settings')"><span class="tab-icon">⚙︎</span><span class="tab-label">Settings</span></button>
+  </nav>
+
+  <div id="beam-toast" class="toast"></div>
+</div></div>
+
+<script>
+(function(){
+  var VIEWS=['conversations','calls','otto','settings'];
+  window.beamSwitchTab=function(name){
+    VIEWS.forEach(function(v){ var el=document.getElementById('view-'+v); if(el) el.classList.toggle('active', v===name); });
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.getAttribute('data-tab')===name); });
+    var title={conversations:'Beam',calls:'Calls',otto:'Otto',settings:'Settings'}[name]||'Beam';
+    var e=document.getElementById('nav-title'); if(e) e.textContent=title;
+    if(name==='otto') startPond();
+    var b=document.querySelector('.body'); if(b) b.scrollTop=0;
+  };
+  window.beamToast=function(m){ var t=document.getElementById('beam-toast'); if(!t) return; t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(function(){t.classList.remove('show');},2800); };
+  window.beamSignIn=function(){ beamToast('Sign-in goes live with your Airlock login — coming soon. 🔐'); };
+
+  /* Otto hero: pond + rock boop — fully client-side, no backend */
+  var pondStarted=false;
+  window.startPond=function(){ if(pondStarted) return; pondStarted=true; var pond=document.getElementById('pond'); if(!pond) return;
+    for(var i=0;i<14;i++){ var b=document.createElement('i'); var s=4+Math.random()*16; b.style.width=s+'px'; b.style.height=s+'px'; b.style.left=Math.random()*100+'%'; b.style.animationDuration=(7+Math.random()*9)+'s'; b.style.animationDelay=(-Math.random()*12)+'s'; pond.appendChild(b);} };
+  var stage=document.getElementById('rockStage'), chip=document.getElementById('boopChip'), countEl=document.getElementById('boopCount'), speech=document.getElementById('speech'), otto=document.getElementById('ottoEmoji');
+  var count=parseInt(localStorage.getItem('beam_otto_boops')||'0',10); if(countEl) countEl.textContent=count;
+  var lines=['boop. 💜','again! again!','it glows brighter now','this one is mine','shiny. perfect.','*happy otter noises*','smooth as a clam','my favorite rock','keep it warm for me','heehee','🦦💎','feel that hum?'];
+  function spark(el){ for(var i=0;i<8;i++){ var s=document.createElement('div'); s.className='spark'; var a=(Math.PI*2/8)*i+Math.random()*0.5,d=60+Math.random()*46; s.style.setProperty('--dx',Math.cos(a)*d+'px'); s.style.setProperty('--dy',Math.sin(a)*d+'px'); el.appendChild(s); setTimeout(function(x){return function(){x.remove();};}(s),700);} var r=document.createElement('div'); r.className='ripple'; el.appendChild(r); setTimeout(function(){r.remove();},750); }
+  function boop(){ if(!stage) return; count++; countEl.textContent=count; localStorage.setItem('beam_otto_boops',count);
+    stage.classList.add('boop'); setTimeout(function(){stage.classList.remove('boop');},190); spark(stage);
+    if(otto){ otto.style.transition='transform .2s'; otto.style.transform='translateY(-10px) scale(1.12)'; setTimeout(function(){otto.style.transform='';},220); }
+    speech.textContent=lines[Math.floor(Math.random()*lines.length)]; speech.classList.add('show'); clearTimeout(speech._t); speech._t=setTimeout(function(){speech.classList.remove('show');},1700);
+    if(navigator.vibrate) navigator.vibrate(12); }
+  if(stage) stage.addEventListener('click',boop);
+  if(chip) chip.addEventListener('click',boop);
+  if(stage) stage.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); boop(); }});
+})();
+</script>
+</body>
+</html>
