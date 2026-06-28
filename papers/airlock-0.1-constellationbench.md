@@ -13,9 +13,9 @@ We present ConstellationBench, a behavioral evaluation framework for large langu
 
 We address this gap with a suite of 7 purpose-built benchmarks grounded in the DECF behavioral framework — a four-dimensional drive model (Dominance, Extraversion, Patience, Formality) adapted from the Predictive Index, a psychometric instrument validated across 30 million human assessments. We evaluate 22 models spanning frontier, mid-tier, and budget cost tiers across 44 evaluation layers totaling 22,200+ LLM calls at approximately $115 in total API compute.
 
-Our central finding is the RLHF paradox: budget-tier models with lighter alignment training consistently outperform frontier models on behavioral fidelity tasks by approximately 20%. We identify an architecture-dependent behavioral ceiling — Mixture-of-Experts (MoE) architectures dominate performance layers while Dense architectures dominate depth layers — and demonstrate that no single architecture optimizes for both simultaneously. We present the Persona-Optimized Model Router (POMR), a tiered routing architecture that exploits this structural split, achieving improved behavioral scores at 97% lower cost than frontier-uniform inference. April 2026 expansion results covering Opus 4.7, GPT-5.4, Llama 4, Gemma 4, and Mamba-Transformer hybrids confirm the effect persists across four distinct architecture families.
+Our central finding is the RLHF paradox: budget-tier models with lighter alignment training consistently outperform frontier models on behavioral fidelity tasks by approximately 20%. We identify an architecture-dependent behavioral ceiling — Mixture-of-Experts (MoE) architectures dominate performance layers while Dense architectures dominate depth layers — and demonstrate that no single architecture optimizes for both simultaneously. We present the Persona-Optimized Model Router (POMR), a tiered routing architecture that exploits this structural split, achieving improved behavioral scores at 97% lower cost than frontier-uniform inference. April 2026 expansion results covering Opus 4.7, GPT-5.4, Llama 4, Gemma 4, and Mamba-Transformer hybrids confirm the effect persists across four distinct architecture families. An architectural-substrate extension (Bench 1.6-A) deploys pure state-space models (Mamba-2.8B) and demonstrates that the NSI measurement discriminates between attention-based and non-attention-based architectures at p < 10⁻⁶ with medium-to-large effect size (Cliff's δ = -0.415).
 
-All benchmark code, scoring logic, signal word dictionaries, and results are publicly available.
+All benchmark code, scoring logic, signal word dictionaries, and results are publicly available at https://huggingface.co/datasets/AirlockLabs/constellation-bench.
 
 ---
 
@@ -54,7 +54,7 @@ Total research cost: approximately $115 in API compute across 22,200+ LLM calls.
 
 ## 3. The DECF Behavioral Framework
 
-### 2.1 Background
+### 3.1 Background
 
 The Predictive Index (PI) is a psychometric instrument with 70+ years of validation across 30 million human behavioral assessments [5]. It measures four behavioral drives:
 
@@ -63,7 +63,7 @@ The Predictive Index (PI) is a psychometric instrument with 70+ years of validat
 - **C (Patience/Consistency)**: The drive for stability. High-C individuals are methodical, thorough, and steady. Low-C individuals are urgent, fast-paced, and impatient.
 - **F (Formality)**: The drive for conformity. High-F individuals are process-driven, compliant, and detail-oriented. Low-F individuals are informal, skip-process, and iterate.
 
-### 2.2 DECF Applied to LLM Evaluation
+### 3.2 DECF Applied to LLM Evaluation
 
 We adapt the PI framework to LLM evaluation by defining 17 behavioral profiles as specific DECF configurations. Each profile is a 4-tuple of drive values on a 1-10 scale:
 
@@ -89,7 +89,7 @@ We adapt the PI framework to LLM evaluation by defining 17 behavioral profiles a
 
 Profiles cluster into three meta-archetypes: **Drivers** (high-D, strong distinctive voice), **Enforcers** (high-C/F, hold through structure), and **Interpreters** (balanced/low-energy, hardest for LLMs to differentiate from baseline).
 
-### 2.3 Signal Word Scoring
+### 3.3 Signal Word Scoring
 
 Persona fidelity is scored by matching drive-appropriate signal words in model output against the target DECF profile. For each of four drives, we maintain curated HIGH and LOW signal word sets (89 words total across 8 sets). The scoring function:
 
@@ -263,6 +263,16 @@ The structural explanation: MoE models always route input to an active expert. T
 No model in our evaluation passes all benchmarks. The best all-rounder (kimi-k2.5) wins or ties 6 of 7 benchmarks but at the cost of depth. Opus-4.6 scores highest on Bench Core (0.589) but ranks 10th overall due to poor persona fidelity.
 
 This finding motivates the routing architecture described in Section 7.
+
+### 6.3 Architectural-Substrate Extension (Bench 1.6-A)
+
+To test whether the architecture-dependent ceiling generalizes beyond transformer-family models, we deployed non-transformer architectures on HF Inference Endpoints. Three cells were preregistered: Mamba-2.8B (pure state-space, base), Jamba-v0.1 (hybrid SSM-Transformer + MoE, base), and xLSTM-7b (matrix-memory recurrent, base). Jamba and xLSTM deployments were blocked by HF container compatibility issues and are deferred to Bench 1.7; Mamba-2.8B ran to completion (n=75 cells, $2.45).
+
+The pooled transformer corpus (Bench 1 + 1.5, n=1050) clusters at mean S_M = 0.371. Mamba-2.8B sits at mean S_M = 0.199. Two-tailed Mann-Whitney U: U = 23,036, p < 10⁻⁶. Cliff's δ = -0.415 (medium-to-large effect). All 15 attention-based models cluster within a 0.32-0.41 band; Mamba falls outside by ~2x margin.
+
+Two interpretations are not mutually exclusive: (1) pure state-space behavior expresses persona-direction tension less crisply than attention because selective-state mechanisms integrate over time differently than cross-position attention; (2) the gap conflates architecture with training regime (Mamba is base, the transformer corpus is instruction-tuned). Both interpretations support the broader claim: the NSI measurement is sensitive to substrate-level architectural differences, expanding the finding from "NSI characterizes transformer behavior" to "NSI discriminates between architecture families."
+
+The combined corpus now covers four architectural families: Dense transformer (14 models, mean S_M = 0.378), Sparse MoE transformer (1 model, S_M = 0.321), Hybrid SSM-Transformer instruct (1 model, S_M = 0.402), and Pure state-space base (1 model, S_M = 0.199). Full preregistration, custom handlers, transcripts, and metrics are available in the dataset repository.
 
 ---
 

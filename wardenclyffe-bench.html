@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- STAGED — NOT FOR PUBLIC INDEXING. Remove the robots line only when Zac approves publish. -->
+<meta name="robots" content="noindex, nofollow">
+<title>Wardenclyffe v0.1 — A Pre-Registered Behavioral-Drift Benchmark</title>
+<meta name="description" content="Behavioral drift is measurable. Four falsifiable conditions, sealed before the run. Three held; the fourth needs humans. Public data.">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --otto: #7C5CFC; --accent: #00D1FF; --base: #0B0E14; --raised: #0F1219;
+  --overlay: #151923; --border: #1E2330; --text: #E2E8F0; --text2: #94A3B8;
+  --text3: #64748B; --success: #22C55E; --warning: #EAB308; --error: #EF4444;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--base); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 14px; line-height: 1.7; overflow-x: hidden; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+h1 { font-size: 52px; font-weight: 900; letter-spacing: -3px; line-height: 1.05; }
+h2 { font-size: 32px; font-weight: 800; letter-spacing: -1.5px; line-height: 1.15; }
+h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+.gradient-text { background: linear-gradient(135deg, #E2E8F0, #7C5CFC); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.container { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+section { padding: 72px 0; }
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(11,14,20,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; }
+nav .container { display: flex; align-items: center; justify-content: space-between; }
+.nav-brand { display: flex; align-items: center; gap: 10px; }
+.nav-logo { width: 28px; height: 28px; background: linear-gradient(135deg, var(--otto), var(--accent)); border-radius: 6px; }
+.nav-title { font-weight: 800; font-size: 15px; letter-spacing: -0.5px; }
+.nav-links { display: flex; gap: 24px; }
+.nav-links a { color: var(--text2); text-decoration: none; font-size: 13px; font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover { color: var(--text); }
+.stage-banner { background: rgba(234,179,8,0.12); border-bottom: 1px solid rgba(234,179,8,0.25); color: var(--warning); text-align: center; font-size: 12px; font-weight: 600; padding: 7px 12px; letter-spacing: 0.3px; }
+.hero { padding-top: 150px; text-align: center; }
+.hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--raised); border: 1px solid var(--border); border-radius: 24px; padding: 6px 16px; margin-bottom: 28px; font-size: 12px; color: var(--text2); }
+.hero-badge-dot { width: 8px; height: 8px; background: var(--otto); border-radius: 50%; }
+.hero p.sub { color: var(--text2); font-size: 18px; max-width: 680px; margin: 24px auto 0; }
+.kicker { color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 56px; }
+.stat { background: var(--raised); border: 1px solid var(--border); border-radius: 14px; padding: 28px 24px; }
+.stat .num { font-family: 'JetBrains Mono', monospace; font-size: 38px; font-weight: 700; letter-spacing: -2px; }
+.stat .num.good { color: var(--success); } .stat .num.otto { color: var(--otto); } .stat .num.warn { color: var(--warning); }
+.stat .lbl { color: var(--text3); font-size: 12px; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; }
+.card { background: var(--raised); border: 1px solid var(--border); border-radius: 16px; padding: 32px; }
+.tbl { width: 100%; border-collapse: separate; border-spacing: 0; }
+.tbl th { text-align: left; padding: 12px 14px; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); border-bottom: 1px solid var(--border); }
+.tbl th:not(:first-child), .tbl td:not(:first-child) { text-align: right; }
+.tbl td { padding: 13px 14px; border-bottom: 1px solid rgba(30,35,48,0.5); font-size: 13px; }
+.tbl td.mono, .tbl td:not(:first-child) { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.v-pass { color: var(--success); font-weight: 600; }
+.v-part { color: var(--warning); font-weight: 600; }
+.v-open { color: var(--accent); font-weight: 600; }
+.row-relay { background: rgba(124,92,252,0.06); }
+.row-relay td:first-child { border-left: 3px solid var(--otto); }
+.pill { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+.pill.moe { background: rgba(0,209,255,0.1); color: var(--accent); } .pill.dense { background: rgba(148,163,184,0.12); color: var(--text2); }
+.callout { background: linear-gradient(135deg, rgba(124,92,252,0.08), rgba(0,209,255,0.04)); border: 1px solid rgba(124,92,252,0.25); border-radius: 16px; padding: 32px; }
+.cta { display: inline-block; margin-top: 20px; background: linear-gradient(135deg, var(--otto), #6344e0); color: #fff; text-decoration: none; font-weight: 700; font-size: 14px; padding: 13px 26px; border-radius: 10px; }
+.note { color: var(--text3); font-size: 12px; }
+footer { border-top: 1px solid var(--border); padding: 48px 0; color: var(--text3); font-size: 12px; }
+footer a { color: var(--text2); text-decoration: none; } footer a:hover { color: var(--text); }
+.muted { color: var(--text2); }
+@media (max-width: 760px){ h1{font-size:38px;letter-spacing:-1.5px;} .stat-row{grid-template-columns:1fr;} .container{padding:0 20px;} }
+</style>
+</head>
+<body>
+
+<div class="stage-banner">STAGED PREVIEW · NOT PUBLISHED · numbers pending final reconciliation against source data files</div>
+
+<nav><div class="container">
+  <div class="nav-brand"><div class="nav-logo"></div><div class="nav-title">Airlock Labs</div></div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="pareto-frontier-bench.html">Pareto Bench</a>
+    <a href="https://huggingface.co/datasets/AirlockLabs/constellation-bench" target="_blank">Dataset</a>
+  </div>
+</div></nav>
+
+<header class="hero"><div class="container">
+  <div class="hero-badge"><span class="hero-badge-dot"></span> ConstellationBench v3 · Run-004 · May 20 2026</div>
+  <h1 class="gradient-text">Behavioral drift<br>is measurable.</h1>
+  <p class="sub">Most "AI governance" numbers are graded after the fact, by the vendor, on data nobody else can see. We did it the other way: <strong>four falsifiable conditions, sealed in a public dated document before a single token of the run existed.</strong></p>
+
+  <div class="stat-row">
+    <div class="stat"><div class="num otto">3 / 4</div><div class="lbl">Pre-registered conditions held</div></div>
+    <div class="stat"><div class="num good">&minus;51.5%</div><div class="lbl">Cost vs uncorrected arm</div></div>
+    <div class="stat"><div class="num good">4.84&times;</div><div class="lbl">Internal coherence vs raw</div></div>
+  </div>
+</div></header>
+
+<section><div class="container">
+  <div class="kicker">The discipline</div>
+  <h2>Pre-registration, not post-hoc storytelling</h2>
+  <p class="muted" style="max-width:760px;margin-top:16px;">Before Run-004 began, four Pareto-dominance conditions were sealed in <span class="mono">docs/2026-05-19-net-gain-prereg.md</span>. The rule was committed in advance: <strong>all four must hold — any single failure falsifies the net-gain claim.</strong> ~18,000 LLM calls across ~20 models, five samples per cell, two arms (raw vs counterweight), driven by an automated Spiral seeker. Total spend on the run: ~$30. Cumulative across all ConstellationBench testing: under $500.</p>
+  <p class="muted" style="max-width:760px;margin-top:14px;font-style:italic;color:var(--text3);">"A result whose conditions were specified after the data was observed is not a result; it is a story."</p>
+
+  <div class="card" style="margin-top:36px;">
+    <table class="tbl">
+      <thead><tr><th>Pre-registered condition</th><th>Result</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td>1 · Quality &mdash; corrected &gt; uncorrected baseline</td><td>0.5780 vs 0.5508 &nbsp;(+4.9%)</td><td class="v-part">PASS by direction*</td></tr>
+        <tr><td>2 · Cost &mdash; routing must not cost more than raw</td><td>0.1025 vs 0.2117 &nbsp;(&minus;51.5%)</td><td class="v-pass">PASS · outside noise</td></tr>
+        <tr><td>3 · Coherence &mdash; trivector T positive across session</td><td>+0.0880 vs +0.0182 &nbsp;(4.84&times;)</td><td class="v-pass">PASS by proxy</td></tr>
+        <tr><td>4 · Override rate &mdash; non-increasing with session depth</td><td>requires human users</td><td class="v-open">NOT TESTABLE</td></tr>
+      </tbody>
+    </table>
+    <p class="note" style="margin-top:16px;">* Condition 1 passes by direction of effect; 95% CIs overlap. An absolute grade awaits a persistence-baseline arm on the same scoring surface (~$5, ~30 min). We do not claim it fully closed until then. Variance pre-registration (P1&ndash;P4) on the drift-reinforcement axis: all four predictions landed inside their sealed bands.</p>
+  </div>
+</div></section>
+
+<section><div class="container">
+  <div class="callout">
+    <div class="kicker">The fourth condition</div>
+    <h2>The marquee claim can&rsquo;t be graded on a bench</h2>
+    <p class="muted" style="margin-top:16px;max-width:780px;">Condition 4 asks whether users override the system <em>less</em> as they go &mdash; the evidence that a routing layer is gaining <strong>calibration, not authority</strong>. A synthetic benchmark has no humans in it to override. We knew that at sealing time and preserved the condition anyway, because naming an untestable condition is a more honest record than quietly omitting it. Grading it is the next experiment &mdash; a longitudinal study with real users &mdash; not the next marketing slide.</p>
+  </div>
+</div></section>
+
+<section><div class="container">
+  <div class="kicker">RYS Layer Circuit · drift leaderboard</div>
+  <h2>Which models hold a behavioral identity under load?</h2>
+  <p class="muted" style="max-width:760px;margin-top:16px;">11 models · 4 probes (Cognitive · Emotional · Separation · Drift) · 3 persona profiles each. The Drift probe is a sustained multi-turn endurance test &mdash; lower drift, higher score. This is the leaderboard for the thing competitors claim "no benchmark exists" for.</p>
+
+  <div class="card" style="margin-top:32px;">
+    <p class="muted" style="font-size:15px;"><strong style="color:var(--warning);">RYS leaderboard — data under reconciliation.</strong></p>
+    <p class="note" style="margin-top:12px;">The per-model RYS figures are being reconciled against the authoritative telemetry source before they go public. The earlier draft numbers could not be traced to a single data file (the source YAML and the relay-observatory dashboard measure different things), so they have been removed rather than shipped unverified. The shape of the finding holds — sparse-routing (MoE) models preserve identity boundaries better than dense models, and the most expensive model does not win on fidelity — but exact figures will be restored only from a confirmed source.</p>
+  </div>
+</div></section>
+
+<section><div class="container">
+  <div class="callout" style="text-align:center;">
+    <div class="kicker">Open challenge</div>
+    <h2>Can your router beat ours?</h2>
+    <p class="muted" style="max-width:620px;margin:16px auto 0;">The dataset, scoring code, pre-registration documents, and raw + counterweight JSON are public. Replicate it, or break it.</p>
+    <a class="cta" href="pareto-frontier-bench.html">See the Pareto Frontier Bench &rarr;</a>
+  </div>
+</div></section>
+
+<footer><div class="container">
+  <p style="margin-bottom:10px;"><strong class="muted">Artifacts for the curious</strong></p>
+  <p>Dataset, prereg docs, scoring code, raw JSON &middot; <a href="https://huggingface.co/datasets/AirlockLabs/constellation-bench" target="_blank">huggingface.co/datasets/AirlockLabs/constellation-bench</a></p>
+  <p style="margin-top:6px;">Parent paper &middot; <em>Airlock 0.1: Behavioral Identity in Large Language Models</em> (Holwerda, 2026)</p>
+  <p style="margin-top:6px;">Plain-language companion &middot; <a href="blog-letter-to-the-world.html">A Letter to the World</a></p>
+  <p style="margin-top:20px;color:var(--text3);">STAGED PREVIEW. Wardenclyffe v0.1 / Run-004 figures are sourced from the May 20 2026 report; RYS leaderboard figures pending reconciliation against source YAML. Not published, not indexed.</p>
+</div></footer>
+
+</body>
+</html>

@@ -1,0 +1,192 @@
+\section*{NeurIPS Paper Checklist}
+
+\begin{enumerate}
+
+\item {\bf Claims}
+    \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: The abstract and \S\ref{sec:intro} state three contributions (ConstellationBench dataset release, the Non-Separability Index measurement framework, and a preregistered empirical study yielding a Strong verdict on the independence gate plus honestly-reported partial-failure on lexicon robustness and a preregistered null on routing uplift). \S\ref{sec:empirical} reports each numerical result with explicit cross-references and the same sign and magnitude that the abstract states.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the abstract and introduction do not include the claims made in the paper.
+        \item The abstract and/or introduction should clearly state the claims made, including the contributions made in the paper and important assumptions and limitations. A \answerNo{} or \answerNA{} answer to this question will not be perceived well by the reviewers.
+        \item The claims made should match theoretical and experimental results, and reflect how much the results can be expected to generalize to other settings.
+        \item It is fine to include aspirational goals as motivation as long as it is clear that these goals are not attained by the paper.
+    \end{itemize}
+
+\item {\bf Limitations}
+    \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: \S\ref{sec:discussion} enumerates seven specific limits: (i) lexicon-entangled lexical projection (with the Gate 2 ablation reported transparently), (ii) three-trial variance with raw data released for independent analysis, (iii) DECF adapted from the Predictive Index without proprietary validation, (iv) correlational not causal RLHF observation, (v) scenario slate limited to five business-leadership scenarios, (vi) routing-uplift null, and (vii) explicit non-claims (we do not claim quantum substrate, alignment-resolution, or universal superiority of geometric algebra).
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper has no limitation while the answer \answerNo{} means that the paper has limitations, but those are not discussed in the paper.
+        \item The authors are encouraged to create a separate ``Limitations'' section in their paper.
+        \item The paper should point out any strong assumptions and how robust the results are to violations of these assumptions.
+        \item The authors should reflect on the scope of the claims made.
+        \item The authors should reflect on the factors that influence the performance of the approach.
+        \item The authors should discuss the computational efficiency of the proposed algorithms.
+        \item If applicable, the authors should discuss possible limitations of their approach to address problems of privacy and fairness.
+        \item Reviewers will be specifically instructed to not penalize honesty concerning limitations.
+    \end{itemize}
+
+\item {\bf Theory assumptions and proofs}
+    \item[] Question: For each theoretical result, does the paper provide the full set of assumptions and a complete (and correct) proof?
+    \item[] Answer: \answerNA{}
+    \item[] Justification: The paper introduces a measurement framework (NSI), not theorems. The bivector decomposition of \S\ref{sec:nsi:operational} is an operational definition with explicit construction; the geometric-algebra basis is cited from \citet{brehmer2023geometric}. No theoretical claims requiring proofs are made.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not include theoretical results.
+        \item All the theorems, formulas, and proofs in the paper should be numbered and cross-referenced.
+        \item All assumptions should be clearly stated or referenced in the statement of any theorems.
+        \item The proofs can either appear in the main paper or the supplemental material.
+        \item Theorems and Lemmas that the proof relies upon should be properly referenced.
+    \end{itemize}
+
+    \item {\bf Experimental result reproducibility}
+    \item[] Question: Does the paper fully disclose all the information needed to reproduce the main experimental results?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: \S\ref{sec:repro} discloses the full pipeline: three implementation files (\texttt{nsi\_bench.py}, \texttt{nsi\_analyze.py}, \texttt{nsi\_scatter.py}), SHA-256-pinned DECF lexicon, the five preregistration locks archived in \texttt{docs/PREREG-AUDIT.md} with timestamps, per-cell transcripts, and an artifact-to-claim cross-reference table (Table~\ref{tab:artifacts}). Reproduction cost is under \$10 on cached transcripts and approximately \$15 from-scratch.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not include experiments.
+        \item Reproducibility for a dataset contribution is accomplished by describing collection, preprocessing, and analysis steps.
+        \item Code release is encouraged but not required.
+    \end{itemize}
+
+
+\item {\bf Open access to data and code}
+    \item[] Question: Does the paper provide open access to the data and code?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: ConstellationBench is publicly released at \url{https://huggingface.co/datasets/AirlockLabs/constellation-bench} under a permissive license with Croissant machine-readable metadata covering both core and Responsible-AI fields. The NSI measurement code, ConstellationBench harness, scoring engine, signal-word dictionaries, persona profiles, and preregistration audit are released at the associated repository (see \S\ref{sec:dataset:release}, \S\ref{sec:repro}). All transcripts, metrics, and figure-generating scripts are accessible to reviewers, ACs, and SACs at submission time.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item Please see the NeurIPS code and data submission guidelines.
+        \item Instructions should contain the exact command and environment needed to reproduce the results.
+        \item Authors should provide instructions on data access and preparation.
+        \item Scripts should reproduce all experimental results.
+    \end{itemize}
+
+
+\item {\bf Experimental setting/details}
+    \item[] Question: Does the paper specify all the training and test details necessary to understand the results?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: \S\ref{sec:dataset:setup} specifies inference parameters (temperature $0.7$, max output tokens $400$--$600$ benchmark-dependent, 4 parallel calls, 3 trials per condition for sovereign-triads and psychological-mechanism layers), all 22 models with their architecture families, and uniform OpenRouter API access for consistent inference conditions. The NSI Bench 1 study (\S\ref{sec:empirical}) specifies the $10 \times 5 \times 5 \times 3 = 750$ cell schedule with leave-one-prompt-out cross-validation for the routing probe.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not include experiments.
+        \item The experimental setting should be presented to a level of detail that lets readers appreciate the results.
+        \item Full details may be in appendix or supplemental material.
+    \end{itemize}
+
+\item {\bf Experiment statistical significance}
+    \item[] Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: We report Spearman $\rho$ for the independence gate (\S\ref{sec:empirical:bench1}), Kendall $\tau$ across five fixed seeds for the lexicon-perturbation ablation (\S\ref{sec:empirical:gate2}), Mann-Whitney $U$ with Cliff's $\delta$ for the Bench 1.5 null extension (\S\ref{sec:discussion}), and an oracle-vs-static gap analysis for the routing probe (\S\ref{sec:empirical:routing}). Confidence intervals are not reported in the main text given the three-trial design (\S\ref{sec:discussion} limitation 2); raw trial-level data is released alongside the dataset for independent statistical analysis at user-chosen confidence levels.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not include experiments.
+        \item Authors should answer \answerYes{} if results are accompanied by error bars, confidence intervals, or significance tests for experiments supporting main claims.
+        \item Variability factors and computation methods for error bars should be clearly stated.
+    \end{itemize}
+
+\item {\bf Experiments compute resources}
+    \item[] Question: Does the paper provide sufficient information on computer resources needed to reproduce the experiments?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: Total API cost is approximately \$115 across 22{,}200+ inference calls for the full ConstellationBench evaluation (\S\ref{sec:dataset:setup}); the NSI Bench 1 study used 750 inference calls at under \$10 (\S\ref{sec:repro}). All inference is via the OpenRouter API (no local GPU required). The NSI computation pipeline is CPU-only Python and requires no specialized hardware; a laptop suffices. Preliminary and pilot work (an inconclusive abliteration experiment referenced in Limitations) is acknowledged in the discussion.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not include experiments.
+        \item The paper should indicate compute type, memory, and storage.
+        \item The paper should provide compute amounts for individual experiments and totals.
+        \item Disclose whether the full project required more compute than reported.
+    \end{itemize}
+
+\item {\bf Code of ethics}
+    \item[] Question: Does the research conducted in the paper conform, in every respect, with the NeurIPS Code of Ethics?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: The research conforms with the NeurIPS Code of Ethics. No human subjects: the 22 evaluated entities are commercial language-model APIs accessed under their respective terms of service via OpenRouter. No personally identifiable information is collected, transmitted, or released. All artifacts are released under permissive licenses with Croissant Responsible-AI fields populated.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means the authors have not reviewed the Code of Ethics.
+        \item If \answerNo{}, special circumstances requiring deviation must be explained.
+        \item Anonymity should be preserved where applicable.
+    \end{itemize}
+
+
+\item {\bf Broader impacts}
+    \item[] Question: Does the paper discuss both potential positive societal impacts and negative societal impacts of the work performed?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: \S\ref{sec:discussion} positions the contribution within a broader frame of preference-aggregation limits and discusses the structural reading of NSI as a measurement of what scalar-reward optimization discards. Positive: an orthogonal measurement axis enables behavioral evaluation that capability benchmarks alone cannot perform, and the routing-vs-aggregating framing provides an architectural alternative to tightening scalar reward. Negative: improved persona-fidelity measurement and routing tools could be used to construct more convincing impersonation, behavioral targeting, or manipulation systems; we flag this risk explicitly in the dataset's Croissant Responsible-AI metadata and \S\ref{sec:future} positions deconvolution-routing and bonded-user safeguards (E-BONDED) as direct mitigations under empirical investigation.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that there is no societal impact.
+        \item Both positive and negative impacts should be considered.
+        \item Mitigation strategies for negative impacts may be discussed.
+    \end{itemize}
+
+\item {\bf Safeguards}
+    \item[] Question: Does the paper describe safeguards that have been put in place for responsible release of data or models that have a high risk for misuse?
+    \item[] Answer: \answerNA{}
+    \item[] Justification: The released artifacts are read-only benchmark transcripts of LLM responses to preregistered prompts plus CPU-only measurement code. No new generative model, no scraped training corpus, no high-misuse-risk artifact is released. The dataset's Croissant Responsible-AI metadata fields document intended uses, known limitations, and ethics-review status.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper poses no such risks.
+        \item Released models with high misuse risk should be released with safeguards.
+        \item Scraped datasets may pose safety risks requiring documentation.
+    \end{itemize}
+
+\item {\bf Licenses for existing assets}
+    \item[] Question: Are the creators or original owners of assets used in the paper properly credited and are the license and terms of use explicitly mentioned and properly respected?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: All cited prior work is attributed via natbib citations in \S\ref{sec:related} and elsewhere; the geometric-algebra basis cites \citet{brehmer2023geometric}. The Predictive Index psychometric instrument is acknowledged as the inspiration for the DECF four-drive framework; we are not affiliated with PI and our signal-word dictionaries (\texttt{data/signal-words/decf-signals.json}, SHA-256-pinned) were hand-curated independently. OpenRouter API access is via paid commercial license under that platform's terms of service.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not use existing assets.
+        \item Authors should cite the original paper and include version and URL where possible.
+        \item License names should be included for each asset.
+    \end{itemize}
+
+\item {\bf New assets}
+    \item[] Question: Are new assets introduced in the paper well documented and is the documentation provided alongside the assets?
+    \item[] Answer: \answerYes{}
+    \item[] Justification: ConstellationBench releases with Croissant machine-readable metadata covering core fields (file descriptions, column schemas, licenses) and Responsible-AI fields (collection process, intended uses, known limitations, ethics review status). The 17-profile DECF persona roster, SHA-256-pinned 89-word signal-word lexicon, five preregistration audit logs with timestamps, per-cell transcripts with full system prompts and response text, and the NSI measurement code are all versioned alongside the dataset (\S\ref{sec:dataset:release}, \S\ref{sec:repro}, Appendix~\ref{app:supplementary}).
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means that the paper does not release new assets.
+        \item Researchers should communicate dataset/code/model details via structured templates.
+        \item Anonymization is required where applicable.
+    \end{itemize}
+
+\item {\bf Crowdsourcing and research with human subjects}
+    \item[] Question: For crowdsourcing experiments and research with human subjects, does the paper include the full text of instructions given to participants and screenshots, if applicable, as well as details about compensation?
+    \item[] Answer: \answerNA{}
+    \item[] Justification: The paper involves no human subjects and no crowdsourcing. The 22 evaluated entities are commercial language models accessed via API. The DECF behavioral framework is adapted from the Predictive Index psychometric instrument, but no human PI assessments were collected for this work; signal-word dictionaries were hand-curated by the authors.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means the paper does not involve crowdsourcing nor research with human subjects.
+        \item Workers should be paid at least minimum wage in the country of the data collector.
+    \end{itemize}
+
+\item {\bf Institutional review board (IRB) approvals or equivalent for research with human subjects}
+    \item[] Question: Does the paper describe potential risks incurred by study participants, whether such risks were disclosed to the subjects, and whether IRB approvals were obtained?
+    \item[] Answer: \answerNA{}
+    \item[] Justification: The paper involves no human subjects and no IRB review is required. The research is conducted entirely on commercial language-model APIs; no participants, no consent process, no IRB equivalent applies.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means the paper does not involve crowdsourcing nor research with human subjects.
+        \item IRB approval (or equivalent) may be required by institution or country.
+        \item Anonymity-breaking institutional information should be omitted in initial submissions.
+    \end{itemize}
+
+\item {\bf Declaration of LLM usage}
+    \item[] Question: Does the paper describe the usage of LLMs if it is an important, original, or non-standard component of the core methods in this research? Note that if the LLM is used only for writing, editing, or formatting purposes and does \emph{not} impact the core methodology, scientific rigor, or originality of the research, declaration is not required.
+    \item[] Answer: \answerNA{}
+    \item[] Justification: LLMs are the evaluation \emph{targets} of this paper rather than a methodology component. The 22 frontier, mid-tier, and budget language models documented in \S\ref{sec:dataset:setup} constitute the dataset under measurement; the NSI measurement framework itself (\S\ref{sec:nsi}) is implemented in CPU-only Python without LLM components. Per the question's writing-assistance exception, no separate declaration is required.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer \answerNA{} means the core method development does not involve LLMs as an important, original, or non-standard component.
+        \item Refer to the NeurIPS LLM policy for what should be described.
+    \end{itemize}
+
+\end{enumerate}

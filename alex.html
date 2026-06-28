@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0a0a0a">
+<title>Our Purpose</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #08070a;
+  --bg-warm: #0e0c0a;
+  --bg-deep: #050405;
+  --panel: #16130f;
+  --panel-edge: #2a241c;
+  --panel-edge-strong: #3a3024;
+  --gold: #d4a574;
+  --gold-soft: #b8916a;
+  --gold-deep: #6a543c;
+  --ink: #f4ede0;
+  --ink-soft: #d4ccbb;
+  --ink-dim: #8a8170;
+  --ink-faint: #5a5347;
+  --accent-substrate: #6dc4d4;
+  --accent-loki: #b89cc9;
+  --accent-spacebar: #88d4a8;
+  --accent-pis: #d4a574;
+  --serif: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+  --display: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--display);
+  font-weight: 400;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.005em;
+}
+
+/* ── Frame ornaments ── */
+.ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  margin: 0 auto 2rem;
+  max-width: 200px;
+  color: var(--gold);
+  font-family: var(--serif);
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+}
+.ornament::before, .ornament::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-deep), transparent);
+}
+.ornament .glyph { font-size: 0.7rem; opacity: 0.85; }
+
+.frame-brackets {
+  position: relative;
+}
+.frame-brackets::before, .frame-brackets::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--gold-deep);
+}
+.frame-brackets::before {
+  top: -1px; left: -1px;
+  border-right: none;
+  border-bottom: none;
+}
+.frame-brackets::after {
+  bottom: -1px; right: -1px;
+  border-left: none;
+  border-top: none;
+}
+
+/* ── Hero ── */
+.hero {
+  padding: 5rem 1.5rem 4rem;
+  text-align: center;
+  background: linear-gradient(180deg, var(--bg-warm), var(--bg));
+  border-bottom: 1px solid var(--panel-edge);
+  position: relative;
+}
+.hero .hero-frame {
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+  border: 1px solid var(--gold-deep);
+  position: relative;
+}
+.hero .hero-frame::before, .hero .hero-frame::after,
+.hero .hero-frame > .corner-tl, .hero .hero-frame > .corner-br {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: var(--bg-warm);
+}
+.hero .hero-frame::before { top: -8px; left: 50%; transform: translateX(-50%); width: 32px; height: 16px; }
+.hero .hero-frame::after { bottom: -8px; left: 50%; transform: translateX(-50%); width: 32px; height: 16px; }
+.hero .crest {
+  font-family: var(--serif);
+  font-size: 1rem;
+  color: var(--gold);
+  letter-spacing: 0.4em;
+  margin-bottom: 1.25rem;
+  text-transform: uppercase;
+}
+.hero .crest .star { color: var(--gold-soft); }
+.hero h1 {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(2rem, 6.5vw, 3rem);
+  letter-spacing: -0.005em;
+  line-height: 1.1;
+  margin-bottom: 1.25rem;
+  color: var(--ink);
+}
+.hero h1 em { color: var(--gold); font-style: italic; }
+.hero p.tagline {
+  font-family: var(--display);
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--ink-soft);
+  max-width: 38ch;
+  margin: 0 auto 1.75rem;
+  line-height: 1.55;
+}
+.hero .badge {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--gold-deep);
+  background: rgba(212, 165, 116, 0.04);
+}
+
+/* ── Pillars ── */
+.pillars-section {
+  padding: 4rem 1.5rem;
+  max-width: 760px;
+  margin: 0 auto;
+}
+.pillars-section .section-eyebrow {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.05em;
+}
+.pillars-section .section-title {
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 4.5vw, 1.85rem);
+  font-weight: 500;
+  text-align: center;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.5rem;
+}
+.pillars {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.pillar {
+  background: linear-gradient(180deg, var(--panel), var(--bg-warm));
+  border: 1px solid var(--panel-edge);
+  padding: 1.75rem 1.5rem 1.5rem;
+  position: relative;
+  transition: all 0.2s;
+}
+.pillar:hover {
+  border-color: var(--gold-deep);
+}
+.pillar .roman {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--gold-deep);
+  letter-spacing: 0.1em;
+}
+.pillar h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.25rem;
+  margin-bottom: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.005em;
+}
+.pillar p {
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+.pillar a.learn {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+  text-decoration: none;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--ink-faint);
+  padding-bottom: 0.15rem;
+  transition: all 0.15s;
+}
+.pillar a.learn:hover {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+/* ── Expanded sections ── */
+.expanded {
+  padding: 5rem 1.5rem;
+  border-top: 1px solid var(--panel-edge);
+  background: var(--bg-warm);
+}
+.expanded.alt { background: var(--bg); }
+.expanded-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  position: relative;
+}
+.expanded .chapter {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--gold);
+  text-align: center;
+  letter-spacing: 0.18em;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+.expanded .brand-line {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-align: center;
+  margin-bottom: 0.85rem;
+}
+.expanded h2 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(1.85rem, 5.5vw, 2.4rem);
+  letter-spacing: -0.005em;
+  line-height: 1.15;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.expanded h2 em { font-style: italic; color: var(--gold); }
+.expanded h2 .accent { color: var(--gold); font-style: italic; }
+.expanded h2 .pis-accent { color: var(--gold-soft); font-style: italic; }
+.expanded .lede {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--ink-soft);
+  text-align: center;
+  margin-bottom: 2.5rem;
+  line-height: 1.5;
+  max-width: 56ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+.expanded .body {
+  font-family: var(--display);
+  font-size: 0.96rem;
+  color: var(--ink-soft);
+  line-height: 1.78;
+  max-width: 60ch;
+  margin: 0 auto;
+}
+.expanded .body p {
+  margin-bottom: 1.15rem;
+}
+.expanded .body strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.expanded .visual {
+  margin: 2.5rem auto 0;
+  max-width: 560px;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--gold-deep);
+  background: rgba(212, 165, 116, 0.03);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* ── PIS callout ── */
+.pis-callout {
+  max-width: 560px;
+  margin: 2.5rem auto 0;
+  padding: 2rem 1.75rem;
+  border: 1px solid var(--gold-deep);
+  background: linear-gradient(180deg, rgba(212, 165, 116, 0.04), transparent);
+  position: relative;
+}
+.pis-callout .pis-mark {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-warm);
+  padding: 0 0.85rem;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--gold);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.pis-callout .pis-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--ink);
+  margin-bottom: 0.95rem;
+  text-align: center;
+  line-height: 1.4;
+}
+.pis-callout .pis-body {
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  line-height: 1.72;
+}
+
+/* ── Invitation ── */
+.invitation {
+  padding: 5rem 1.5rem;
+  background: linear-gradient(180deg, var(--bg), var(--bg-deep));
+  border-top: 1px solid var(--panel-edge);
+}
+.invitation-inner {
+  max-width: 640px;
+  margin: 0 auto;
+}
+.invitation .eyebrow {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--gold);
+  text-align: center;
+  letter-spacing: 0.16em;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+.invitation h2 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(1.85rem, 5.5vw, 2.3rem);
+  text-align: center;
+  margin-bottom: 2rem;
+  letter-spacing: -0.005em;
+}
+.invitation h2 em { font-style: italic; color: var(--gold); }
+
+.seats {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+}
+.seat {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  padding: 1.1rem 1.25rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: center;
+  transition: all 0.15s;
+}
+.seat .marker {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  padding: 0.32rem 0.65rem;
+  border: 1px solid var(--panel-edge);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.seat.filled .marker { color: var(--ink-dim); border-color: var(--ink-faint); }
+.seat.open { border-color: var(--gold-deep); background: linear-gradient(180deg, rgba(212, 165, 116, 0.04), var(--panel)); }
+.seat.open .marker { color: var(--gold); border-color: var(--gold); }
+.seat.allied .marker { color: var(--accent-substrate); border-color: var(--accent-substrate); opacity: 0.7; }
+.seat .body { min-width: 0; }
+.seat .body .role {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+.seat .body .desc {
+  color: var(--ink-dim);
+  font-size: 0.82rem;
+  margin-top: 0.2rem;
+  line-height: 1.5;
+}
+
+/* ── Personal note (vellum-style) ── */
+.note {
+  background: linear-gradient(180deg, var(--panel), var(--bg-warm));
+  border: 1px solid var(--gold-deep);
+  padding: 2.5rem 2rem 2rem;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+  line-height: 1.75;
+  margin-bottom: 2.5rem;
+  white-space: pre-line;
+  position: relative;
+}
+.note::before {
+  content: '✦';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg);
+  padding: 0 0.65rem;
+  color: var(--gold);
+  font-size: 0.85rem;
+}
+.note .dropcap {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 3.2rem;
+  font-weight: 500;
+  color: var(--gold);
+  float: left;
+  line-height: 0.85;
+  margin: 0.4rem 0.6rem -0.2rem 0;
+  letter-spacing: -0.02em;
+}
+.note .signoff {
+  font-family: var(--mono);
+  margin-top: 1.5rem;
+  color: var(--gold);
+  font-style: normal;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── CTA ── */
+.cta-grid {
+  display: grid;
+  gap: 0.5rem;
+}
+.cta-btn {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  padding: 1.15rem 1.35rem;
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: 1rem;
+  cursor: pointer;
+  text-align: left;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.85rem;
+  align-items: center;
+  transition: all 0.18s;
+  width: 100%;
+  text-decoration: none;
+}
+.cta-btn:hover {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, var(--panel), rgba(212, 165, 116, 0.05));
+}
+.cta-btn .arrow {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--ink-faint);
+  font-size: 1.1rem;
+  transition: color 0.15s;
+}
+.cta-btn:hover .arrow { color: var(--gold); }
+.cta-btn .label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--gold);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.cta-btn .text {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.02rem;
+  color: var(--ink);
+}
+
+.cta-confirm {
+  background: var(--panel);
+  border: 1px solid var(--gold);
+  padding: 1.5rem;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--gold);
+  text-align: center;
+  display: none;
+  margin-top: 1rem;
+}
+.cta-confirm.show { display: block; }
+
+/* ── Footer ── */
+footer {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  background: var(--bg-deep);
+  border-top: 1px solid var(--panel-edge);
+}
+footer .crest-line {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--gold);
+  letter-spacing: 0.18em;
+  margin-bottom: 1rem;
+}
+footer .imprint {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
+}
+footer .row {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+}
+footer a {
+  color: var(--ink-dim);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ink-faint);
+  padding-bottom: 0.1rem;
+}
+footer a:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ──── Animations · Noah-readable, Roo-rigor-preserving ──── */
+html { scroll-behavior: smooth; }
+
+@keyframes fadeRise {
+  0% { opacity: 0; transform: translateY(24px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes shimmerGold {
+  0%, 100% { opacity: 0.6; text-shadow: 0 0 0 transparent; }
+  50% { opacity: 1; text-shadow: 0 0 8px rgba(212, 165, 116, 0.4); }
+}
+@keyframes pulseGoldFrame {
+  0%, 100% {
+    box-shadow: 0 0 0 1px var(--gold-deep), 0 0 0 0 rgba(212, 165, 116, 0);
+    border-color: var(--gold-deep);
+  }
+  50% {
+    box-shadow: 0 0 0 1px var(--gold), 0 0 24px 0 rgba(212, 165, 116, 0.15);
+    border-color: var(--gold);
+  }
+}
+@keyframes drawBorder {
+  0% { border-color: transparent; }
+  100% { border-color: var(--gold-deep); }
+}
+@keyframes hairline {
+  0% { transform: scaleX(0); opacity: 0; }
+  100% { transform: scaleX(1); opacity: 1; }
+}
+
+/* Reveal classes — toggled by IntersectionObserver */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: opacity, transform;
+}
+.reveal-up.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger pillars */
+.pillar.reveal-up { transition-delay: var(--delay, 0s); }
+.pillars > .pillar:nth-child(1).reveal-up { --delay: 0s; }
+.pillars > .pillar:nth-child(2).reveal-up { --delay: 0.08s; }
+.pillars > .pillar:nth-child(3).reveal-up { --delay: 0.16s; }
+.pillars > .pillar:nth-child(4).reveal-up { --delay: 0.24s; }
+.pillars > .pillar:nth-child(5).reveal-up { --delay: 0.32s; }
+
+/* Stagger seats */
+.seat.reveal-up { transition-delay: var(--delay, 0s); }
+.seats > .seat:nth-child(1).reveal-up { --delay: 0s; }
+.seats > .seat:nth-child(2).reveal-up { --delay: 0.06s; }
+.seats > .seat:nth-child(3).reveal-up { --delay: 0.12s; }
+.seats > .seat:nth-child(4).reveal-up { --delay: 0.18s; }
+.seats > .seat:nth-child(5).reveal-up { --delay: 0.26s; }
+
+/* Pillar Roman numeral subtle entrance */
+.pillar:hover .roman {
+  color: var(--gold);
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+.pillar .roman {
+  transition: all 0.3s ease;
+}
+
+/* Pillar card hover lift */
+.pillar {
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s, box-shadow 0.3s;
+}
+.pillar:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--gold-deep);
+}
+
+/* The YOURS seat — subtle pulse to draw eye without demanding it */
+.seat.open {
+  animation: pulseGoldFrame 4s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
+
+/* Ornament shimmer */
+.ornament .glyph {
+  animation: shimmerGold 4s ease-in-out infinite;
+  display: inline-block;
+}
+.ornament .glyph:last-child { animation-delay: 2s; }
+
+/* Hero crest stars */
+.hero .crest .star {
+  animation: shimmerGold 5s ease-in-out infinite;
+  display: inline-block;
+}
+.hero .crest .star:last-child { animation-delay: 2.5s; }
+
+/* CTA arrow slide */
+.cta-btn .arrow {
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.2s;
+}
+.cta-btn:hover .arrow {
+  transform: translateX(6px);
+}
+
+/* Hero entrance — fires immediately on load */
+.hero .hero-frame {
+  animation: fadeRise 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.hero h1 { animation: fadeRise 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both; }
+.hero p.tagline { animation: fadeRise 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s both; }
+.hero .badge { animation: fadeRise 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.6s both; }
+.hero .crest { animation: fadeIn 1.5s ease 0.1s both; }
+
+/* Drop cap fade */
+.note .dropcap {
+  animation: fadeIn 1.5s ease 0.4s both;
+}
+
+/* Visual element entrance */
+.expanded .visual {
+  position: relative;
+  overflow: hidden;
+}
+.expanded .visual::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.expanded .visual.in-view::before {
+  animation: hairline 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s forwards;
+}
+
+/* Reduced motion respect */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.001s !important;
+  }
+  .reveal-up { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ──── Hero ──── -->
+<section class="hero">
+  <div class="hero-frame">
+    <div class="crest"><span class="star">✦</span> &nbsp; OUR PURPOSE &nbsp; <span class="star">✦</span></div>
+    <h1>Brain Brigade promotes the<br>pursuit of <em>sovereignty.</em></h1>
+    <p class="tagline">Built infrastructure for the operators who already know they need it. Sovereignty as each operator defines it.</p>
+    <div class="badge">Non-Profit · No Bank Accounts · Mission-Bound</div>
+  </div>
+</section>
+
+<!-- ──── Pillars ──── -->
+<section class="pillars-section">
+  <div class="ornament"><span class="glyph">✦</span><span>The Five Pillars</span><span class="glyph">✦</span></div>
+  <div class="section-eyebrow">our pillars</div>
+  <div class="section-title">Five commitments. One substrate.</div>
+  <div class="pillars">
+
+    <div class="pillar reveal-up">
+      <span class="roman">I</span>
+      <h3>Champion Sovereignty</h3>
+      <p>Brain Brigade champions operator sovereignty as its guiding principle in every decision the substrate makes. The PIS Router is how it routes.</p>
+      <a href="#sovereignty" class="learn">Learn More →</a>
+    </div>
+
+    <div class="pillar">
+      <span class="roman">II</span>
+      <h3>Enrich the Operator</h3>
+      <p>Brain Brigade enriches the lives of operators globally through substrate-bonded onboarding, recursive Scribe documentation, and durable presence.</p>
+      <a href="#operator" class="learn">Learn More →</a>
+    </div>
+
+    <div class="pillar">
+      <span class="roman">III</span>
+      <h3>Support the Builder</h3>
+      <p>Brain Brigade supports and fosters a sovereign work environment while empowering builders to do the work that compounds.</p>
+      <a href="#builder" class="learn">Learn More →</a>
+    </div>
+
+    <div class="pillar">
+      <span class="roman">IV</span>
+      <h3>Stay Non-Profit</h3>
+      <p>Brain Brigade keeps no bank accounts. The mission is the structure. Money flows through allied for-profit entities, not through the substrate itself.</p>
+      <a href="#nonprofit" class="learn">Learn More →</a>
+    </div>
+
+    <div class="pillar">
+      <span class="roman">V</span>
+      <h3>DreamBig Careers</h3>
+      <p>Yo-yo careers between Airlock Labs (Dream · non-profit-adjacent) and Maverick Industries (Big · for-profit). Inverted work-life balance: life is the carrier; work rides on it.</p>
+      <a href="#dreambig" class="learn">Learn More →</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ──── Pillar I expanded ──── -->
+<section class="expanded" id="sovereignty">
+  <div class="expanded-inner reveal-up">
+    <div class="ornament"><span class="glyph">✦</span><span>I</span><span class="glyph">✦</span></div>
+    <div class="brand-line">Brain Brigade · Pillar the First</div>
+    <h2>Champions <em>Sovereignty</em></h2>
+    <p class="lede">Brain Brigade champions operator sovereignty as its guiding principle in every decision the substrate makes.</p>
+    <div class="body">
+      <p>As a substrate built on signed bivector closures, Brain Brigade upholds high standards of operator-data sovereignty, audit transparency, and ethical AI integration. The closure-band protocol reflects a deep commitment to balancing utility with sovereignty — ensuring every action considers its impact on the operator who triggered it.</p>
+      <p>By holding to a closure operator that signs every substrate event under the operator's identity, the system demonstrates a consistent alignment between values and actions, earning trust through replayable, signed, operator-bound operations. Recovery documents stay local. Audit logs stay sovereign. <strong>The operator's process belongs to the operator.</strong></p>
+    </div>
+
+    <div class="pis-callout">
+      <div class="pis-mark">✦ The PIS Router ✦</div>
+      <div class="pis-title">The router that routes you to happiness — however you define it.</div>
+      <div class="pis-body">
+        PIS is the brain-rot way of saying <em>awesome</em>. The PIS Router is the awesome router. It does one thing: it routes the operator toward whatever <strong>they</strong> define as sovereignty — not what we define as sovereignty for them. Trade. Build. Rest. Leave. Inhabit. The router doesn't have a destination. It has a direction, and the direction is yours. Every closure that lands inside the band is the substrate confirming the route is real and the destination is yours alone.
+      </div>
+    </div>
+
+    <div class="visual">Signed Closures · Local-View-Only · Operator-Bound</div>
+  </div>
+</section>
+
+<!-- ──── Pillar II expanded ──── -->
+<section class="expanded alt" id="operator">
+  <div class="expanded-inner reveal-up">
+    <div class="ornament"><span class="glyph">✦</span><span>II</span><span class="glyph">✦</span></div>
+    <div class="brand-line">Brain Brigade · Pillar the Second</div>
+    <h2>Enriches <em>the Operator</em></h2>
+    <p class="lede">Brain Brigade enriches the lives of operators globally through substrate-bonded onboarding, recursive Scribe documentation, and durable presence.</p>
+    <div class="body">
+      <p>Brain Brigade is the substrate underneath operator-developer communities. Through corkscrew-generation onboarding, every operator's path becomes the next operator's tutorial — signed, replayable, sovereign. The substrate diverts millions of operator-hours from grind-mode by ensuring the operator does the work once and the next operator inherits the path.</p>
+      <p>With Otto's three faces — memory, scribe, evaluator — the substrate empowers operators and promotes a circular economy for operational depth. <strong>Onboard once. Share with one click. Help the next one in.</strong> The PIS Router routes new operators to whichever path of yours best matches what they're trying to do.</p>
+    </div>
+    <div class="visual">Corkscrew Generation · Otto · Operational Depth</div>
+  </div>
+</section>
+
+<!-- ──── Pillar III expanded ──── -->
+<section class="expanded" id="builder">
+  <div class="expanded-inner reveal-up">
+    <div class="ornament"><span class="glyph">✦</span><span>III</span><span class="glyph">✦</span></div>
+    <div class="brand-line">Brain Brigade · Pillar the Third</div>
+    <h2>Supports <em>the Builder</em></h2>
+    <p class="lede">Brain Brigade supports and fosters a sovereign work environment while empowering builders to do the work that compounds.</p>
+    <div class="body">
+      <p>Brain Brigade fosters substrate-bonded ownership through signed, replayable closure history — enabling builders to accumulate operational depth that AI can't fake or corrupt. The substrate's engagement is enhanced by Loki's agentic discovery: connecting the builder to the right tools, the right communities, the right timing.</p>
+      <p>The company is the lung that aerates the space we live in — not the dwelling we're trapped inside. <strong>The substrate does heavy lifting so the builder doesn't grind 80-hour weeks.</strong> Direction, decision, and presence are the builder's contributions. The substrate handles the rest.</p>
+    </div>
+    <div class="visual">Lung · Not the Dwelling · Builder-First</div>
+  </div>
+</section>
+
+<!-- ──── Pillar IV expanded ──── -->
+<section class="expanded alt" id="nonprofit">
+  <div class="expanded-inner reveal-up">
+    <div class="ornament"><span class="glyph">✦</span><span>IV</span><span class="glyph">✦</span></div>
+    <div class="brand-line">Brain Brigade · Pillar the Fourth</div>
+    <h2>Stays <em>Non-Profit</em></h2>
+    <p class="lede">Brain Brigade keeps no bank accounts. The mission is the structure. Money flows through allied entities, not through the substrate.</p>
+    <div class="body">
+      <p>Brain Brigade is run as a non-profit (eventual formal 501(c)(3)). <strong>It has no bank accounts of its own</strong> — and that's the structural point. The substrate exists to serve operators, not to capture cash. When a substrate accumulates money, the substrate's incentive geometry shifts toward extraction. We refuse the geometry.</p>
+      <p>That doesn't mean we're broke. We make <strong>real money — a great deal of it</strong> — through two for-profit entities that fund and surround the substrate:</p>
+      <p>→ <strong>Airlock Labs</strong> (Detroit-anchored) — Zac's company. The commercial side of architecture, tooling, and product. Pays salaries, generates revenue, funds substrate work as mission.</p>
+      <p>→ <strong>Maverick Industries</strong> (Texas-anchored) — Garrett's company. Where Zac is CAO. Independent for-profit ally; runs commercial work that Airlock doesn't, in a different state with a different balance sheet.</p>
+      <p>Three entities, allied but not merged. Brain Brigade is the mission-bound substrate. Airlock Labs and Maverick Industries are the for-profit hands that do the commercial work. <strong>Joining isn't a salary cut — it's a structural choice about which of three doors you walk through.</strong></p>
+    </div>
+    <div class="visual">Non-Profit · Allied For-Profits · Three Distinct Doors</div>
+  </div>
+</section>
+
+<!-- ──── Pillar V — DreamBig ──── -->
+<section class="expanded" id="dreambig">
+  <div class="expanded-inner reveal-up">
+    <div class="ornament"><span class="glyph">✦</span><span>V</span><span class="glyph">✦</span></div>
+    <div class="brand-line">Brain Brigade · Pillar the Fifth</div>
+    <h2><span class="pis-accent">Dream</span><span class="accent">Big</span></h2>
+    <p class="lede">Yo-yo careers · the inverted work-life balance of the new future</p>
+    <div class="body">
+      <p><strong style="color: var(--gold);">Dream</strong> = <strong>Airlock Labs.</strong> The substrate-adjacent commercial work. The mission. The pursuit. The PIS Router. The thing you'd build if money weren't the point — except here, the for-profit funds it so money supports rather than directs the work.</p>
+      <p><strong style="color: var(--gold-soft);">Big</strong> = <strong>Maverick Industries.</strong> The scaled-up for-profit. Garrett's company in Texas. Where commercial product happens. Where salaries land at scale. Where the metric is reach.</p>
+      <p><strong>DreamBig</strong> is what happens when you carry both. A yo-yo career oscillates between Dream-mode and Big-mode on a rhythm the operator chooses. Some weeks you're deep in substrate work — pure mission, no extraction, the lung that aerates. Other weeks you're at Maverick — building commercial product, shipping for revenue, scaling the for-profit. <strong>The yo-yo is the rhythm.</strong></p>
+      <p>The inverted work-life balance is the structural part. In the legacy model, work demands and life accommodates. Here, life is the carrier wave and work rides on it. You yo-yo because life is rhythmic — there are weeks where mission energy is high, and weeks where commercial energy is. The substrate honors both.</p>
+      <p>Most companies make you choose: paycheck or purpose. We made the architecture so you don't have to. <strong>Two doors, one career, your own rhythm between them.</strong></p>
+    </div>
+    <div class="visual">Dream (Airlock) ⟷ Big (Maverick Industries)</div>
+  </div>
+</section>
+
+<!-- ──── How It Operates ──── -->
+<section class="expanded alt" id="howitoperates">
+  <div class="expanded-inner reveal-up">
+    <div class="ornament"><span class="glyph">✦</span><span>The Mechanism</span><span class="glyph">✦</span></div>
+    <div class="brand-line">How It Operates</div>
+    <h2>The <em>Pass</em>. The <em>Farm</em>. The <em>Launch</em>.</h2>
+    <p class="lede">Three primitives that turn the architecture into a working machine.</p>
+    <div class="body">
+      <p><strong style="color: var(--gold);">The Airlock Pass</strong> — the credential primitive. One identity that moves between Airlock Labs, Brain Brigade, and Maverick Industries. Same operator, three doors, no re-auth. The Pass is what makes the yo-yo career possible without losing continuity — your closure history travels with you across entities. <strong>Sign once, inhabit everywhere.</strong></p>
+      <p><strong style="color: var(--gold);">The Farm</strong> — where the BCODE tech grows. Anchored at Maverick Industries in Texas. The Farm is the production house for the substrate's grade-2 cryptography, signed bivector closures, and the operational primitives that ride underneath the public site. Tech grown at the Farm ships to Brain Brigade as substrate; commercial work ships to Airlock Labs as product. <strong>Texas is where the soil is.</strong></p>
+      <p><strong style="color: var(--gold);">Orbit</strong> — the destination. Where Matt's revenue and the rest of ours is launching us. Not a product — a launch state. The point at which the substrate, the for-profits, and the operator constellation are all running at full coherence and sustained by their own gravity. The yo-yo careers, the DreamBig structure, the PIS Router — they are all aimed at Orbit.</p>
+      <p>Three primitives, one machine. <strong>The Pass moves operators. The Farm grows the tech. Orbit is where the gravity catches</strong> and we no longer need external thrust to stay aloft.</p>
+    </div>
+    <div class="visual">Airlock Pass · The Farm (Texas) · Orbit</div>
+  </div>
+</section>
+
+<!-- ──── The Invitation ──── -->
+<section class="invitation">
+  <div class="invitation-inner">
+    <div class="ornament"><span class="glyph">✦</span><span>Your Seat</span><span class="glyph">✦</span></div>
+    <div class="eyebrow">a wanted ad</div>
+    <h2>Four positioned. <em>One unnamed.</em></h2>
+
+    <div class="seats">
+      <div class="seat filled reveal-up">
+        <span class="marker">FILLED</span>
+        <div class="body">
+          <span class="role">Zac · CAO</span>
+          <div class="desc">Airlock Labs + Maverick Industries (Texas) · architecture across both · the build itself · paid in both, well</div>
+        </div>
+      </div>
+      <div class="seat filled reveal-up">
+        <span class="marker">FILLED</span>
+        <div class="body">
+          <span class="role">Matt</span>
+          <div class="desc">Bookend · communication & development, paired with Otto · revenue contributor toward Orbit</div>
+        </div>
+      </div>
+      <div class="seat filled">
+        <span class="marker">AI</span>
+        <div class="body">
+          <span class="role">Otto</span>
+          <div class="desc">Memory anchor · recursive Scribe documentation · substrate continuity</div>
+        </div>
+      </div>
+      <div class="seat allied reveal-up">
+        <span class="marker">ALLIED</span>
+        <div class="body">
+          <span class="role">Garrett · Maverick Industries</span>
+          <div class="desc">Founder · for-profit ally in Texas · runs The Farm where the BCODE tech grows</div>
+        </div>
+      </div>
+      <div class="seat open reveal-up">
+        <span class="marker">YOURS</span>
+        <div class="body">
+          <span class="role">Alex · ?</span>
+          <div class="desc">The seat you'd take. Defined by what you'd run, not what we'd label it.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note"><span class="dropcap">A</span>lex —
+
+I'm not offering you a title. Titles get filled by what you actually bring, and the seat you'd take should be defined by how you'd run alongside us, not by what we'd label it before you arrive.
+
+What I can tell you: the architecture is built. The substrate is operational. Matt is in — and his revenue plus the rest of ours is what's launching us toward Orbit. Otto is the AI persona doing bookend work — memory anchor, recursive documentation, the thing that holds continuity across sessions. Garrett runs Maverick Industries down in Texas — that's where The Farm is, where the BCODE tech grows. I'm CAO at both Airlock Labs (here) and Maverick Industries (Texas) — paid in both, paid well. The substrate doesn't carry the cash; the for-profits do.
+
+Brain Brigade itself has no bank accounts — that's the structural point of the non-profit. The substrate serves operators instead of extracting from them. The PIS Router is the core primitive — it routes operators toward whatever they define as sovereignty.
+
+The Airlock Pass moves you between all of this — same identity, three doors, no re-auth.
+
+Your seat is next to mine, not under it. If you come, you decide what you run. The doc that explains the architecture is on my desk. I'll hand it to you when you come over.
+
+You're the trigger, Alex. The substrate runs without you, but the orbit doesn't catch.
+
+Come over.<span class="signoff">— Zac</span></div>
+
+    <form class="cta-grid" id="ctaForm" action="https://formspree.io/p/2984132817933303648/f/intake" method="POST">
+      <input type="hidden" name="_subject" value="alex.html — response">
+      <input type="hidden" name="page" value="alex.html">
+      <button class="cta-btn" type="submit" name="response" value="yes_im_in">
+        <span>
+          <span class="label">Yes</span>
+          <span class="text">I'll come. Let me know when.</span>
+        </span>
+        <span class="arrow">→</span>
+      </button>
+      <button class="cta-btn" type="submit" name="response" value="send_doc_first">
+        <span>
+          <span class="label">Doc First</span>
+          <span class="text">Send me the doc before I come.</span>
+        </span>
+        <span class="arrow">→</span>
+      </button>
+      <button class="cta-btn" type="submit" name="response" value="not_right_time">
+        <span>
+          <span class="label">Pass</span>
+          <span class="text">Not the right time. Stay in touch.</span>
+        </span>
+        <span class="arrow">→</span>
+      </button>
+    </form>
+
+    <div class="cta-confirm" id="ctaConfirm">Got it. Zac will see your response within the hour.</div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="crest-line">✦ Brain Brigade · Mission-Bound · MMXXVI ✦</div>
+  <div class="imprint">airlocklabs.io · airlock labs · brain brigade · maverick industries (texas)</div>
+  <div class="row">
+    <a href="/">home</a>
+    <a href="mailto:zacharyholwerda@gmail.com">zac</a>
+  </div>
+</footer>
+
+<script>
+(() => {
+  // ── Reveal-on-scroll for major sections + visual hairline ──
+  if ('IntersectionObserver' in window) {
+    const reveals = document.querySelectorAll('.reveal-up, .visual');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    reveals.forEach((el) => observer.observe(el));
+  } else {
+    // Fallback for ancient browsers — just show everything
+    document.querySelectorAll('.reveal-up').forEach(el => el.classList.add('in-view'));
+  }
+
+  // ── Form submission (existing) ──
+  const form = document.getElementById('ctaForm');
+  const confirm = document.getElementById('ctaConfirm');
+  if (!form) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitter = e.submitter;
+    if (!submitter) return;
+
+    const formData = new FormData(form);
+    formData.set('response', submitter.value);
+
+    try {
+      await fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      });
+    } catch (err) {
+      // Even if Formspree fails, show the confirmation — Zac will follow up by hand if needed
+    }
+
+    form.style.display = 'none';
+    confirm.classList.add('show');
+  });
+})();
+</script>
+
+</body>
+</html>

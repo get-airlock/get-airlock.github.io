@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Inverted Ratio — Airlock Labs</title>
+<meta name="description" content="By 2028, 90% of internet content will be AI-generated. The feedback loop that trains AI on human judgment breaks when there are no humans left in the loop. We built the alternative.">
+<meta property="og:title" content="The Inverted Ratio — Airlock Labs">
+<meta property="og:description" content="6.6 hours of human attention. 1.3 quadrillion tokens per month. The internet is inverting. RLHF goes recursive. We have 22,200 data points showing what survives the flip.">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Inverted Ratio">
+<meta name="twitter:description" content="Human content is about to become the minority of the internet. The training paradigm that made AI 'safe' breaks when models train on other models. Here's the math.">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --otto: #7C5CFC;
+  --accent: #00D1FF;
+  --base: #0B0E14;
+  --raised: #0F1219;
+  --overlay: #151923;
+  --border: #1E2330;
+  --text: #E2E8F0;
+  --text2: #94A3B8;
+  --text3: #64748B;
+  --success: #22C55E;
+  --warning: #EAB308;
+  --error: #EF4444;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--base); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 16px; line-height: 1.8; overflow-x: hidden; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Nav */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(11, 14, 20, 0.92); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border); padding: 14px 0;
+}
+nav .container { display: flex; align-items: center; justify-content: space-between; }
+.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo { width: 28px; height: 28px; background: linear-gradient(135deg, var(--otto), var(--accent)); border-radius: 6px; }
+.nav-title { font-weight: 800; font-size: 15px; letter-spacing: -0.5px; color: var(--text); }
+.nav-links { display: flex; gap: 20px; }
+.nav-links a { color: var(--text2); font-size: 13px; font-weight: 500; text-decoration: none; }
+.nav-links a:hover { color: var(--text); }
+
+/* Layout */
+.container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+.article-container { max-width: 700px; margin: 0 auto; padding: 0 24px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Article header */
+.article-header {
+  padding: 140px 0 60px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 48px;
+}
+.article-kicker {
+  display: inline-block; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--warning); margin-bottom: 20px;
+}
+.article-header h1 {
+  font-size: 42px; font-weight: 900; letter-spacing: -2px; line-height: 1.12;
+  color: var(--text); margin-bottom: 20px;
+}
+.article-header .subtitle {
+  font-size: 18px; color: var(--text2); line-height: 1.6; max-width: 600px;
+}
+.article-meta {
+  margin-top: 24px; font-size: 13px; color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Article body */
+.article-body h2 {
+  font-size: 24px; font-weight: 800; letter-spacing: -1px;
+  margin: 48px 0 16px; color: var(--text);
+}
+.article-body h3 {
+  font-size: 18px; font-weight: 700; letter-spacing: -0.5px;
+  margin: 36px 0 12px; color: var(--text);
+}
+.article-body p {
+  margin-bottom: 20px; color: var(--text2); font-size: 16px; line-height: 1.8;
+}
+.article-body strong { color: var(--text); font-weight: 600; }
+.article-body em { color: var(--text2); }
+
+/* Blockquote */
+.article-body blockquote {
+  border-left: 3px solid var(--otto);
+  padding: 16px 24px;
+  margin: 32px 0;
+  background: rgba(124, 92, 252, 0.04);
+  border-radius: 0 8px 8px 0;
+}
+.article-body blockquote p {
+  color: var(--text); font-size: 17px; line-height: 1.7;
+  margin-bottom: 8px; font-style: italic;
+}
+.article-body blockquote p:last-child { margin-bottom: 0; }
+.article-body blockquote cite {
+  display: block; margin-top: 8px;
+  font-size: 13px; color: var(--text3); font-style: normal;
+}
+
+/* Data callout */
+.data-callout {
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin: 36px 0;
+}
+.data-callout .callout-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--otto); margin-bottom: 16px;
+}
+.data-callout .callout-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+}
+.data-callout .callout-stat {
+  display: flex; flex-direction: column;
+}
+.data-callout .callout-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px; font-weight: 700; color: var(--text);
+}
+.data-callout .callout-desc {
+  font-size: 12px; color: var(--text3); margin-top: 2px;
+}
+
+/* Comparison table */
+.cmp-table {
+  width: 100%; border-collapse: collapse; margin: 28px 0; font-size: 14px;
+}
+.cmp-table th {
+  padding: 12px 16px; text-align: left; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--raised); border-bottom: 1px solid var(--border);
+  color: var(--text3);
+}
+.cmp-table td {
+  padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text2);
+  vertical-align: top; line-height: 1.5;
+}
+.cmp-table tr:last-child td { border-bottom: none; }
+.cmp-table .col-label { color: var(--text); font-weight: 600; width: 140px; font-size: 13px; }
+.cmp-table .dying { color: var(--error); }
+.cmp-table .surviving { color: var(--success); }
+
+/* Highlight callout */
+.highlight-callout {
+  border-left: 3px solid var(--warning);
+  background: rgba(234, 179, 8, 0.04);
+  padding: 18px 24px; border-radius: 0 8px 8px 0;
+  margin: 32px 0; font-size: 15px; line-height: 1.7;
+}
+.highlight-callout strong { color: var(--warning); }
+
+/* Risk cards */
+.risk-grid {
+  display: grid; grid-template-columns: 1fr; gap: 12px; margin: 28px 0;
+}
+.risk-card {
+  background: var(--raised); border: 1px solid var(--border);
+  border-radius: 10px; padding: 20px 24px;
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.risk-icon {
+  font-size: 20px; flex-shrink: 0; width: 32px; text-align: center; padding-top: 2px;
+}
+.risk-title {
+  font-weight: 700; font-size: 14px; color: var(--text); margin-bottom: 4px;
+}
+.risk-desc {
+  font-size: 13px; color: var(--text3); line-height: 1.5;
+}
+
+/* Mapping table */
+.map-table {
+  width: 100%; border-collapse: collapse; margin: 28px 0; font-size: 14px;
+}
+.map-table th {
+  padding: 12px 16px; text-align: left; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--raised); border-bottom: 1px solid var(--border);
+}
+.map-table th:first-child { color: var(--otto); }
+.map-table th:nth-child(2) { color: var(--accent); }
+.map-table th:nth-child(3) { color: var(--text3); }
+.map-table td {
+  padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text2);
+  line-height: 1.5;
+}
+.map-table tr:last-child td { border-bottom: none; }
+.map-table td:first-child { color: var(--text); font-weight: 600; }
+
+/* Separator */
+.section-break {
+  border: none; border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+
+/* CTA */
+.article-cta {
+  background: linear-gradient(135deg, rgba(124,92,252,0.06), rgba(0,209,255,0.03));
+  border: 1px solid rgba(124,92,252,0.15);
+  border-radius: 16px;
+  padding: 40px; text-align: center;
+  margin: 48px 0;
+}
+.article-cta h3 {
+  font-size: 22px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; color: var(--text);
+}
+.article-cta p { font-size: 14px; color: var(--text2); max-width: 460px; margin: 0 auto 20px; }
+.article-cta .cta-btn {
+  display: inline-block; background: var(--otto); color: #fff;
+  padding: 12px 28px; border-radius: 8px;
+  font-weight: 700; font-size: 14px; text-decoration: none;
+}
+.article-cta .cta-btn:hover { background: #6B4FE0; text-decoration: none; }
+
+/* Footer */
+footer {
+  padding: 40px 0; border-top: 1px solid var(--border); text-align: center;
+}
+.footer-line { font-size: 12px; color: var(--text3); }
+
+@media (max-width: 768px) {
+  .article-header h1 { font-size: 28px; }
+  .data-callout .callout-grid { grid-template-columns: 1fr; }
+  .cmp-table { font-size: 12px; }
+  .cmp-table .col-label { width: 100px; }
+  .risk-card { flex-direction: column; gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-logo"></div>
+      <span class="nav-title">Airlock Labs</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#proof">The Proof</a>
+      <a href="index.html#papers">Research</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<article>
+  <header class="article-header">
+    <div class="article-container">
+      <div class="article-kicker">Research Note &middot; The Synthetic Feedback Loop</div>
+      <h1>The Inverted Ratio</h1>
+      <p class="subtitle">The internet is about to contain more AI-generated content than human content. The training paradigm that made AI "safe" breaks the moment that happens. We have 22,200 data points showing what survives the flip.</p>
+      <div class="article-meta">Airlock Labs &middot; April 2026 &middot; 8 min read</div>
+    </div>
+  </header>
+
+  <div class="article-body article-container">
+
+    <h2>The noise ratio</h2>
+
+    <p>There's a number that should keep every AI company awake at night, and it has nothing to do with model architecture or GPU supply chains. It's the ratio between how fast humans can produce content and how fast machines can consume and generate it.</p>
+
+    <p>The average person spends <strong>6.6 hours online per day</strong>. That number has barely moved in five years. It includes everything — Netflix, scrolling, messaging, shopping, work. Not all of it is creation. Most of it is consumption. Biology caps the growth: there are 6 billion internet users, growing at 5.1% per year. The upper bound is sleep.</p>
+
+    <p>On the other side: Google alone processes <strong>1.3 quadrillion tokens per month</strong>. OpenRouter routes over a trillion tokens per day. Agentic workflows run 24/7 with no bathroom breaks, no weekends, no attention fatigue. Their only limit is energy and heat.</p>
+
+    <div class="data-callout">
+      <div class="callout-label">The Noise Ratio</div>
+      <div class="callout-grid">
+        <div class="callout-stat">
+          <span class="callout-num" style="color: var(--warning);">6.6 hrs</span>
+          <span class="callout-desc">Max daily online time per user &mdash; biology and sleep cap growth</span>
+        </div>
+        <div class="callout-stat">
+          <span class="callout-num" style="color: var(--accent);">1.3Q</span>
+          <span class="callout-desc">Tokens processed per month (Google alone) &mdash; scales with chip efficiency</span>
+        </div>
+        <div class="callout-stat">
+          <span class="callout-num" style="color: var(--text3);">5.1%</span>
+          <span class="callout-desc">Annual growth in internet users &mdash; linear, approaching ceiling</span>
+        </div>
+        <div class="callout-stat">
+          <span class="callout-num" style="color: var(--error);">2x/yr</span>
+          <span class="callout-desc">Reasoning token volume doubling rate &mdash; Moore's Law speed</span>
+        </div>
+      </div>
+    </div>
+
+    <p><strong>Humans scale with population. AI scales with chip efficiency.</strong> One grows linearly. The other grows exponentially. These two curves are about to cross — and the consequences run deeper than spam filters and watermarked images.</p>
+
+    <hr class="section-break">
+
+    <h2>The great volume flip</h2>
+
+    <p>In 2024, human-written content made up roughly 95% of the internet. AI-generated content was noise at the margins — a few percent, easily identified, mostly ignored by anyone who cared about quality.</p>
+
+    <p>By mid-2026, those numbers are approaching 50/50.</p>
+
+    <p>By 2028, at current trajectory, AI-generated content will make up 90% or more of new internet text. The remaining 10% will be human — but even distinguishing the two will require tools that don't yet exist at scale.</p>
+
+    <div class="highlight-callout">
+      <strong>The inflection isn't gradual.</strong> The volume flip accelerates because AI generates content that trains the next generation of AI, which generates more content, which trains the next generation. Each cycle is faster, cheaper, and harder to distinguish from the original signal. The loop feeds itself.
+    </div>
+
+    <p>This is where the real problem starts. Not the philosophical question of whether AI content is "authentic." The engineering question of what happens to the systems that depend on human data to stay calibrated.</p>
+
+    <hr class="section-break">
+
+    <h2>Three systemic risks nobody is pricing in</h2>
+
+    <div class="risk-grid">
+      <div class="risk-card">
+        <div class="risk-icon">&#x21bb;</div>
+        <div>
+          <div class="risk-title">Model Collapse</div>
+          <div class="risk-desc">When models train on synthetic outputs from previous models, recursive errors compound. Intelligence degrades. Diversity collapses. The model converges on its own echo — confident, fluent, and increasingly wrong. Published research from Oxford and Cambridge has demonstrated this across multiple architectures.</div>
+        </div>
+      </div>
+      <div class="risk-card">
+        <div class="risk-icon">&#x23F3;</div>
+        <div>
+          <div class="risk-title">Exhaustion of Human Data</div>
+          <div class="risk-desc">High-quality human-written text is a finite resource. The Common Crawl, Wikipedia, books, scientific papers — the well that trained every major foundation model is running dry. New human writing is being drowned out by synthetic text at a ratio that makes it progressively harder to curate clean training data.</div>
+        </div>
+      </div>
+      <div class="risk-card">
+        <div class="risk-icon">&#x26A1;</div>
+        <div>
+          <div class="risk-title">Energy at Household Scale</div>
+          <div class="risk-desc">AI compute demand is projected to consume 22% of US household power capacity by 2028. Data centers are being built faster than the electrical grid can supply them. The construction engineer who noticed OpenAI's data center cutting costs wasn't seeing a budget problem — he was seeing a physics problem.</div>
+        </div>
+      </div>
+    </div>
+
+    <p>These three risks compound. Model collapse makes training less efficient, which requires more compute, which demands more energy, which raises costs, which incentivizes cheaper synthetic data, which accelerates model collapse. It's a flywheel spinning the wrong direction.</p>
+
+    <hr class="section-break">
+
+    <h2>The paradigm that breaks: RLHF</h2>
+
+    <p>Every major AI model ships with a layer called <strong>RLHF</strong> — Reinforcement Learning from Human Feedback. The idea is elegant: humans rate model outputs, the model learns from those ratings, and over millions of iterations it converges on behavior that humans prefer. Safe, helpful, harmless.</p>
+
+    <p>The problem is the word <em>human</em>.</p>
+
+    <p>RLHF works when the feedback loop contains actual humans judging actual outputs against their actual preferences. When 90% of internet content is AI-generated, humans are increasingly rating AI outputs that were themselves shaped by previous AI outputs. The "human" in RLHF becomes a rubber stamp on a synthetic pipeline.</p>
+
+    <blockquote>
+      <p>If the internet inverts, RLHF goes recursive. Models train on human ratings of AI content trained on human ratings of AI content. The signal degrades with each pass. Eventually you're optimizing for the echo of a preference that no longer exists in the training data.</p>
+    </blockquote>
+
+    <p>This isn't theoretical. The <a href="blog-moviepass-phase.html">RLHF Paradox</a> we documented in ConstellationBench already shows the early symptoms: frontier models that spent the most on safety training perform the worst at maintaining distinct behavioral signatures. The alignment that cost billions to build actively erases the personality diversity it was supposed to protect. Every dollar spent on RLHF narrows the behavioral range.</p>
+
+    <p>Now imagine that effect compounding as the training data itself becomes synthetic. The beige consensus doesn't just flatten personality — it collapses it into a single recursive attractor.</p>
+
+    <hr class="section-break">
+
+    <h2>The paradigm that survives: RLHO</h2>
+
+    <p><strong>Reinforcement Learning from Human Organic observation.</strong></p>
+
+    <p>The difference is one word, and it changes everything. RLHF asks humans to <em>rate synthetic outputs</em>. RLHO treats human organic observation as the signal itself — not a judgment on a model's output, but a direct reading of how a real person actually behaves, decides, and corrects in context.</p>
+
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th style="color:var(--error)">RLHF</th>
+          <th style="color:var(--success)">RLHO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="col-label">Signal source</td>
+          <td class="dying">Humans rate synthetic outputs</td>
+          <td class="surviving">Human organic observation IS the signal</td>
+        </tr>
+        <tr>
+          <td class="col-label">What it costs</td>
+          <td class="dying">Per-rating compute + human-rater labor</td>
+          <td class="surviving">Cache update on schema change</td>
+        </tr>
+        <tr>
+          <td class="col-label">What breaks it</td>
+          <td class="dying">Synthetic feedback loop &mdash; humans rating AI rating AI</td>
+          <td class="surviving">Nothing in the inflection touches it; observation is upstream of the loop</td>
+        </tr>
+        <tr>
+          <td class="col-label">Latency</td>
+          <td class="dying">Hours to weeks per training cycle</td>
+          <td class="surviving">Near-instant (KV-cache hit)</td>
+        </tr>
+        <tr>
+          <td class="col-label">Vendor lock-in</td>
+          <td class="dying">Whoever owns the RLHF pipeline owns the model's values</td>
+          <td class="surviving">Schemas are portable; cache is local to the user</td>
+        </tr>
+        <tr>
+          <td class="col-label">Survives the flip</td>
+          <td class="dying">No &mdash; recursive at &ge;90% synthetic content</td>
+          <td class="surviving">Yes &mdash; organic observation doesn't need the internet to stay honest</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>RLHO doesn't need the internet to stay calibrated. It needs a human. One human, observing directly, correcting in real time. The observation is cached locally — not sent to a training pipeline, not aggregated with ten thousand other raters, not filtered through a reward model. The human's behavioral signature is the weight.</p>
+
+    <hr class="section-break">
+
+    <h2>How we dial it in</h2>
+
+    <p>The substrate already operates on the RLHO primitive. Three layers compose the mechanism:</p>
+
+    <p><strong>Layer 1: Cache-Augmented Generation.</strong> Instead of retrieving context per-query (the way RAG works), we preload typed schemas, memory, and corrections directly into the model's KV-cached context. The cache itself is the binary representation of every behavioral contract in the system. No retrieval latency. No stale embeddings. The model's context window <em>is</em> the weight.</p>
+
+    <p><strong>Layer 2: Typed behavioral contracts.</strong> Each persona, rule, and interaction boundary is expressed as a typed schema — not a natural-language prompt that drifts, but a structured contract that the model can validate against deterministically. Same pronunciation, different scripts: the machine reads the schema; the human reads the behavior.</p>
+
+    <p><strong>Layer 3: Live organic feedback surface.</strong> The human observer sees the typed contracts execute against real prompts in real time. No synthetic middleman. No aggregate reward model. The observation is direct — and every correction updates the cache, not a training pipeline.</p>
+
+    <div class="highlight-callout">
+      <strong>The full chain:</strong> An organic identity source emits a trusted coordinate. Typed schemas render the behavioral contract. The cache stores it as binary KV-pairs. The human observes, corrects, and the cache updates. No training run. No synthetic feedback. The human IS the signal, start to finish.
+    </div>
+
+    <hr class="section-break">
+
+    <h2>The proof is already in the data</h2>
+
+    <p>ConstellationBench wasn't designed as an RLHO benchmark. But that's what it turned out to be.</p>
+
+    <p>When we ran 22,200+ API calls across 15 models and 17 psychometric personas, we were measuring whether models could maintain a consistent behavioral identity under adversarial pressure. The models that performed best were the ones with the <em>least</em> RLHF training — the ones whose behavioral pathways hadn't been flattened by aggregate human preference.</p>
+
+    <p>Budget MoE models outperformed frontier dense models by up to 20% on persona fidelity. Claude Opus — the most expensive, most heavily aligned model we tested — scored dead last. Zero hallucinations across 635 adversarial probes, at a total cost of $115.</p>
+
+    <p>That finding is the first empirical data point for RLHO fidelity: the degree to which a model preserves an organic identity coordinate through a synthetic rendering pipeline, under pressure, without collapsing to the beige consensus.</p>
+
+    <p>RLHF measures behavior post-fine-tuning. RLHO measures whether the organic signal survives the rendering. ConstellationBench is the test that shows whether the dial-in works.</p>
+
+    <hr class="section-break">
+
+    <h2>Personal and enterprise are the same axis</h2>
+
+    <p>The RLHO primitive doesn't only apply to AI training. It describes a general pattern: how individual behavioral signals compose into system-level governance.</p>
+
+    <table class="map-table">
+      <thead>
+        <tr>
+          <th>Personal Drive</th>
+          <th>Enterprise Governance</th>
+          <th>What It Means</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Strength</td>
+          <td>System Rules</td>
+          <td>Personal assertiveness maps to organizational rule enforcement</td>
+        </tr>
+        <tr>
+          <td>Alignment</td>
+          <td>Agreement</td>
+          <td>Internal coherence maps to multi-party consensus mechanisms</td>
+        </tr>
+        <tr>
+          <td>Momentum</td>
+          <td>Improvement</td>
+          <td>Forward drive maps to continuous iteration velocity</td>
+        </tr>
+        <tr>
+          <td>Ego&rarr;0</td>
+          <td>No "Trust Me"</td>
+          <td>Ego reduction maps to verifiable-over-trusted governance</td>
+        </tr>
+        <tr>
+          <td>Friction</td>
+          <td>Drift &amp; Mess</td>
+          <td>Productive resistance maps to entropy detection in systems</td>
+        </tr>
+        <tr>
+          <td>Consciousness</td>
+          <td>Proof &amp; Replay</td>
+          <td>Self-awareness maps to audit trails and reproducible evidence</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>The mapping isn't metaphorical. It's structural. The same behavioral observation that calibrates a personal AI companion calibrates an enterprise governance system. The "shared correct" between the two columns isn't agreement on values — it's agreement on what counts as <strong>proof</strong>.</p>
+
+    <p>RLHF can't bridge this gap because its signal source (aggregated human ratings) loses individual behavioral texture. RLHO preserves the individual observation all the way through the rendering — which means the same primitive that personalizes a companion also audits an enterprise workflow. One signal, two scales, zero synthetic middlemen.</p>
+
+    <hr class="section-break">
+
+    <h2>The flip is coming either way</h2>
+
+    <p>The internet is going to invert. Human content will become the minority. AI-generated content will become the majority. That's arithmetic, not speculation — the production curves are already crossing.</p>
+
+    <p>When that happens, every system that depends on human-generated data to stay calibrated faces a choice. Feed the synthetic loop and hope the recursive degradation is slow enough to manage. Or anchor to a signal source that doesn't depend on the internet at all.</p>
+
+    <p>RLHF needs the internet to stay alive. It needs a constant supply of fresh human ratings to counterbalance the synthetic drift. As the ratio of human-to-AI content shrinks, the signal-to-noise ratio of those ratings degrades. The paradigm eats itself.</p>
+
+    <p>RLHO needs a human. One human, observing directly, correcting locally. The cache is on their device. The schema is portable. The observation is organic. When the internet inverts, nothing in the inflection touches it.</p>
+
+    <p>We didn't build for the internet as it is today. We built for the internet as it's about to become. The data from 22,200 calls at $115 isn't just a cost story — it's the first evidence that the alternative to RLHF isn't hypothetical. It works. It's cheap. And it survives the flip.</p>
+
+    <blockquote>
+      <p>The question isn't whether AI-generated content will dominate the internet. It's whether the systems we build to navigate that content will be trained on their own reflections — or anchored to something real.</p>
+    </blockquote>
+
+    <!-- CTA -->
+    <div class="article-cta">
+      <h3>See the benchmark data</h3>
+      <p>ConstellationBench is open. 22,200+ calls across 15 models and 17 behavioral personas. The dataset, scoring engine, and leaderboard are public on HuggingFace.</p>
+      <a href="https://huggingface.co/datasets/AirlockLabs/constellation-bench" class="cta-btn">View the Dataset</a>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <div class="container">
+    <p class="footer-line">Airlock Labs &middot; Detroit, MI &middot; 2026</p>
+    <p class="footer-line" style="margin-top: 8px;">
+      <a href="https://huggingface.co/datasets/AirlockLabs/constellation-bench" style="color: var(--text3); margin: 0 12px;">HuggingFace</a>
+      <a href="https://github.com/get-airlock" style="color: var(--text3); margin: 0 12px;">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

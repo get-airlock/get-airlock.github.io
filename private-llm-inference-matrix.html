@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Private LLM Inference Decision Matrix — Airlock Labs</title>
+<meta name="description" content="Moat vs. Myth — a scoring framework for private LLM inference deployments (Self-Hosted / TEE / Hybrid MPC / Pure FHE-MPC) in 2026.">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg: #0B0E14;
+  --raised: #0F1219;
+  --overlay: #151923;
+  --border: #1E2330;
+  --text: #E2E8F0;
+  --text2: #94A3B8;
+  --text3: #64748B;
+  --otto: #7C5CFC;
+  --accent: #00D1FF;
+  --green: #22C55E;
+  --yellow: #EAB308;
+  --red: #EF4444;
+  --oxide: #d96d28;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 14px; line-height: 1.55; padding: 32px 24px;
+  max-width: 1200px; margin: 0 auto;
+}
+.mono { font-family: 'JetBrains Mono', 'IBM Plex Mono', 'Menlo', monospace; }
+
+header { padding-bottom: 18px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+.kicker { font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+  letter-spacing: 2.2px; text-transform: uppercase; color: var(--otto); margin-bottom: 8px; }
+h1 { font-size: 28px; font-weight: 900; letter-spacing: -1px; line-height: 1.15; margin-bottom: 6px; }
+h1 .accent { color: var(--oxide); }
+.lede { color: var(--text2); font-size: 14.5px; max-width: 80ch; }
+
+.exec {
+  background: var(--raised); border: 1px solid var(--border);
+  border-left: 3px solid var(--oxide); padding: 14px 18px;
+  margin: 18px 0 24px; font-size: 13.5px; color: var(--text);
+}
+.exec .label { display: block; font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 6px; }
+
+h2 { font-size: 16px; font-weight: 800; letter-spacing: -0.4px; margin: 24px 0 10px; }
+
+table { width: 100%; border-collapse: collapse; margin: 12px 0 18px;
+  font-size: 12.5px; table-layout: fixed; }
+th, td { border: 1px solid var(--border); padding: 9px 10px; text-align: left;
+  vertical-align: top; }
+th { background: var(--overlay); color: var(--text);
+  font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600;
+  letter-spacing: 0.6px; text-transform: uppercase; }
+td.crit { background: var(--raised); font-weight: 600; color: var(--text); }
+td .cite { color: var(--text3); font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+
+.badge { display: inline-block; padding: 1px 7px; border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.4px; }
+.badge.win { background: rgba(34,197,94,0.15); color: var(--green); }
+.badge.mid { background: rgba(234,179,8,0.15); color: var(--yellow); }
+.badge.theater { background: rgba(239,68,68,0.15); color: var(--red); }
+
+.score-row { background: var(--overlay); font-weight: 700; }
+.score-row td { font-family: 'JetBrains Mono', monospace; }
+.score-cell { text-align: center; font-size: 14px; }
+
+.score-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0 6px; }
+.score-card { background: var(--raised); border: 1px solid var(--border);
+  border-left: 3px solid var(--otto); padding: 11px 14px; }
+.score-card.win   { border-left-color: var(--green); }
+.score-card.mid   { border-left-color: var(--yellow); }
+.score-card.theater { border-left-color: var(--red); }
+.score-card .range { font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+.score-card .verdict { font-weight: 700; margin-bottom: 4px; font-size: 13px; }
+.score-card .detail { color: var(--text2); font-size: 11.5px; }
+
+.usage {
+  background: var(--overlay); border: 1px solid var(--border);
+  padding: 12px 16px; margin: 14px 0; font-size: 12.5px;
+  color: var(--text2);
+}
+.usage strong { color: var(--text); }
+.usage ol { margin: 6px 0 0 22px; }
+.usage ol li { margin-bottom: 4px; }
+
+.refs { font-size: 11px; color: var(--text3); margin-top: 18px; padding-top: 12px;
+  border-top: 1px solid var(--border); }
+.refs a { color: var(--text2); text-decoration: none; word-break: break-all; }
+.refs a:hover { color: var(--accent); }
+.refs ol { margin-left: 18px; }
+.refs li { margin-bottom: 5px; line-height: 1.4; }
+
+footer { margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; font-size: 11px; color: var(--text3);
+  font-family: 'JetBrains Mono', monospace; letter-spacing: 0.6px; text-transform: uppercase; }
+
+@media print {
+  body { background: white; color: #000; padding: 0.4in; max-width: none; font-size: 10.5px; }
+  h1 { color: #000; font-size: 20px; }
+  h1 .accent { color: var(--oxide); }
+  h2 { color: #000; }
+  .lede, .exec, td, th, .score-card, .usage, .refs, footer { color: #000; }
+  .exec, .score-card, .usage, td.crit { background: #f5f5f5; border-color: #ccc; }
+  th { background: #e8e8e8; color: #000; border-color: #999; }
+  td { border-color: #ccc; }
+  table { font-size: 9.5px; }
+  .badge.win { background: #d4f4dd; color: #166534; }
+  .badge.mid { background: #fef3c7; color: #854d0e; }
+  .badge.theater { background: #fee2e2; color: #991b1b; }
+  .score-card .range, .kicker { color: var(--oxide); }
+  footer { color: #555; }
+  .refs a { color: #555; }
+  @page { size: letter; margin: 0.5in; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">Airlock Labs · Investor Memo · 2026</div>
+  <h1>Private LLM Inference Decision Matrix: <span class="accent">Moat vs. Myth</span></h1>
+  <p class="lede">A scoring framework that weighs latency tolerance, privacy needs, scale, and budget against the four real deployment options. Score your use case 1–5 per axis; the matrix points at the quadrant winner — and prioritizes near-term viability over crypto fantasy.</p>
+</header>
+
+<div class="exec">
+  <span class="label">Executive Summary</span>
+  Roughly 90% of enterprise "private LLM" requirements are met today by self-hosted or TEE-based inference at approximately 1/10th the cost and latency of fully cryptographic alternatives. Pure FHE and MPC remain demonstration-grade in 2026 — published benchmarks show slowdowns ranging from 10× (hybrid MPC) to over 1,000,000× (pure FHE) versus cleartext baselines. The matrix below scores a use case across five criteria; the resulting score routes the buyer to one of three quadrants with a defensible, cited rationale.
+</div>
+
+<h2>Decision Matrix</h2>
+<table>
+  <thead>
+    <tr>
+      <th style="width:21%">Criterion (1–5)</th>
+      <th style="width:19.75%">Self-Hosted Plaintext <span class="badge win">WIN</span></th>
+      <th style="width:19.75%">TEE (SGX / Confidential VM) <span class="badge win">WIN</span></th>
+      <th style="width:19.75%">Hybrid MPC (KV-focused) <span class="badge mid">PILOT</span></th>
+      <th style="width:19.75%">Pure FHE / MPC <span class="badge theater">THEATER</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="crit">Latency (TTFT &lt;1s?)</td>
+      <td>Excellent (baseline)</td>
+      <td>Good (&lt;20% overhead)</td>
+      <td>Poor (10–100×) <span class="cite">[2][3][4]</span></td>
+      <td>Fantasy (&gt;1,000,000×) <span class="cite">[2][3][4]</span></td>
+    </tr>
+    <tr>
+      <td class="crit">Privacy Guarantee</td>
+      <td>None (your infra)</td>
+      <td>Strong (hardware isolation)</td>
+      <td>Very strong (distributed)</td>
+      <td>Theoretical max <span class="cite">[1]</span></td>
+    </tr>
+    <tr>
+      <td class="crit">Cost / M Tokens</td>
+      <td>$0.001–0.04 (on-prem) <span class="cite">[6]</span></td>
+      <td>+10–50% over cloud cleartext</td>
+      <td>High comms cost (unquantified)</td>
+      <td>Prohibitive <span class="cite">[5][6]</span></td>
+    </tr>
+    <tr>
+      <td class="crit">Scale (QPS)</td>
+      <td>High (GPU clusters)</td>
+      <td>Medium</td>
+      <td>Low</td>
+      <td>None <span class="cite">[7]</span></td>
+    </tr>
+    <tr>
+      <td class="crit">Moat Fit</td>
+      <td>Sovereignty / low ops</td>
+      <td>Regulated (HIPAA / GDPR)</td>
+      <td>Research / partners</td>
+      <td>2028+ hype <span class="cite">[8]</span></td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr class="score-row">
+      <td class="crit">Score Example<br><span style="font-weight:400; color:var(--text3); font-family:'JetBrains Mono',monospace; font-size:10px;">High-scale product, med privacy</span></td>
+      <td class="score-cell">22 / 25</td>
+      <td class="score-cell">19 / 25</td>
+      <td class="score-cell">12 / 25</td>
+      <td class="score-cell">5 / 25</td>
+    </tr>
+  </tfoot>
+</table>
+
+<h2>Scoring Quadrants</h2>
+<div class="score-legend">
+  <div class="score-card win">
+    <div class="range">≥ 18 / 25</div>
+    <div class="verdict">Self-Hosted or TEE — Win Now</div>
+    <div class="detail">Production-ready, defensible, cost-competitive. Self-host breaks even in 3–6 months at 10M tokens/month vs. APIs.</div>
+  </div>
+  <div class="score-card mid">
+    <div class="range">10–17 / 25</div>
+    <div class="verdict">Hybrid Pilot — R&amp;D Only</div>
+    <div class="detail">Run a bounded pilot if cryptographic privacy is a hard regulatory or contractual requirement. Do not promise production timelines under 6 months.</div>
+  </div>
+  <div class="score-card theater">
+    <div class="range">&lt; 10 / 25</div>
+    <div class="verdict">Wait — or Bluff in Decks</div>
+    <div class="detail">Pure FHE/MPC for general-purpose LLM inference is theater in 2026. Honest pitch: <em>"We will adopt it when published benchmarks reach &lt;5× cleartext overhead. We are not there yet, and neither is anyone shipping in production."</em></div>
+  </div>
+</div>
+
+<h2>Usage Guide</h2>
+<div class="usage">
+  <ol>
+    <li><strong>Score your scenario</strong> 1–5 per axis. Example: agentic workflow → latency=5, privacy=3, scale=4, moat=4, budget=4.</li>
+    <li><strong>Identify the winning quadrant.</strong> Self-hosted or TEE wins ~90% of cases. Defer pure FHE unless a quantum-threat or nation-state-actor model is in scope.</li>
+    <li><strong>ROI calc.</strong> Self-host breaks even in 3–6 months at 10M tokens/month vs. priced APIs.<sup>[6]</sup></li>
+    <li><strong>Risk priorities.</strong> Model theft &gt; data leaks. Focus TEE attestation + watermarking before considering fully encrypted inference.<sup>[9]</sup></li>
+    <li><strong>Pitch line:</strong> "TEE deployment, breakeven in 3 months on our volume, sovereignty moat via attested compute, no cryptographic theater."</li>
+  </ol>
+</div>
+
+<h2>Why this matters for Airlock</h2>
+<p style="color: var(--text2); font-size: 13px; max-width: 80ch;">
+The Airlock substrate routes ~90% of behavioral traffic to budget mixture-of-experts models running on commodity self-hosted or TEE-attested hardware (per <a href="papers/airlock-0.1-constellationbench.md" style="color: var(--accent); text-decoration: none;">ConstellationBench 0.1</a>), and reserves frontier dense models for the ~2% of reasoning-critical traffic. The matrix above is the buyer-facing version of the same decision: most "private LLM" buyers are actually buying TEE or self-host, and the cryptographic alternatives are research-stage. Our pricing model — 10% activation + 20% of savings + a referral program — captures margin on the savings the customer realizes by <em>not</em> over-buying cryptographic privacy they cannot use.
+</p>
+
+<h2>Limits of this matrix</h2>
+<p style="color: var(--text2); font-size: 13px; max-width: 80ch;">
+The numbers above are 2026 production benchmarks for general-purpose LLM inference. Specialized vertical workloads (small models, batched inference, narrow domains) may shift FHE/MPC into viable territory earlier. The matrix is a starting point for the conversation, not a final answer. Re-score every six months; revisit when H200 / B300 confidential-compute SKUs land or when a published FHE benchmark crosses the 5× cleartext-overhead threshold.
+</p>
+
+<div class="refs">
+  <strong>Sources:</strong>
+  <ol>
+    <li><a href="https://datasaur.ai/blog/private-llms-definition-spectrum-and-a-buyers-framework" target="_blank">Private LLMs: Definition, Spectrum, and a Buyer's Framework — Datasaur</a></li>
+    <li><a href="https://www.reddit.com/r/crypto/comments/1mue2qk/is_multiparty_computation_or_fhe_realistic_yet/" target="_blank">Is multi-party computation or FHE realistic yet for private LLM inference? — r/crypto</a></li>
+    <li><a href="https://neurips.cc/virtual/2025/poster/116363" target="_blank">MPC-Friendly KV Cache Eviction for Efficient Private LLM Inference — NeurIPS 2025</a></li>
+    <li><a href="https://www.computer.org/csdl/proceedings-article/iiswc/2025/491700a084/2bNw7sv0Qx2" target="_blank">Confidential LLM Inference: Performance and Cost Across CPU and GPU — IISWC 2025</a></li>
+    <li><a href="https://arxiv.org/abs/2601.09527" target="_blank">Private LLM Inference on Consumer Blackwell GPUs — arXiv 2601.09527</a></li>
+    <li><a href="https://introl.com/blog/inference-unit-economics-true-cost-per-million-tokens-guide" target="_blank">Inference Unit Economics: The True Cost Per Million Tokens — Introl</a></li>
+    <li><a href="https://www.digitalocean.com/blog/llm-inference-tradeoffs" target="_blank">The LLM Inference Trilemma: Throughput, Latency, Cost — DigitalOcean</a></li>
+    <li><a href="https://llm.co/blog/true-cost-of-llms" target="_blank">The True Price of Private LLMs Is Higher Than We Realized — LLM.co</a></li>
+    <li><a href="https://www.rockcybermusings.com/p/llm-data-leakage-training-vs-inference-risk" target="_blank">Training vs Inference: Where Your Data Actually Leaks in LLM Pipelines</a></li>
+  </ol>
+</div>
+
+<footer>
+  <span>airlocklabs.io · investor memo · noindex</span>
+  <span>© 2026 Airlock Technologies LLC</span>
+</footer>
+
+</body>
+</html>

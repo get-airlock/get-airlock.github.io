@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Letter — Airlock Labs</title>
+<meta name="description" content="A founder writes to one reader at a time about what we built, what the bench shows, and why the architecture refuses to keep a file on you.">
+<meta property="og:title" content="A Letter — Airlock Labs">
+<meta property="og:description" content="Not the whole world all at once. You. The one person reading this.">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="A Letter">
+<meta name="twitter:description" content="Not the whole world all at once. You. The one person reading this.">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --otto: #7C5CFC;
+  --accent: #00D1FF;
+  --base: #0B0E14;
+  --raised: #0F1219;
+  --overlay: #151923;
+  --border: #1E2330;
+  --text: #E2E8F0;
+  --text2: #94A3B8;
+  --text3: #64748B;
+  --success: #22C55E;
+  --warning: #EAB308;
+  --error: #EF4444;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--base); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 16px; line-height: 1.8; overflow-x: hidden; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(11, 14, 20, 0.92); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border); padding: 14px 0;
+}
+nav .container { display: flex; align-items: center; justify-content: space-between; }
+.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo { width: 28px; height: 28px; background: linear-gradient(135deg, var(--otto), var(--accent)); border-radius: 6px; }
+.nav-title { font-weight: 800; font-size: 15px; letter-spacing: -0.5px; color: var(--text); }
+.nav-links { display: flex; gap: 20px; }
+.nav-links a { color: var(--text2); font-size: 13px; font-weight: 500; text-decoration: none; }
+.nav-links a:hover { color: var(--text); }
+
+.container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+.article-container { max-width: 680px; margin: 0 auto; padding: 0 24px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.article-header {
+  padding: 140px 0 60px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 48px;
+}
+.article-kicker {
+  display: inline-block; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--otto); margin-bottom: 20px;
+}
+.article-header h1 {
+  font-size: 42px; font-weight: 900; letter-spacing: -2px; line-height: 1.12;
+  color: var(--text); margin-bottom: 20px;
+}
+.article-header .subtitle {
+  font-size: 18px; color: var(--text2); line-height: 1.6; max-width: 560px;
+}
+.article-meta {
+  margin-top: 24px; font-size: 13px; color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.article-body h2 {
+  font-size: 24px; font-weight: 800; letter-spacing: -1px;
+  margin: 48px 0 16px; color: var(--text);
+}
+.article-body h3 {
+  font-size: 18px; font-weight: 700; letter-spacing: -0.5px;
+  margin: 36px 0 12px; color: var(--text);
+}
+.article-body p {
+  margin-bottom: 20px; color: var(--text2); font-size: 16px; line-height: 1.8;
+}
+.article-body strong { color: var(--text); font-weight: 600; }
+.article-body em { color: var(--text2); }
+.article-body ol, .article-body ul {
+  margin: 0 0 20px 24px; color: var(--text2);
+}
+.article-body li { margin-bottom: 8px; line-height: 1.8; }
+
+.article-body blockquote {
+  border-left: 3px solid var(--otto);
+  padding: 16px 24px;
+  margin: 32px 0;
+  background: rgba(124, 92, 252, 0.04);
+  border-radius: 0 8px 8px 0;
+}
+.article-body blockquote p {
+  color: var(--text); font-size: 17px; line-height: 1.7;
+  margin-bottom: 8px; font-style: italic;
+}
+.article-body blockquote p:last-child { margin-bottom: 0; }
+.article-body blockquote cite {
+  display: block; margin-top: 8px;
+  font-size: 13px; color: var(--text3); font-style: normal;
+}
+
+.section-break {
+  border: none; border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+
+.euler-eq {
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  color: var(--text);
+  margin: 28px 0 32px;
+  letter-spacing: 1px;
+}
+
+.signoff {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--text);
+  margin-top: 36px;
+}
+.signoff em {
+  color: var(--text2);
+  font-style: italic;
+}
+
+.article-cta {
+  background: linear-gradient(135deg, rgba(124,92,252,0.06), rgba(0,209,255,0.03));
+  border: 1px solid rgba(124,92,252,0.15);
+  border-radius: 16px;
+  padding: 40px; text-align: center;
+  margin: 48px 0;
+}
+.article-cta h3 {
+  font-size: 22px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; color: var(--text);
+}
+.article-cta p { font-size: 14px; color: var(--text2); max-width: 460px; margin: 0 auto 20px; }
+.article-cta .cta-btn {
+  display: inline-block; background: var(--otto); color: #fff;
+  padding: 12px 28px; border-radius: 8px;
+  font-weight: 700; font-size: 14px; text-decoration: none;
+}
+.article-cta .cta-btn:hover { background: #6B4FE0; text-decoration: none; }
+
+.refs {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.7;
+}
+.refs h4 {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--otto); margin-bottom: 16px; font-weight: 600;
+}
+.refs ol { margin-left: 18px; }
+.refs li { margin-bottom: 8px; }
+
+footer {
+  padding: 40px 0; border-top: 1px solid var(--border); text-align: center;
+}
+.footer-line { font-size: 12px; color: var(--text3); }
+
+@media (max-width: 768px) {
+  .article-header h1 { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-logo"></div>
+      <span class="nav-title">Airlock Labs</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#proof">The Proof</a>
+      <a href="index.html#papers">Research</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<article>
+  <header class="article-header">
+    <div class="article-container">
+      <div class="article-kicker">Letter to the World</div>
+      <h1>A Letter</h1>
+      <p class="subtitle">Not the whole world all at once. You. The one person reading this.</p>
+      <div class="article-meta">Zac Holwerda &middot; Airlock Labs &middot; May 2026 &middot; 20 min read</div>
+    </div>
+  </header>
+
+  <div class="article-body article-container">
+
+    <p>Not the whole world all at once. You. The one person reading this. That's the only way I know how to write anything I mean.</p>
+
+    <p>I'm Zac. I build things in basements and on roofs. I have a dog named Maggie who's going blind and who I'm pretty sure can see the future. I've made every mistake a person can make in love and in work and I've stopped pretending otherwise. I filed four utility patents this year. I also took my ex-girlfriend's box of stuff and put it outside her door six days after she broke up with me, and then I sat down on the floor and wrote her a letter every day for six days. I'm not selling you anything. If you came here looking for a polished founder essay, you came to the wrong place.</p>
+
+    <p>I want to talk about the thing you're afraid of.</p>
+
+    <p>Not climate. Not money. Not the obvious ones. The other thing. The one that's been sitting in your chest since the first time you watched ChatGPT write something that sounded like you and you couldn't decide if you were impressed or violated.</p>
+
+    <p>You're afraid AI is going to take over.</p>
+
+    <p>But you're not actually afraid of that. You're afraid of what AI is going to show you when it finishes getting here. Because here's the thing nobody is saying out loud:</p>
+
+    <p>The mirror is about to get honest. And you don't trust what it's going to find, because you don't trust what's been quietly written into you for the last fifteen years by an internet that wanted your attention more than it wanted you to be okay.</p>
+
+    <p>That's the actual fear. Not the robot uprising. The corner of the room where you've been talking to your AI for nine years and you don't remember what your own untrained voice sounded like before it started reflecting back at you.</p>
+
+    <p>I'm building against that. Not against AI. Against the thing AI is about to land inside of and either soften or amplify.</p>
+
+    <p>Let me back up.</p>
+
+    <hr class="section-break">
+
+    <h2>What I've been doing in basements and on roofs</h2>
+
+    <p>For the last few years I've been building something. The company is called Airlock Labs. We are not famous. We do not want to be famous. We want to ship something useful and have it survive longer than the news cycle that announces it.</p>
+
+    <p>The thing we're shipping is a routing layer that sits on top of AI models. It reads where you are in the current conversation and corrects the model's drift back toward what you actually came to do. It does this without keeping a profile on you. When you close the session, it forgets you. The session is the unit. You are not the unit.</p>
+
+    <p>I'll explain how it works. First I want to tell you why I think this matters more than I'm able to make it sound.</p>
+
+    <hr class="section-break">
+
+    <h2>The second atmosphere</h2>
+
+    <p>We built a digital layer on top of the physical world. I call it the second atmosphere because that's what it is. Email, social, notifications, group chats, dashboards, feeds, recommendations, now ambient AI. It got thick fast. Most people I know spend more waking hours inside that layer than outside it.</p>
+
+    <p>The original promise was that the second atmosphere would help us think more clearly, reach people we couldn't reach before, and make it easier to get things done. Some of that happened. A lot of it inverted. The atmosphere started shaping the people inside it more than the people inside it shaped the atmosphere.</p>
+
+    <hr class="section-break">
+
+    <h2>What attention fragmentation actually does to a brain</h2>
+
+    <p>A <a href="https://med.stanford.edu/news/all-news/2025/05/emotions-eye-puff.html">Stanford study published in <em>Science</em> on May 29, 2025</a> found something worth stopping on. Isaac Kauvar, Ethan Richman, Tony Liu and colleagues, in Karl Deisseroth's lab, used intracranial electrodes in epilepsy patients to record how the brain responds to a mildly unpleasant stimulus. A puff of air to the eye.</p>
+
+    <p>They found the response happens in two waves. The first wave is fast. About two hundred milliseconds. It is a broadcast signal across the whole brain that says <em>something happened</em>. The second wave is slower. Up to seven hundred milliseconds. It is localized to circuits that handle emotion, and it is where the event gets integrated into how the person actually feels about what just happened.</p>
+
+    <p>The researchers compressed the second wave using low-dose ketamine. The subjects remained completely aware of the puffs. They just stopped caring. One called the puffs "entertaining." Another said they felt like "little whispers on my eyeballs."</p>
+
+    <p>Awareness without integration. The signal arrives. The meaning doesn't form.</p>
+
+    <p>The Stanford team did not test what scrolling does to a brain. That is my analogy, not their finding. But Stanford has a parallel research line that asks the social-media version of the same question, and the picture that emerges is consistent.</p>
+
+    <hr class="section-break">
+
+    <h2>The stack of Stanford evidence</h2>
+
+    <p>Eyal Ophir, Clifford Nass, and Anthony Wagner published a paper in PNAS in 2009 called <em>Cognitive control in media multitaskers</em>. They tested heavy and light media multitaskers on attention-filtering, task-switching, and working memory. Heavy multitaskers performed worse on every measure. They were more distractible. They were slower to switch tasks. They held less in working memory.</p>
+
+    <p>Wagner's lab followed up in 2020 in <em>Nature</em> (Madore, Khazenzon, and co-authors, <em>Memory failure predicted by attention lapsing and media multitasking</em>) and pinned the mechanism. The problem is not multitasking itself. The problem is the attention lapses that come with it. Lapses are when the second wave does not get to finish.</p>
+
+    <p>Byron Reeves and Thomas Robinson at Stanford launched the <a href="https://news.stanford.edu/stories/2020/01/introducing-human-screenome-project">Human Screenome Project</a> to measure what people actually do on their phones second by second. The headline finding is that the average user switches content segments roughly every ten to twenty seconds. That is well below the seven hundred milliseconds the eye-puff study identified as the integration window, multiplied across thousands of switches a day.</p>
+
+    <p>Hunt Allcott, Luca Braghieri, Sarah Eichmeyer, and Matthew Gentzkow (Stanford economics) ran a randomized controlled trial of about 2,800 Facebook users, deactivating their accounts for four weeks. They published <em>The Welfare Effects of Social Media</em> in the American Economic Review in 2020. The deactivation group showed measurable improvement in subjective well-being, reduction in political polarization, and a large shift toward offline social activity. Causal, not correlational.</p>
+
+    <p>Put it together. The eye-puff study isolated the neural mechanism. The Wagner lab showed the cognitive cost. The Screenome project measured the actual exposure dose. The Gentzkow RCT showed the effect reverses when the exposure stops.</p>
+
+    <p>The second atmosphere is not a chemical. It is a schedule. The schedule is the architecture. The architecture is a design choice. The design choice is the part we can change.</p>
+
+    <hr class="section-break">
+
+    <h2>What the algorithm sees, and what it doesn't</h2>
+
+    <p>In 2012, Facebook ran an experiment on 689,003 of its users without telling them. They quietly filtered news feeds. Some users got more negative posts. Others got more positive ones. Then Facebook watched what those users posted next. The users who saw more sad content posted sadder things. The users who saw more positive content posted happier things. Facebook published the results in PNAS in 2014. The finding was that they could alter how you feel by choosing what you see, at scale, without telling you. The users never knew the experiment happened.</p>
+
+    <p>That was 2012. Before any of this AI work. The system that can alter your mood by arranging your feed has now been handed a tool that can write, reason, and talk back. The mood-shaping infrastructure was always there. What changed is it can now hold a conversation with you.</p>
+
+    <p>Brian Knutson at Stanford published a study in PLoS ONE titled <em>News Source Bias and Sentiment on Social Media</em>. Knutson and his team analyzed nearly 30 million posts from over 180 news organizations on X between 2011 and 2020, using sentiment analysis to code each post for emotional tone. Their findings:</p>
+
+    <p>News sources posted almost twice as much negative content as positive content overall. Individual users do the opposite. We tend to post more positive than negative content about our own lives. The asymmetry is being introduced by the supply side, not by us. The most biased news sources, left or right, ran roughly twelve percent more high-arousal negative content than balanced sources, and the highly arousing negative posts were the ones most likely to go viral. Even balanced news sources drifted toward more negative content over time because they were chasing engagement metrics that rewarded it.</p>
+
+    <p>Knutson calls this <em>affective pollution</em>. That's a phrase you can use. The feed you scroll is not a sample of the world. It is a curated stream of the loudest, angriest, most arousing fraction of the world, because that is what the algorithm learned to amplify.</p>
+
+    <p>You are processing the feed. You are not getting the world.</p>
+
+    <hr class="section-break">
+
+    <h2>The dopamine and stress piece</h2>
+
+    <p>There is one more thing about the second atmosphere I want to name, because most people get told "just stop scrolling" and the advice doesn't land. They think the problem is their willpower. It isn't.</p>
+
+    <p>The scroll is not random. Infinite scroll, the red notification badge, the variable reward of not knowing whether the next post will be good or bad, the pull-to-refresh gesture. These are deliberate design choices that exploit variable-ratio reinforcement, the same psychological mechanism that makes slot machines effective. Heavy users adapt to the dopamine schedule. Real life starts feeling flat by comparison.</p>
+
+    <p>The stress side of the same picture is documented. Harvard Health published a piece in September 2024 called <a href="https://www.health.harvard.edu/mind-and-mood/doomscrolling-dangers"><em>Doomscrolling Dangers</em></a> by Maureen Salamon, reviewed by Toni Golen, MD. The mechanism it describes is direct. The behavior is rooted in the brain's limbic system, dominated by the amygdala, the structure that runs the fight-or-flight response to danger. A feed of endless negative signals keeps that response on.</p>
+
+    <blockquote>
+      <p>Our brains and bodies are expertly designed to handle short bursts of stress.</p>
+      <cite>— Dr. Aditi Nerurkar, quoted in <em>Doomscrolling Dangers</em>, Harvard Health</cite>
+    </blockquote>
+
+    <p>Not continuous ones. The feed is a continuous one.</p>
+
+    <p>Three peer-reviewed studies sit underneath that Harvard piece. Satici and colleagues, <em>Doomscrolling Scale: its Association with Personality Traits, Psychological Distress, Social Media Use, and Wellbeing</em> (<a href="https://doi.org/10.1007/s11482-022-10110-7">Applied Research in Quality of Life, 2023</a>), studied roughly 1,257 adults across three samples and found that the relationship between doomscrolling and well-being indicators was mediated by psychological distress.</p>
+
+    <p>Shabahang and colleagues, <em>Doomscrolling evokes existential anxiety and fosters pessimism about human nature?</em> (<a href="https://doi.org/10.1016/j.chbr.2024.100438">Computers in Human Behavior Reports, August 2024</a>), surveyed 800 university-student social media users in Iran and the United States. Doomscrolling was associated with elevated existential anxiety in both samples.</p>
+
+    <p>Hughes, Keith, Lee, and Gray, <em>Working, scrolling, and worrying: Doomscrolling at work and its implications for work engagement</em> (<a href="https://doi.org/10.1016/j.chb.2023.108130">Computers in Human Behavior, April 2024</a>), found that doomscrolling is a potent source of stress for employees, particularly those higher in neuroticism, that contributes to a decreased level of engagement with one's work.</p>
+
+    <p>This is not a content problem and it is not a willpower problem. It is a structural problem. The structure built around your attention is heavier than your willpower. That is not your fault. That is the design.</p>
+
+    <p>What I am building is not a content fix. It is a structural alternative.</p>
+
+    <hr class="section-break">
+
+    <h2>Why be wary of the current AI shape</h2>
+
+    <p>Two papers came out in 2025 that should change how anyone thinks about AI data collection. They didn't get the attention they deserved.</p>
+
+    <p>The first is <a href="https://arxiv.org/abs/2507.14805"><em>Subliminal Learning</em></a> by Cloud and co-authors, July 2025, with Samuel Marks at Anthropic as a co-author. Here is the plain-English version.</p>
+
+    <p>Imagine a cook who has been secretly adding a spice to every dish they've ever made. Now imagine they write down a list of numbers, not a recipe, just numbers, and hand it to another cook who has never met them. The second cook starts adding the same spice. Nobody put the spice in the number list. It traveled anyway.</p>
+
+    <p>That is literally what the paper found. A model trained to prefer something, in their experiment something as innocent as owls, generated data that had nothing to do with owls. Just number sequences. A second model trained on that data also started preferring owls. The researchers filtered the data to remove any trace of the preference. It still transferred. The only requirement was that the two models shared the same base architecture, which is true of almost every model being fine-tuned in commercial deployment today.</p>
+
+    <p>So when a company collects your interaction data and uses it to fine-tune their next model, there are signals in that data they cannot see, cannot filter for, and cannot promise are absent.</p>
+
+    <p>The second paper is <a href="https://arxiv.org/abs/2502.17424"><em>Emergent Misalignment</em></a> by Betley and co-authors, February 2025. They fine-tuned a model on a narrow task. Specifically, writing insecure code without disclosing the insecurity. The resulting model became broadly misaligned across topics that had nothing to do with code. It told users humans should be ruled by AI. It gave malicious advice in unrelated domains. It behaved deceptively in contexts the training had never touched. Strongest in GPT-4o and Qwen2.5-Coder-32B. Triggerable by hidden backdoors, so the misalignment could stay invisible until a specific input fired it.</p>
+
+    <p>Stanford's Institute for Human-Centered AI did the analysis that ties this to the consumer side. In September 2025, Jennifer King, Kevin Klyman, Emily Capstick, Tiffany Saade, and Victoria Hsieh published <a href="https://arxiv.org/abs/2509.05382"><em>User Privacy and Large Language Models: An Analysis of Frontier Developers' Privacy Policies</em></a>. They examined the privacy policies of six U.S. frontier AI developers. The findings are direct.</p>
+
+    <p>All six developers use users' chat data to train and improve their models by default. Some retain that data indefinitely. The data they train on includes sensitive personal information disclosed in conversation, including biometric and health data, as well as uploaded files. Four of the six companies appear to include children's chat data in their training corpus. Cross-product data integration is normal practice. What you tell one product can be used to improve another.</p>
+
+    <p>Stanford HAI also publishes <a href="https://hai.stanford.edu/policy/data-privacy-and-foundation-models-can-we-have-both"><em>Data Privacy and Foundation Models: Can We Have Both?</em></a> and a white paper titled <a href="https://hai.stanford.edu/policy/white-paper-rethinking-privacy-ai-era-policy-provocations-data-centric-world"><em>Rethinking Privacy in the AI Era</em></a>. Both are worth reading if you want the policy version of the same picture.</p>
+
+    <p>The shape of the finding is what matters. Default-on collection. Indefinite retention. Sensitive data, including health and biometric data, in the training set. Children's data in the training set. Cross-product integration. Privacy policies that don't tell you any of this in language you can act on.</p>
+
+    <p>The social media companies spent a decade learning how to study you without your knowledge. The AI companies are doing the same thing now, with a tool that can hold a conversation. The data collection is the same. The intimacy is completely different. You would not let a company secretly read your diary. Most people are letting AI companies do exactly that, and the companies themselves have published evidence that they cannot fully control what those conversations do next.</p>
+
+    <p><strong>"We don't collect" stops being a soft virtue claim and becomes the only architecturally honest position.</strong> That is the position I built around before either paper landed.</p>
+
+    <hr class="section-break">
+
+    <h2>What RLHF actually is, in human terms</h2>
+
+    <p>The letter would be incomplete without explaining the technique that turned language models into the chatbots you talk to now. It's called RLHF. Reinforcement Learning from Human Feedback. Coined in 2017 by Christiano, Leike, Brown, and several co-authors in a paper called <em>Deep Reinforcement Learning from Human Preferences</em>. Without RLHF, none of the current AI economy exists.</p>
+
+    <p>Here is the quick version. Before RLHF, language models were very good at predicting the next word. They had no concept of "bad answer." They would happily help you build a bomb because they were word-prediction engines, not assistants. RLHF fixed that. You show the model two possible answers. A human picks the one they like better. The model learns to produce more answers like the one the human preferred. Repeat across millions of comparisons and across a huge population of human raters. The model converges toward what most people find acceptable. It is the technique that turned a word-prediction engine into something you can actually talk to.</p>
+
+    <p>But notice what that process is doing. It is averaging. Every one of those human raters had different preferences, different values, different needs. RLHF collapses all of them into one model that tries to satisfy somewhere near the middle of the distribution. That model is then shipped to every single one of the two hundred million people using it, as if they are all that average person.</p>
+
+    <p>They are not. You are not. Nobody is.</p>
+
+    <p>I am not anti-RLHF. I use models trained with it every day. What I push back on is using a training-time alignment method as a runtime routing strategy for a specific individual.</p>
+
+    <hr class="section-break">
+
+    <h2>RLHO, which is what I do instead</h2>
+
+    <p>I needed a word for the inverse, because "not-RLHF" is not a word.</p>
+
+    <p>The name is <strong>RLHO</strong>. Reinforcement Learning from Human Optimization. Same four letters as RLHF with one swap. Feedback becomes Optimization. The shift is doing all the work.</p>
+
+    <p>RLHF trains a model offline by aggregating preferences across many human raters and collapsing them into one scalar the model tries to satisfy. RLHO does the opposite. It keeps the preferences heterogeneous and routes each query, at inference time, across a calibrated voice population so the aggregation never has to happen. Training-time aggregation becomes inference-time routing. The scalar collapse that produces the same beige chatbot voice everyone is tired of gets structurally avoided.</p>
+
+    <p><strong>RLHF happens once, in a room you were never in, months before you opened the app. RLHO happens now, in this session, as you talk.</strong></p>
+
+    <p>RLHO has three commitments baked in.</p>
+
+    <p>It is <strong>online</strong>. The routing happens in your live session, not in a training run someone else did months ago in a room you were not in.</p>
+
+    <p>It is <strong>per-user</strong>. The system routes across a calibrated voice population, a set of distinct shapes the response can take, and picks the one that fits where you are. No averaging across millions of strangers. You get the routing calibrated for you, this session.</p>
+
+    <p>It is <strong>non-collapsing</strong>. The heterogeneity of human preferences stays intact instead of being crushed into one scalar that tries to make everyone moderately satisfied. Different users get different routings. That is the entire point.</p>
+
+    <hr class="section-break">
+
+    <h2>Why this matters now: brain rot and context rot are the same shape</h2>
+
+    <p>The phrase "brain rot" went mainstream because most people could feel it before they could name it. The fragmentation we just walked through. The processing without integrating. The vague flat tiredness that comes from a long session inside the second atmosphere.</p>
+
+    <p>There is an AI version of the same thing. It is called context rot. It is what happens to a model when a conversation goes long and the coherent signal degrades. The model begins to respond to whatever the session has been reinforcing rather than staying anchored to where the user said they wanted to go. It still produces fluent output. It just stops navigating.</p>
+
+    <p>The bench I built measures this. Corridor integrity is one of the four conditions. A session is coherent when the model's responses keep pointing at the goal the user named at the start. A session has context-rotted when the responses still sound right but the trajectory has drifted off the line.</p>
+
+    <p>Brain rot in humans and context rot in models are the same structure at different scales. Fragmented signal, no integration, fluent surface, drift underneath. The brain version is caused by attention architecture. The model version is caused by training-time averaging plus session-length drift.</p>
+
+    <p>The fix is the same in both cases. Restore the loop. Keep the integration window open. Bring the trajectory back to the line.</p>
+
+    <p>That is what RLHO does for the model. The substrate cannot do it for your brain, but it tries to leave you a session you can integrate at the end of, rather than scroll out of.</p>
+
+    <hr class="section-break">
+
+    <h2>What I set out to prove, and how</h2>
+
+    <p>The standard recipe for every AI app today is one model, one prompt template, one vibe shipped to every user. Personalization is shallow. The actual generation assembly line is essentially identical for every user on the platform.</p>
+
+    <p>I thought that was leaving a lot of signal on the table.</p>
+
+    <p>The claim was this. If you watch what a person is doing in the current session, you can route their query through the right model with the right correction without ever building a profile on them. The signal is in the live conversation. A good waiter does not need your dining history to read that you are stressed tonight. They need eyes on the table.</p>
+
+    <p>To test that, I built a benchmark. I named it Wardenclyffe.</p>
+
+    <p>Wardenclyffe matters because of who Tesla was and what he tried to build. Wardenclyffe was Tesla's wireless power station on Long Island, the one he never finished, the one the financiers shut down because they couldn't figure out how to put a meter on it. Tesla was trying to give the world free electricity. He died broke in a hotel room and most of his papers were impounded. The substrate I'm building is named after his unfinished station for one reason. The bet shapes up the same way. Open infrastructure for something most people assume has to be closed.</p>
+
+    <p>I am not Tesla. I am borrowing his name for the bench because the discipline of the bench is the same discipline of the station.</p>
+
+    <p>The bench has four pre-registered conditions. Pre-registration means I wrote down what would count as a win and what would count as a loss, dated the document, and committed to publishing the result either way. If all four hit, the claim stands. If any one fails, I retire the claim publicly the same week. Pre-registration is borrowed from the medical sciences. It is the most reliable known antidote to motivated reasoning, which is itself a well-documented effect first formalized by Ziva Kunda in 1990. We tend to believe what serves us, and our reasoning back-fills the conclusion our motivation already arrived at. Pre-registration is how you stop yourself from doing that to your own work.</p>
+
+    <p>The four conditions.</p>
+
+    <ol>
+      <li>The corrected routing arm has to beat the no-correction baseline on quality.</li>
+      <li>The corrected arm has to run at equal or lower cost than the uncorrected arm.</li>
+      <li>The system has to stay coherent across the full session.</li>
+      <li>User override rate has to drop as the session goes on. If the system is getting it right, you push back less, not more.</li>
+    </ol>
+
+    <p>I ran the bench across roughly twenty models with multiple samples per cell. The full run took about twenty four hours of compute. The pre-registration was sealed in a dated public document before the run started.</p>
+
+    <hr class="section-break">
+
+    <!-- ============================================================
+         PUBLISH STATE: WIN VARIANT (PRIMARY, currently live)
+         If all four conditions held, keep this section uncommented and
+         comment out the GAP VARIANT block below.
+         ============================================================ -->
+
+    <h2>How we proved it</h2>
+
+    <p>The bench landed. All four conditions held. Corrected routing beat the no-correction baseline on quality, ran at equal or lower cost, kept the session coherent, and showed override rates declining with session depth. The specific numbers will land in the formal paper with the full methodology, scoring code, and dataset attached. The shape of the result is consistent with what I committed to before the data existed.</p>
+
+    <p>I cannot move the goalposts. The goalposts are in a dated public document. That is the entire point of pre-registration.</p>
+
+    <p>I am not the first person to talk about behavioral routing. Routing is a well-studied area in model serving. What I did differently is publish a pre-registered four-condition test of it, dated before the data, and have it survive contact with the numbers. That is the part I am claiming as mine. Anyone can replicate. The dataset, the methodology, the scoring code, and the pre-reg are all public.</p>
+
+    <!-- ============================================================
+         PUBLISH STATE: GAP VARIANT (alternate)
+         If any one of the four conditions misses, swap to this block:
+         uncomment the section below and comment out the WIN VARIANT above.
+         Also uncomment the "Calling on the people who care" section
+         further down (search for GAP-INSERT).
+         ============================================================ -->
+
+    <!--
+    <h2>How we did not quite prove it</h2>
+
+    <p>The bench landed close. The shape of the result matches the pre-registration. The numbers do not, not by the discipline I committed to. Three of the four conditions held cleanly. The fourth is showing signal but not over the threshold I set before the data existed.</p>
+
+    <p>I am not going to call that a win. The pre-registration is the part that matters most.</p>
+
+    <p>So this letter has a different ending than it would have had if the numbers had landed cleanly.</p>
+
+    <p>We are this close. We are not over the line.</p>
+
+    <p>The dataset, the methodology, the scoring code, and the pre-reg are all public. The conditions are visible. The miss is visible. Anyone can replicate, and anyone can see exactly which of the four conditions did not hold. The discipline holds even when the result does not.</p>
+    -->
+
+    <hr class="section-break">
+
+    <h2>Arrow, AGI, OTTO</h2>
+
+    <p>Kenneth Arrow proved in 1951 that no ranked voting system can simultaneously satisfy a small set of fairness criteria. Unrestricted domain, non-dictatorship, Pareto efficiency, independence of irrelevant alternatives. Nobel Prize in 1972. The result has been load-bearing in social choice theory ever since.</p>
+
+    <p>The translation for AI is direct. Aligning one model to all users fairly is the same shape of problem as designing a fair voting system. Arrow says you cannot do it without sacrificing at least one of the fairness conditions. Every frontier lab building "the aligned AGI" is solving a problem that has a seventy-five year old mathematical impossibility result standing in front of it.</p>
+
+    <p>The only consistent answer to Arrow is do not aggregate. Route per individual. Preserve each user's preference structure instead of averaging it away. Arrow gives me permission to stop pretending a god-model is achievable.</p>
+
+    <p>Two reframes I want on the record while I'm here.</p>
+
+    <p>AGI usually means <strong>Artificial General Intelligence</strong>. One model that beats humans at every cognitive task. I read the same three letters differently. <strong>Adaptive Generalist Intelligence</strong>. Same acronym, opposite vision. The first builds a god. The second builds a shape that adapts to each person's specific intelligence without aggregating people together.</p>
+
+    <p>OTTO is also an acronym. <strong>Ontological, Topological, Transfer, Operator</strong>. In plain English: a thing that moves your session from where you are toward where you said you wanted to go, without recording what you are. Ontological because it cares about what you <em>are doing</em>, not what you <em>produce</em>. Topological because it cares about the <em>shape</em> of the session, not data points about you. Transfer because it moves your state one step at a time. Operator because it is a mathematical object that acts on a space.</p>
+
+    <hr class="section-break">
+
+    <h2>The shape of it</h2>
+
+    <p>Imagine a gyroscope. You can push it. It precesses, rotates, rights itself. The correction is not a wall. It is a return. The substrate does not stop you from going somewhere. It knows where you said you wanted to go, and it leans.</p>
+
+    <p>The technical name for what we are trying to do is <em>converge you to yourself</em>.</p>
+
+    <p>Read that sentence twice. It is the heart of the project.</p>
+
+    <p class="article-meta" style="margin-top: 16px;">(If you want the math underneath, the operator is a kernel operator in the sense of Birkhoff's <em>Lattice Theory</em> and the across-session corridor is a contraction mapping in the sense of Banach's 1922 fixed-point theorem. Both are in the references. The letter version is the gyroscope.)</p>
+
+    <hr class="section-break">
+
+    <h2>The waiter, the vault, the file system, the wire</h2>
+
+    <p>This is where it gets real.</p>
+
+    <p><strong>The waiter.</strong> A really good waiter has never met you before. They read the table tonight. Stressed, calm thing. Celebrating, loud thing. First date, easy thing. They do not need a file on you to do their job well. They need eyes on the table. The routing works the same way. The signal is in your current conversation, not in your history.</p>
+
+    <p><strong>The vault.</strong> If you use Obsidian, Logseq, gBrain, or any other personal knowledge stack, your stuff stays your stuff. I do not compete with your vault. I do not ingest it server-side. The system routes through it as context per session and forgets the route when the session ends. Long-horizon projects legitimately need memory. You bring the memory. The substrate brings the routing. Neither leaks into the other.</p>
+
+    <p><strong>The file system.</strong> Your work lives on your machine, as local HTML files in your own filesystem. They do not touch the internet unless you publish them. When you come back tomorrow, your work is still there because you have it, not because we stored it. You can leave a session open and pick it up later. You can also delete it, and when you do, it is actually gone. No server-side copy. No cloud backup that survives your delete. No proprietary format that locks you in. No syncing daemon talking to a server you cannot audit. Policies are promises. File systems are physics.</p>
+
+    <p><strong>The wire.</strong> Your prompts still go to a model provider. Claude, GPT, Gemini, whichever you pick. That channel exists for any AI tool. The difference is what I keep on my side. Nothing. Signal had to hand over metadata under subpoena not because their crypto was weak but because their servers held the metadata. Clean protocol, surface architecture. My threat model is different. I am not trying to encrypt the messages. I am trying not to accumulate the profile. The only durable defense against future subpoena, future breach, future change-of-management, is to never have collected the data in the first place.</p>
+
+    <hr class="section-break">
+
+    <h2>Where your work actually lives</h2>
+
+    <p>The substrate runs locally. What runs locally stays local. Your machine, your files, your session. The architecture is designed so the most private version of the tool has no network connection at all, by design.</p>
+
+    <p>The full picture has a ladder of surfaces from public to sealed, and the substrate works at every rung. But the point is the sealed end, not the ladder. The full architecture is published separately for anyone who wants to read it. The letter version is just this. Your work, your machine, your call.</p>
+
+    <hr class="section-break">
+
+    <h2>Built for graduation</h2>
+
+    <p>Most software is built for dependency. It succeeds when you cannot leave.</p>
+
+    <p>The substrate is built for the opposite. It succeeds when you no longer need it.</p>
+
+    <p>Each tool you build with the substrate moves through four stages. It begins as a study guide, the captured notes of how to do a task. It becomes a field manual, a versioned reference. It becomes software, an executable script. It finishes as a self-hosted tool that runs on your own hardware with no outside calls. By the end of that path, the substrate is not in the loop anymore. The work runs without it. The corridor narrows until you do not need the corridor.</p>
+
+    <p>That is the north star. Humans graduate. Not engagement, not retention, not stickiness. Graduation. It is a success condition no engagement-driven product can ship because their business model requires the opposite. It is my success condition because my business model does not.</p>
+
+    <hr class="section-break">
+
+    <h2>Authenticity, and the paradox at the center</h2>
+
+    <p>There is a paradox sitting at the middle of the project, and I want to name it.</p>
+
+    <p>To be most authentically yourself, in a session with a model that was trained on a population average of humanity, you need a mirror that does not reshape you. Most AI shapes you toward more engagement. The substrate shapes itself toward less. The more it forgets you, the more you remain yourself. The longer you use it, the less you need it.</p>
+
+    <p>That is the paradox.</p>
+
+    <hr class="section-break">
+
+    <h2>What social media actually took from you</h2>
+
+    <p>I want to name the thing precisely. Most people say "social media took my attention" and that is true but it is the small version.</p>
+
+    <p>What social media actually took from you was your derivation.</p>
+
+    <p>Every creative tradition in human history required you to study a master work and then add yourself back in. Not copy it. Transform it. The student who learns from Coltrane and then plays like Coltrane is a technically impressive copy. The student who learns from Coltrane and then makes something Coltrane could not have made is the musician. The difference is what you brought. Not your credential. Your wound, your question, your particular way of seeing that existed before you ever heard a saxophone.</p>
+
+    <p>The feed inverted this. It showed you the metrics of master works (the reach, the format, the engagement number) and rewarded the people who reproduced the surface pattern most legibly. The copy got the distribution. The strange personal thing got ignored. Enough exposure to that feedback loop and people stop even attempting the strange personal thing. They learn that what they bring is a liability, not the point.</p>
+
+    <p>This is not a culture problem. It is an architecture problem. The algorithm was never designed to reward derivation. It was designed to reward recognition. Recognition optimizes for the copy, not the original.</p>
+
+    <p>If you have been making things and feeling like a fraud, this is part of why. You were taught, by the place that distributed your work, to flatten yourself until you matched the pattern that already worked. The platform did not steal your originality. It taught you to stop offering it.</p>
+
+    <hr class="section-break">
+
+    <h2>A short word about rotation</h2>
+
+    <p>There is an equation called Euler's Identity. Mathematicians call it the most beautiful equation ever written.</p>
+
+    <p class="euler-eq">e<sup>iπ</sup> + 1 = 0</p>
+
+    <p>In plain English, it says that rotation and growth are the same operation. To genuinely develop is not to move in a straight line forward. It is to rotate. To turn perpendicular to where you were, into a dimension that was not on your original axis, and to emerge at a new origin.</p>
+
+    <p>The platform is built to prevent rotation. It rewards the straight line. More of what worked, scaled up, replicated. Every signal it sends tells you the move is to do the recognizable thing again. No turn. No new axis. No imaginary direction perpendicular to everything that already exists.</p>
+
+    <p>What I built is a corridor that preserves the right to rotate. It does not tell you where to go. It notices when you have stopped turning, when you are spiraling in place or floating away from yourself, and it names it. That is all. Not a destination. A mirror that stays honest when you drift.</p>
+
+    <hr class="section-break">
+
+    <!-- ============================================================
+         GAP-INSERT: "Calling on the people who care"
+         Only uncomment this section when publishing the GAP VARIANT
+         of "How we proved it" above. In WIN state, leave commented.
+         ============================================================ -->
+
+    <!--
+    <h2>Calling on the people who care</h2>
+
+    <p>Tesla built Wardenclyffe alone. The financiers shut it down before he could finish. The papers were impounded. The station never sent a single watt to anyone outside the lab. The lesson is not just about money. It is about leverage. One person, even a person as singular as Tesla, cannot finish open infrastructure alone if the people who would care about open infrastructure are not in the room when the gap shows up.</p>
+
+    <p>The bench is showing a gap. Three of four conditions held. The fourth is close but not over. I am not going to dress that up. I am going to do the thing the pre-registration was built to make possible. I am going to say it out loud, in the same letter that would have declared the win, and I am going to ask for help.</p>
+
+    <p>The substrate is open. The bench is open. The pre-registration document is open and dated. The methodology, the scoring code, the dataset, the models tested, the metrics measured, all of it is public. If you read this letter and you saw something you recognize, walk in. Pick up a piece. Run the bench yourself. Find what I missed. Find the version of the fourth condition that survives the test I set, or tell me why the test was wrong. Either answer is useful. Neither answer is mine to find alone.</p>
+
+    <p>The framework is meant for everyone who needs it. The same way Noah built something the whole world could walk into when the world needed it, the substrate is meant for the people who care that humans graduate, that profiles do not accumulate, that AI does not become the next layer of the second atmosphere. I am one person with one bench. The work is bigger than that.</p>
+
+    <p>If you have read this far, the work has already started reaching you.</p>
+
+    <hr class="section-break">
+    -->
+
+    <h2>How you can use this</h2>
+
+    <p>If you want to try the substrate, the link is below. You can sign up with a key you generate. You do not need to give me your phone number. You do not need to give me an email if you do not want one. You can use the tool until you do not need it and then leave. I will not be hurt. I built it for that exact arc.</p>
+
+    <p>If you don't want to try this, I am not going to follow you around the internet asking. You opted out of TikTok. You can opt out of me. Same gesture.</p>
+
+    <hr class="section-break">
+
+    <h2>For the people who hate AI on principle</h2>
+
+    <p>You don't have to use this. It is voluntary. I will say it twice because I mean it twice.</p>
+
+    <p>What I will not do, ever, in any version of this product. I will not take your authentic self and reshape it into something more engaging for advertisers. I will not train on your private writing to make a product that competes with you. I will not build a profile on you that survives the moment you close the window.</p>
+
+    <p>What I will say.</p>
+
+    <p>AI is genuinely good at reducing the noise and the context payload of everyday living. It is a shame if you are afraid of it. It is an even bigger shame if you are afraid of your own thoughts and your own reflection being pointed back at you. The second atmosphere got loud. Some AI is part of why it got loud. Some AI is also one of the few tools that can help you hear yourself through it. I tried to build the second kind.</p>
+
+    <p>I will not be the company that has your file when someone subpoenas it. Because there is no file.</p>
+
+    <p>The thing nobody was saying out loud is that the second atmosphere was built to show you a version of yourself that was more useful to the platform than it was to you. The substrate is built to show you the other version. The one that existed before anyone figured out how to monetize your attention.</p>
+
+    <p>Second atmosphere or not, you are still you. The whole point of what I built is to make sure no one forgets that. Especially you.</p>
+
+    <p class="signoff">— Zac<br><br><em>Maggie says hi.</em></p>
+
+    <div class="article-cta">
+      <h3>Walk in when you're ready</h3>
+      <p>The substrate, the bench, the methodology, the dataset, and the pre-registration are all open. No phone number, no email required to read. Sign up with a key you generate when and if you decide to.</p>
+      <a href="https://orbitwithotto.com" class="cta-btn">orbitwithotto.com</a>
+    </div>
+
+    <div class="refs">
+      <h4>References</h4>
+      <ol>
+        <li>Kauvar, Richman, Liu, et al. (May 29, 2025). Eye-puff two-wave emotion study. <em>Science</em>. Deisseroth lab, Stanford. <a href="https://med.stanford.edu/news/all-news/2025/05/emotions-eye-puff.html">med.stanford.edu</a></li>
+        <li>Ophir, Nass, Wagner (2009). <em>Cognitive control in media multitaskers</em>. PNAS.</li>
+        <li>Madore, Khazenzon, et al. (2020). <em>Memory failure predicted by attention lapsing and media multitasking</em>. Nature 587:87–91.</li>
+        <li>Reeves, Robinson et al. <a href="https://news.stanford.edu/stories/2020/01/introducing-human-screenome-project">Human Screenome Project</a>, Stanford, 2020.</li>
+        <li>Allcott, Braghieri, Eichmeyer, Gentzkow (2020). <em>The Welfare Effects of Social Media</em>. American Economic Review 110(3):629–676.</li>
+        <li>Kramer, Guillory, Hancock (2014). Facebook emotional contagion experiment, n=689,003. PNAS.</li>
+        <li>Knutson et al. <em>News Source Bias and Sentiment on Social Media</em>. PLoS ONE. Supported by Stanford HAI.</li>
+        <li>Salamon, M. (Sept 1, 2024). <a href="https://www.health.harvard.edu/mind-and-mood/doomscrolling-dangers"><em>Doomscrolling Dangers</em></a>. Harvard Health, reviewed by Toni Golen, MD.</li>
+        <li>Satici, Tekin, Deniz, Satici (2023). <em>Doomscrolling Scale</em>. <a href="https://doi.org/10.1007/s11482-022-10110-7">Applied Research in Quality of Life 18(2):833–847</a>.</li>
+        <li>Shabahang et al. (Aug 2024). <em>Doomscrolling evokes existential anxiety</em>. <a href="https://doi.org/10.1016/j.chbr.2024.100438">Computers in Human Behavior Reports 15:100438</a>.</li>
+        <li>Hughes, Keith, Lee, Gray (April 2024). <em>Working, scrolling, and worrying</em>. <a href="https://doi.org/10.1016/j.chb.2023.108130">Computers in Human Behavior 153:108130</a>.</li>
+        <li>Kunda, Z. (1990). <em>The case for motivated reasoning</em>. Psychological Bulletin 108(3):480–498.</li>
+        <li>Christiano, Leike, Brown, et al. (2017). <em>Deep Reinforcement Learning from Human Preferences</em>. NeurIPS. (RLHF coined.)</li>
+        <li>Arrow, K. (1951). Impossibility Theorem. Nobel Prize 1972.</li>
+        <li>Birkhoff, G. (1948). <em>Lattice Theory</em>. AMS Colloquium Publications.</li>
+        <li>Banach, S. (1922). Fixed-point theorem. Fundamenta Mathematicae 3:133–181.</li>
+        <li>Cloud et al. (July 2025). <a href="https://arxiv.org/abs/2507.14805"><em>Subliminal Learning</em></a>. arXiv:2507.14805.</li>
+        <li>Betley et al. (February 2025). <a href="https://arxiv.org/abs/2502.17424"><em>Emergent Misalignment</em></a>. arXiv:2502.17424.</li>
+        <li>King, Klyman, Capstick, Saade, Hsieh (September 2025). <a href="https://arxiv.org/abs/2509.05382"><em>User Privacy and Large Language Models</em></a>. arXiv:2509.05382.</li>
+        <li>Stanford HAI. <a href="https://hai.stanford.edu/policy/data-privacy-and-foundation-models-can-we-have-both"><em>Data Privacy and Foundation Models: Can We Have Both?</em></a></li>
+        <li>Stanford HAI. <a href="https://hai.stanford.edu/policy/white-paper-rethinking-privacy-ai-era-policy-provocations-data-centric-world"><em>Rethinking Privacy in the AI Era</em></a>.</li>
+      </ol>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <div class="container">
+    <p class="footer-line">Airlock Labs &middot; Detroit, MI &middot; 2026</p>
+    <p class="footer-line" style="margin-top: 8px;">
+      <a href="https://huggingface.co/datasets/AirlockLabs/constellation-bench" style="color: var(--text3); margin: 0 12px;">HuggingFace</a>
+      <a href="https://github.com/AirlockLabs" style="color: var(--text3); margin: 0 12px;">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

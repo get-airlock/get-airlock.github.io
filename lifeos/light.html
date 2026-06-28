@@ -409,7 +409,13 @@
   const DAYS = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
   function parse(text){
     if(!text || !text.trim()) return null;
-    let s = text.trim().replace(/^\s*(i\s+(have|have got|got|need|need to|should)|remind me( to)?|add|schedule|put down)\s+/i,'');
+    let s = text.trim();
+    // Intent type — so the title is concrete ("Beta Testing reminder"), not the raw snippet.
+    let kind = '';
+    if(/\balarm\b/i.test(s)) kind = 'alarm';
+    else if(/\bremind(er)?\b/i.test(s)) kind = 'reminder';
+    // Strip the command lead-in so what's left is the NOUN, not "send a reminder for ...".
+    s = s.replace(/^\s*(please\s+)?(can you\s+|could you\s+)?(set (an?\s+)?alarm( for| to)?|send( me)?( a)? reminder( for| to| about)?|set (a\s+)?reminder( for| to| about)?|remind me( to| about| for)?|reminder( for| to| about)?|alarm( for)?|i\s+(have|have got|got|need|need to|should)|add|schedule|put down)\s+/i,'');
     let day = null, dayLabel = '';
     const dm = s.match(/\b(today|tomorrow|tonight|mon|tue|tues|wed|thu|thur|thurs|fri|sat|sun|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i);
     if(dm){ const w = dm[1].toLowerCase();
@@ -427,9 +433,11 @@
       timeLabel = fmt(hm);
       s = s.replace(tm[0],'').trim();
     }
-    s = s.replace(/\b(at|on|for|the)\b\s*$/i,'').replace(/\s{2,}/g,' ').trim();
-    const title = s ? s[0].toUpperCase()+s.slice(1) : 'Something';
-    return { title, hm, day, dayLabel, timeLabel };
+    s = s.replace(/^\s*(for|to|about|at|on|the)\b\s*/i,'').replace(/\b(at|on|for|to|the)\b\s*$/i,'').replace(/\s{2,}/g,' ').trim();
+    const noun = s ? s.replace(/\b\w/g, c => c.toUpperCase()) : '';   // title-case the noun → concrete
+    let title = noun || (kind ? kind[0].toUpperCase()+kind.slice(1) : 'Something');
+    if(kind && noun && !new RegExp('\\b'+kind+'\\b','i').test(noun)) title = noun + ' ' + kind;  // "Beta Testing reminder"
+    return { title, hm, day, dayLabel, timeLabel, kind };
   }
   function fmt(hm){ if(!hm) return ''; let [h,m]=hm.split(':').map(Number); const ap=h>=12?'pm':'am'; let hh=h%12; if(hh===0)hh=12; return hh+(m?':'+String(m).padStart(2,'0'):'')+ap; }
 

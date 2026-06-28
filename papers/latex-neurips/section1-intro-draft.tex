@@ -1,0 +1,90 @@
+% Section 1 (Introduction) draft for "Beyond Web5: A Substrate Map"
+% Locked 2026-04-29; operator-revised LaTeX from canon
+% Source: project_neurips_paper_pivot_substrate_map_beyond_web5.md
+% Markdown sibling: airlock-labs-site/papers/beyond-web5-substrate-map.md
+
+\section{Introduction}
+
+The last decade of web and AI infrastructure has produced a familiar ladder:
+Web1 (read), Web2 (read--write), Web3 (own), and Web4 (inhabit, via
+substrate-resident agents) \cite{bernerslee1989,oconnor2023web4}. Recent proposals
+branded as ``Web5'' argue for an additional layer centered on decentralized
+identity and personal-server federation \cite{tbd_web5,solid_pods,ssi_survey}, but
+largely stop at architectural slogans rather than concrete, measurable systems.
+In this work we take a complementary approach: instead of debating the exact
+definition of Web5, we implement and instrument an operator-resident substrate
+that sits \emph{beyond} the conventional ladder, treating Web1--4 as input
+surfaces to a single local control shell.
+The resulting system combines seven primitives---identity, logging, behavioral
+scoring, inheritance, incentives, and federation---into a working ``operator OS''
+whose behavior we can probe empirically using a 17-persona benchmark
+(ConstellationBench) and a fully wired state service with 4/4 health, loading,
+persistence, and warm-start checks passing.
+
+\subsection{From Web5 slogans to operator-resident substrates}
+
+Most Web5 discussions to date focus on protocol proposals: decentralized
+identifiers (DIDs) and verifiable credentials \cite{w3c_did_core}, personal data
+stores and Solid pods \cite{solid_pods}, or high-level visions of ``the web of
+identity'' \cite{tbd_web5}. These lines of work are important, but they leave
+open a concrete systems question: \emph{what primitives are actually required
+to operate a real, operator-resident substrate that sits above existing web
+layers and interacts with them in practice?}
+
+We address this question empirically. Rather than specifying a new protocol
+and leaving its deployment as future work, we start from a running system used
+for day-to-day development, then factor out the primitives that proved necessary
+to make it observable, auditable, and controllable by a human operator.
+Concretely, our implementation exposes seven reusable primitives:
+\begin{enumerate}
+  \item phone-anchored decentralized identifiers (Skeet);
+  \item a biometric-gated local control shell that federates identities
+        (Spacebar v0);
+  \item signed bivector closures for event logging (BCODE);
+  \item behavioral-fidelity scoring via DECF and a 17-persona dataset
+        (ConstellationBench);
+  \item agent inheritance patterns for specialized assistants (OctoAgent);
+  \item a token-economy layer for incentives (\$MOTION with ACODE/BCODE split);
+  \item matrix-style federation transport (Matrix / bitchat).
+\end{enumerate}
+Each primitive is implemented in a real codebase, exported as an open artifact,
+and evaluated in the context of the running substrate.
+
+\subsection{ConstellationBench as an empirical lens}
+
+ConstellationBench is a 17-persona benchmark designed to measure
+behavioral fidelity of large language models along multiple DECF axes:
+directionality, explicitness, coherence, and fidelity \cite{constellationbench}.
+Rather than being the sole focus of this paper, ConstellationBench plays the
+role of an \emph{empirical lens} on the substrate: we use it to probe how
+different primitives behave when populated with real personas and real models.
+
+First, we use DECF scores across personas to quantify how consistently
+frontier models reproduce intended behavioral profiles, providing a concrete
+notion of ``behavioral fidelity'' that goes beyond aggregate task accuracy.
+Second, we instrument the substrate so that every evaluation run produces
+signed BCODE closures and serialized context, allowing us to study how
+inheritance patterns (OctoAgent) and logging interact in practice.
+The Phase-0 wiring---a state service, persona loader, session persistence, and
+warm-start behavior, with 4/4 canonical wires green and 25/26 tests passing---serves
+as our reproducibility receipt: it specifies exactly which components must be
+operational for other groups to replicate our experiments or to plug in
+alternative primitives.
+
+\subsection{Contributions}
+
+Our contributions are threefold:
+\begin{itemize}
+  \item \textbf{Substrate map.} We identify seven primitives that, in combination,
+        are sufficient to operate a working operator-resident substrate above
+        existing web layers, and we provide an architectural map showing how
+        they compose into a single local control shell.
+  \item \textbf{Empirical lens.} We use ConstellationBench as a behavioral-fidelity
+        lens on this substrate, reporting results for multiple frontier models
+        across 17 personas and analyzing how inheritance and logging primitives
+        behave under stress.
+  \item \textbf{Open artifacts.} We release the ConstellationBench dataset,
+        evaluation runtime, and core substrate components (ACODE-free) so that
+        other operator-resident systems can reuse individual primitives or
+        benchmark alternative designs against the same empirical lens.
+\end{itemize}

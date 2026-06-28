@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spacebar — Operator Console (Pilot) — Airlock Labs</title>
+<meta name="description" content="Spacebar is the operator-facing surface paired to OctoAgent / Untangler across the ACODE↔BCODE boundary. Compose intent, watch the closure compute, see the acceptance band gate enforce inline.">
+<meta property="og:title" content="Spacebar — Operator Console Pilot">
+<meta property="og:description" content="ACODE compose. BCODE untangle. 4-state commit. Closure-band stability, live.">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --otto: #7C5CFC;
+  --accent: #00D1FF;
+  --base: #0B0E14;
+  --raised: #0F1219;
+  --overlay: #151923;
+  --border: #1E2330;
+  --text: #E2E8F0;
+  --text2: #94A3B8;
+  --text3: #64748B;
+  --success: #22C55E;
+  --warning: #EAB308;
+  --error: #EF4444;
+  --frost: rgba(124, 92, 252, 0.08);
+}
+html, body { height: 100%; }
+body {
+  background:
+    radial-gradient(1100px 600px at 20% -10%, rgba(124,92,252,0.18), transparent 60%),
+    radial-gradient(900px 500px at 100% 100%, rgba(0,209,255,0.10), transparent 55%),
+    var(--base);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  overflow: hidden;
+}
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Top nav */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(11, 14, 20, 0.65); backdrop-filter: blur(24px) saturate(140%);
+  border-bottom: 1px solid var(--border); padding: 12px 0;
+}
+nav .container { display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo { width: 26px; height: 26px; background: linear-gradient(135deg, var(--otto), var(--accent)); border-radius: 6px; }
+.nav-title { font-weight: 800; font-size: 14px; letter-spacing: -0.5px; color: var(--text); }
+.nav-kicker { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); margin-left: 12px; padding: 3px 8px; border: 1px solid var(--accent); border-radius: 4px; }
+.nav-meta { display: flex; gap: 18px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text2); align-items: center; }
+.nav-meta .pill { padding: 3px 8px; background: var(--overlay); border: 1px solid var(--border); border-radius: 4px; }
+.nav-meta .pill .ok { color: var(--success); }
+
+/* 3-pane shell */
+.shell {
+  position: fixed; top: 56px; left: 0; right: 0; bottom: 0;
+  display: grid; grid-template-columns: 320px 1fr 380px;
+  gap: 14px; padding: 14px;
+}
+.pane {
+  background: linear-gradient(180deg, rgba(15,18,25,0.88) 0%, rgba(11,14,20,0.88) 100%);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  backdrop-filter: blur(18px) saturate(140%);
+  display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.pane-head {
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.pane-head h2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--accent); font-weight: 600;
+}
+.pane-head .side {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--text3); padding: 2px 6px; border: 1px solid var(--border); border-radius: 3px;
+}
+.pane-body { flex: 1; overflow-y: auto; padding: 14px 16px; }
+.pane-body::-webkit-scrollbar { width: 6px; }
+.pane-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Left pane — Pushover */
+.notif {
+  padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--raised); margin-bottom: 8px;
+  font-size: 12px; color: var(--text2);
+}
+.notif .src { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--otto); margin-bottom: 4px; letter-spacing: 1px; text-transform: uppercase; }
+.notif .body { color: var(--text); margin-bottom: 4px; line-height: 1.5; }
+.notif .ts { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3); }
+
+/* Center pane — Compose + Untangler */
+.compose-wrap { padding: 16px 20px; flex: 1; overflow-y: auto; }
+.compose-wrap::-webkit-scrollbar { width: 6px; }
+.compose-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.persona-row {
+  display: flex; gap: 10px; margin-bottom: 12px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+}
+.persona-row .field { flex: 1; padding: 8px 10px; background: var(--overlay); border: 1px solid var(--border); border-radius: 4px; }
+.persona-row .field label { display: block; color: var(--text3); font-size: 9px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+.persona-row .field .val { color: var(--text); font-weight: 600; }
+.persona-row .field select {
+  background: transparent; border: none; color: var(--text); font-family: inherit;
+  font-size: 11px; font-weight: 600; cursor: pointer; outline: none; padding: 0; width: 100%;
+}
+.persona-row .field select option { background: var(--overlay); }
+
+textarea#intent {
+  width: 100%; min-height: 140px; padding: 14px 16px;
+  background: var(--overlay); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6;
+  resize: vertical; outline: none; transition: border-color 0.2s;
+}
+textarea#intent:focus { border-color: var(--otto); }
+
+.compose-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3);
+}
+.compose-meta .preview { color: var(--accent); }
+
+button.submit {
+  margin-top: 14px; width: 100%; padding: 14px;
+  background: linear-gradient(135deg, var(--otto), var(--accent));
+  border: none; color: white; border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+button.submit:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(124,92,252,0.4); }
+button.submit:active { transform: translateY(0); }
+button.submit:disabled { opacity: 0.5; cursor: wait; }
+
+/* Untangler stage */
+.untangler {
+  margin-top: 22px; padding: 18px; border: 1px solid var(--border); border-radius: 8px;
+  background: linear-gradient(180deg, rgba(124,92,252,0.05), transparent);
+  position: relative; overflow: hidden; min-height: 120px;
+}
+.untangler-head {
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--text2); text-transform: uppercase; letter-spacing: 1.5px;
+  margin-bottom: 14px;
+}
+.untangler-head .status { padding: 3px 8px; border-radius: 3px; border: 1px solid var(--border); font-size: 10px; }
+.status.idle { color: var(--text3); }
+.status.computing { color: var(--accent); border-color: var(--accent); animation: pulse 1.2s infinite; }
+.status.accepted { color: var(--success); border-color: var(--success); background: rgba(34,197,94,0.08); }
+.status.rejected { color: var(--error); border-color: var(--error); background: rgba(239,68,68,0.08); }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+.closure-formula {
+  font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  text-align: center; padding: 12px; background: var(--overlay); border-radius: 6px;
+  color: var(--text2); margin-bottom: 14px;
+}
+.closure-formula .var { color: var(--accent); font-weight: 600; }
+
+/* 8+1 OctoConductor arm legend */
+.octo-head {
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--text3); margin-bottom: 8px;
+  padding: 6px 10px; background: var(--base); border: 1px dashed var(--border); border-radius: 4px;
+}
+.octo-head .label { letter-spacing: 1px; text-transform: uppercase; }
+.octo-head .ladder { color: var(--otto); font-weight: 600; }
+.octo-head .ladder .step { color: var(--text3); }
+.octo-head .ladder .step.active { color: var(--accent); }
+
+.arms {
+  display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px;
+  margin-bottom: 14px;
+}
+.arm {
+  position: relative; padding: 8px 4px 6px; background: var(--overlay);
+  border: 1px solid var(--border); border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace; text-align: center;
+  transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
+  overflow: hidden; cursor: help;
+}
+.arm .num {
+  font-size: 9px; color: var(--text3); letter-spacing: 1px;
+  display: block; margin-bottom: 3px;
+}
+.arm .nm {
+  font-size: 9px; color: var(--text); font-weight: 600;
+  display: block; line-height: 1.1; min-height: 22px;
+}
+.arm .bar {
+  position: absolute; bottom: 0; left: 0; height: 2px;
+  background: var(--accent); width: 0%; transition: width 0.6s cubic-bezier(.2,.8,.2,1);
+}
+.arm.lit { background: rgba(0,209,255,0.05); border-color: var(--accent); }
+.arm.lit .nm { color: var(--accent); }
+.arm[data-arm="7"] { border-left: 2px solid var(--otto); }  /* arm 7 = phase-1 dispatch substrate */
+.arm[data-arm="3"] { border-left: 2px solid var(--accent); } /* arm 3 = ShaderC = provenance twin */
+.arm[data-arm="1"] { border-left: 2px solid var(--success); } /* arm 1 = Redrield = Spacebar twin */
+
+.norm-display {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 12px;
+}
+.norm-bar {
+  flex: 1; height: 8px; background: var(--overlay); border-radius: 4px;
+  position: relative; overflow: hidden; border: 1px solid var(--border);
+}
+.norm-fill {
+  height: 100%; background: linear-gradient(90deg, var(--success), var(--warning), var(--error));
+  width: 0%; transition: width 0.6s cubic-bezier(.2,.8,.2,1);
+  border-radius: 4px;
+}
+.norm-threshold {
+  position: absolute; top: -4px; height: 16px; width: 2px;
+  background: var(--text); border-radius: 1px;
+  box-shadow: 0 0 6px rgba(255,255,255,0.5);
+}
+.norm-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text2);
+  min-width: 120px; text-align: right;
+}
+.norm-label .val { color: var(--text); font-weight: 600; }
+
+.threshold-row {
+  display: flex; align-items: center; gap: 12px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3);
+  margin-bottom: 12px;
+}
+.threshold-row input[type=range] { flex: 1; accent-color: var(--accent); }
+.threshold-row .label { min-width: 130px; }
+.threshold-row .val { color: var(--accent); min-width: 50px; }
+
+.closure-detail {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text2);
+  padding: 10px 12px; background: var(--base); border-radius: 4px; border: 1px solid var(--border);
+  white-space: pre-wrap; line-height: 1.6;
+}
+.closure-detail .k { color: var(--otto); }
+.closure-detail .v { color: var(--text); }
+.closure-detail .ok { color: var(--success); }
+.closure-detail .err { color: var(--error); }
+
+/* 4-state commit */
+.commit-row {
+  margin-top: 18px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+}
+.commit-row button {
+  padding: 12px 8px; border: 1px solid var(--border); background: var(--raised);
+  color: var(--text2); border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  transition: all 0.15s;
+}
+.commit-row button:hover:not(:disabled) { color: var(--text); border-color: var(--otto); background: var(--overlay); }
+.commit-row button:disabled { opacity: 0.3; cursor: not-allowed; }
+.commit-row button[data-action=yes] { border-left: 3px solid var(--success); }
+.commit-row button[data-action=yes-allow] { border-left: 3px solid var(--accent); }
+.commit-row button[data-action=no-wait] { border-left: 3px solid var(--warning); }
+.commit-row button[data-action=insert] { border-left: 3px solid var(--otto); }
+
+/* Right pane — BCODE ledger */
+.ledger-entry {
+  padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--raised); margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+}
+.ledger-entry .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.ledger-entry .id { color: var(--accent); font-weight: 600; }
+.ledger-entry .ts { color: var(--text3); font-size: 10px; }
+.ledger-entry .body { color: var(--text2); margin: 4px 0; }
+.ledger-entry .footer { display: flex; justify-content: space-between; font-size: 10px; color: var(--text3); margin-top: 4px; }
+.ledger-entry .norm { color: var(--text); }
+.ledger-entry.accepted { border-left: 3px solid var(--success); }
+.ledger-entry.rejected { border-left: 3px solid var(--error); }
+.ledger-entry .verdict.ok { color: var(--success); }
+.ledger-entry .verdict.err { color: var(--error); }
+
+.empty {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3);
+  text-align: center; padding: 24px 0; line-height: 1.7;
+}
+
+/* Footer hint */
+.boundary-hint {
+  position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3);
+  padding: 6px 14px; background: rgba(15,18,25,0.85); border: 1px solid var(--border);
+  border-radius: 20px; backdrop-filter: blur(12px);
+  letter-spacing: 1.5px; pointer-events: none;
+}
+.boundary-hint .b { color: var(--accent); }
+.boundary-hint .a { color: var(--otto); }
+
+/* Responsive collapse */
+@media (max-width: 1100px) {
+  .shell { grid-template-columns: 280px 1fr; }
+  .pane.right { display: none; }
+}
+@media (max-width: 800px) {
+  .shell { grid-template-columns: 1fr; padding: 8px; gap: 8px; }
+  .pane.left { display: none; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="/" class="nav-brand">
+      <div class="nav-logo"></div>
+      <div class="nav-title">Airlock Labs</div>
+      <span class="nav-kicker">Spacebar · Pilot</span>
+    </a>
+    <div class="nav-meta">
+      <span class="pill">DID <span class="ok">verified</span></span>
+      <span class="pill">Untangler <span id="gateState" class="ok">live</span></span>
+      <span class="pill" id="closureCount">closures · 0</span>
+    </div>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- LEFT — Pushover / inbound -->
+  <section class="pane left">
+    <div class="pane-head">
+      <h2>Inbound · Pushover</h2>
+      <span class="side">ACODE</span>
+    </div>
+    <div class="pane-body" id="notifList">
+      <div class="notif">
+        <div class="src">Argus · OSINT</div>
+        <div class="body">Three new mentions of "BCODE" on Hacker News. Sentiment: positive. No claim conflict.</div>
+        <div class="ts">2026-04-30 09:14</div>
+      </div>
+      <div class="notif">
+        <div class="src">PSA · Carrier</div>
+        <div class="body">Skeet keyring rotation completed for did:sonr:zac. New burner email allocated.</div>
+        <div class="ts">2026-04-30 08:52</div>
+      </div>
+      <div class="notif">
+        <div class="src">ConstellationBench</div>
+        <div class="body">Run #47 finished. 17 personas × 22 models. Mean fidelity Δ = +0.034 vs baseline.</div>
+        <div class="ts">2026-04-30 07:31</div>
+      </div>
+      <div class="notif">
+        <div class="src">BCODE · Audit</div>
+        <div class="body">Closure ledger size: 14,832 entries. 0 rejections in last 24h. Band stable.</div>
+        <div class="ts">2026-04-30 06:00</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CENTER — Compose + Untangler -->
+  <section class="pane center">
+    <div class="pane-head">
+      <h2>Compose &nbsp;→&nbsp; Untangle &nbsp;→&nbsp; Commit</h2>
+      <span class="side">ACODE → BCODE → ACODE</span>
+    </div>
+    <div class="compose-wrap">
+
+      <div class="persona-row">
+        <div class="field">
+          <label>persona</label>
+          <select id="persona">
+            <option value="zac:sovereign">zac · sovereign</option>
+            <option value="agent:lokey">agent · lokey</option>
+            <option value="agent:argus">agent · argus</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>model (L)</label>
+          <select id="model">
+            <option value="opus-4-7">opus-4-7</option>
+            <option value="sonnet-4-6">sonnet-4-6</option>
+            <option value="haiku-4-5">haiku-4-5</option>
+            <option value="qwen-3-6-27b">qwen-3-6-27b</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>chamber</label>
+          <select id="chamber">
+            <option value="standard">standard</option>
+            <option value="control">control · strict</option>
+            <option value="explore">explore · loose</option>
+          </select>
+        </div>
+      </div>
+
+      <textarea id="intent" placeholder="Describe what you want OctoAgent to do…&#10;&#10;e.g. &quot;Draft a follow-up to Sarim with the PSA-Core integration plan and ship to Resend.&quot;"></textarea>
+
+      <div class="compose-meta">
+        <span><span class="preview" id="charCount">0</span> chars · provenance block <span class="preview">attached</span></span>
+        <span class="mono">PACTEnvelope ready</span>
+      </div>
+
+      <button class="submit" id="submitBtn">Submit · Run Untangler</button>
+
+      <!-- Untangler stage -->
+      <div class="untangler" id="untangler">
+        <div class="untangler-head">
+          <span>OctoAgent · Untangler · BCODE</span>
+          <span class="status idle" id="status">idle</span>
+        </div>
+
+        <div class="closure-formula">
+          <span class="var">C</span> = <span class="var">P</span> ∧ <span class="var">L</span> ⊕ <span class="var">R</span> ⊕ <span class="var">W</span>
+        </div>
+
+        <div class="octo-head">
+          <span class="label">head · conductor-framework <span style="color:var(--error)">(Selenium-2 broken)</span></span>
+          <span class="ladder">ladder <span class="step">1</span>·<span class="step active">2</span>·<span class="step">3</span>·<span class="step">4</span></span>
+        </div>
+
+        <div class="arms" id="arms" title="OctoConductor — 8 arms, each contributing one channel of the response-distributed fidelity vector R">
+          <div class="arm" data-arm="1" title="Redrield/Conductor — Rust+React FRC driver station · Spacebar's twin"><span class="num">1</span><span class="nm">Redrield</span><div class="bar"></div></div>
+          <div class="arm" data-arm="2" title="jshvarts/ConductorMVP — Kotlin clean-architecture MVP template"><span class="num">2</span><span class="nm">jshvarts</span><div class="bar"></div></div>
+          <div class="arm" data-arm="3" title="microsoft/ShaderConductor — HLSL→multi cross-compile · Provenance Filter twin"><span class="num">3</span><span class="nm">ShaderC</span><div class="bar"></div></div>
+          <div class="arm" data-arm="4" title="danielgerlag/conductor — C# distributed workflow server"><span class="num">4</span><span class="nm">danielg</span><div class="bar"></div></div>
+          <div class="arm" data-arm="5" title="gemini-cli-extensions/conductor — AI-CLI orchestration"><span class="num">5</span><span class="nm">gemini</span><div class="bar"></div></div>
+          <div class="arm" data-arm="6" title="bluelinelabs/Conductor — Android view-stack pattern"><span class="num">6</span><span class="nm">blueline</span><div class="bar"></div></div>
+          <div class="arm" data-arm="7" title="conductor-oss/conductor — Orkes enterprise event-driven · Phase-1 dispatch"><span class="num">7</span><span class="nm">orkes</span><div class="bar"></div></div>
+          <div class="arm" data-arm="8" title="Netflix/conductor — origin seed (archived)"><span class="num">8</span><span class="nm">Netflix</span><div class="bar"></div></div>
+        </div>
+
+        <div class="norm-display">
+          <div class="norm-bar">
+            <div class="norm-fill" id="normFill"></div>
+            <div class="norm-threshold" id="normThresh" style="left: 70%;"></div>
+          </div>
+          <div class="norm-label">‖C‖<sub>F</sub> = <span class="val" id="normVal">—</span></div>
+        </div>
+
+        <div class="threshold-row">
+          <span class="label">acceptance band d</span>
+          <input type="range" id="thresh" min="20" max="95" value="70">
+          <span class="val mono" id="threshVal">0.70</span>
+        </div>
+
+        <pre class="closure-detail" id="detail">awaiting submit…
+P  = [—, —, —, —]
+L  = [—, —, —, —]   sha256: —
+R  = [—, —, —, —]   8-arm fidelity vector
+W  = [—, —, —, —]   rolling history
+C  = (idle)
+verdict = —</pre>
+
+        <div class="commit-row">
+          <button data-action="yes" disabled>Yes</button>
+          <button data-action="yes-allow" disabled>Yes · Allow</button>
+          <button data-action="no-wait" disabled>No · Wait</button>
+          <button data-action="insert" disabled>Insert Task</button>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- RIGHT — BCODE ledger -->
+  <section class="pane right">
+    <div class="pane-head">
+      <h2>BCODE · Closure Ledger</h2>
+      <span class="side">audit</span>
+    </div>
+    <div class="pane-body" id="ledger">
+      <div class="empty">
+        no closures yet · submit an intent to populate the audit chain
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="boundary-hint">
+  <span class="a">ACODE</span> &nbsp;⇆&nbsp; provenance filter &nbsp;⇆&nbsp; <span class="b">BCODE</span>
+</div>
+
+<script>
+// --- Mocked OctoAgent / Untangler ----------------------------------------
+// Real wiring is BCODE Rust side (post-MVP). Pilot uses deterministic JS
+// so the operator can feel the closure-band stability mechanic end-to-end.
+
+const PERSONA_VECS = {
+  'zac:sovereign':  [0.92, 0.18, 0.74, 0.31],
+  'agent:lokey':    [0.41, 0.88, 0.22, 0.65],
+  'agent:argus':    [0.55, 0.12, 0.91, 0.28],
+};
+
+// Fixed model fingerprints (sha256-derived in real impl; static here)
+const MODEL_VECS = {
+  'opus-4-7':     [0.81, 0.34, 0.62, 0.45],
+  'sonnet-4-6':   [0.72, 0.41, 0.58, 0.39],
+  'haiku-4-5':    [0.55, 0.62, 0.41, 0.33],
+  'qwen-3-6-27b': [0.48, 0.29, 0.71, 0.52],
+};
+
+// Rolling history vector W — mock starts neutral, drifts with each accept
+let W = [0.50, 0.50, 0.50, 0.50];
+
+// FNV-style stable hash for deterministic R from text
+function hashText(s) {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h;
+}
+// Holds the most recent raw 8-arm vector for legend lighting + detail pane
+let lastArms = null;
+
+function rFromIntent(text) {
+  const h = hashText(text || ' ');
+  // 8-arm fidelity vector → projected to 4 for the closure
+  const arms = [];
+  let x = h;
+  for (let i = 0; i < 8; i++) {
+    x = (Math.imul(x, 1664525) + 1013904223) >>> 0;
+    arms.push((x % 1000) / 1000);
+  }
+  lastArms = arms;
+  // pair-fold 8 arms → 4 components (octo arms aggregating into R)
+  return [
+    (arms[0] + arms[4]) / 2,
+    (arms[1] + arms[5]) / 2,
+    (arms[2] + arms[6]) / 2,
+    (arms[3] + arms[7]) / 2,
+  ];
+}
+
+// Light up the 8-arm legend with current contribution magnitudes
+function paintArms(arms) {
+  const cells = document.querySelectorAll('.arm');
+  cells.forEach((cell, i) => {
+    const v = arms[i] || 0;
+    const bar = cell.querySelector('.bar');
+    bar.style.width = (v * 100).toFixed(0) + '%';
+    if (v > 0.55) cell.classList.add('lit');
+    else cell.classList.remove('lit');
+  });
+}
+function clearArms() {
+  document.querySelectorAll('.arm').forEach(c => {
+    c.classList.remove('lit');
+    c.querySelector('.bar').style.width = '0%';
+  });
+}
+
+// Wedge-style binding (P ∧ L) → bivector magnitudes per pair
+function wedge(P, L) {
+  // grade-2 components (4 choose 2 = 6)
+  const w = [];
+  for (let i = 0; i < 4; i++)
+    for (let j = i + 1; j < 4; j++)
+      w.push(P[i] * L[j] - P[j] * L[i]);
+  return w; // length 6
+}
+
+// XOR-style composition (real impl: signed wedge fold; pilot: weighted blend)
+function compose(wedgeBivec, R, Wv) {
+  // map R and W back into bivector grade by simple anti-symmetric fold
+  const rB = [
+    R[0]*Wv[1] - R[1]*Wv[0],
+    R[0]*Wv[2] - R[2]*Wv[0],
+    R[0]*Wv[3] - R[3]*Wv[0],
+    R[1]*Wv[2] - R[2]*Wv[1],
+    R[1]*Wv[3] - R[3]*Wv[1],
+    R[2]*Wv[3] - R[3]*Wv[2],
+  ];
+  return wedgeBivec.map((v, i) => v + rB[i] * 0.6);
+}
+
+// Frobenius norm on grade-2 part
+function frobenius(bivec) {
+  return Math.sqrt(bivec.reduce((s, v) => s + v * v, 0));
+}
+
+// --- UI wiring -----------------------------------------------------------
+
+const intentEl = document.getElementById('intent');
+const charCountEl = document.getElementById('charCount');
+const submitBtn = document.getElementById('submitBtn');
+const statusEl = document.getElementById('status');
+const normFillEl = document.getElementById('normFill');
+const normValEl = document.getElementById('normVal');
+const normThreshEl = document.getElementById('normThresh');
+const threshEl = document.getElementById('thresh');
+const threshValEl = document.getElementById('threshVal');
+const detailEl = document.getElementById('detail');
+const ledgerEl = document.getElementById('ledger');
+const closureCountEl = document.getElementById('closureCount');
+const personaEl = document.getElementById('persona');
+const modelEl = document.getElementById('model');
+const chamberEl = document.getElementById('chamber');
+const commitBtns = document.querySelectorAll('.commit-row button');
+
+let lastClosure = null;
+let closureN = 0;
+
+intentEl.addEventListener('input', () => {
+  charCountEl.textContent = intentEl.value.length;
+});
+
+threshEl.addEventListener('input', () => {
+  const d = parseInt(threshEl.value) / 100;
+  threshValEl.textContent = d.toFixed(2);
+  // band visual: position threshold marker on bar (max norm visualized = 1.5)
+  const pct = (d / 1.5) * 100;
+  normThreshEl.style.left = pct + '%';
+});
+
+// Chamber overrides — Control tightens d, Explore loosens
+chamberEl.addEventListener('change', () => {
+  if (chamberEl.value === 'control') threshEl.value = '40';
+  else if (chamberEl.value === 'explore') threshEl.value = '90';
+  else threshEl.value = '70';
+  threshEl.dispatchEvent(new Event('input'));
+});
+
+function setStatus(s, label) {
+  statusEl.className = 'status ' + s;
+  statusEl.textContent = label;
+}
+
+function fmt(arr, p = 3) {
+  return '[' + arr.map(v => v.toFixed(p)).join(', ') + ']';
+}
+
+submitBtn.addEventListener('click', async () => {
+  const text = intentEl.value.trim();
+  if (!text) {
+    intentEl.focus();
+    return;
+  }
+
+  submitBtn.disabled = true;
+  commitBtns.forEach(b => b.disabled = true);
+  setStatus('computing', 'computing closure…');
+
+  // Animate compute (perceptible latency = honest "the math is happening" beat)
+  await new Promise(r => setTimeout(r, 650));
+
+  const P = PERSONA_VECS[personaEl.value];
+  const L = MODEL_VECS[modelEl.value];
+  const R = rFromIntent(text);
+  const wedgePL = wedge(P, L);
+  const C = compose(wedgePL, R, W);
+  const norm = frobenius(C);
+  const d = parseInt(threshEl.value) / 100;
+  const accepted = norm <= d;
+
+  // Norm bar fill (cap visual at 1.5)
+  const pct = Math.min(norm / 1.5, 1) * 100;
+  normFillEl.style.width = pct + '%';
+  normValEl.textContent = norm.toFixed(4);
+
+  paintArms(lastArms);
+
+  const armNames = ['Redrield','jshvarts','ShaderC','danielg','gemini','blueline','orkes','Netflix'];
+  const armsLine = lastArms.map((v,i)=>`${armNames[i]}=${v.toFixed(2)}`).join(' ');
+
+  detailEl.innerHTML = `<span class="k">P</span>  = <span class="v">${fmt(P)}</span>   ${personaEl.value}
+<span class="k">L</span>  = <span class="v">${fmt(L)}</span>   ${modelEl.value}
+<span class="k">arms</span> = <span class="v">${armsLine}</span>
+<span class="k">R</span>  = <span class="v">${fmt(R)}</span>   (8→4 fold)
+<span class="k">W</span>  = <span class="v">${fmt(W)}</span>   rolling history
+<span class="k">C</span>  = <span class="v">${fmt(C, 2)}</span>   (grade-2)
+<span class="k">‖C‖</span><span class="k">F</span> = <span class="v">${norm.toFixed(4)}</span>  threshold d = ${d.toFixed(2)}
+<span class="k">verdict</span> = ${accepted ? '<span class="ok">ACCEPTED</span>' : '<span class="err">REJECTED · closure_status = blocked</span>'}`;
+
+  if (accepted) {
+    setStatus('accepted', 'accepted · closure within band');
+    commitBtns.forEach(b => b.disabled = false);
+  } else {
+    setStatus('rejected', 'rejected · closure exits band');
+    // Blast door — flash the untangler red
+    const u = document.getElementById('untangler');
+    u.style.boxShadow = '0 0 0 1px var(--error), 0 0 40px rgba(239,68,68,0.3) inset';
+    setTimeout(() => { u.style.boxShadow = ''; }, 1400);
+  }
+
+  // Append to ledger
+  closureN++;
+  closureCountEl.textContent = `closures · ${closureN}`;
+  const entry = document.createElement('div');
+  entry.className = 'ledger-entry ' + (accepted ? 'accepted' : 'rejected');
+  const id = 'C' + Date.now().toString(36).slice(-6).toUpperCase();
+  const ts = new Date().toTimeString().slice(0, 8);
+  entry.innerHTML = `
+    <div class="top"><span class="id">${id}</span><span class="ts">${ts}</span></div>
+    <div class="body">${text.length > 80 ? text.slice(0, 77) + '…' : text}</div>
+    <div class="footer">
+      <span>${personaEl.value} · ${modelEl.value}</span>
+      <span class="norm">‖C‖<sub>F</sub> = ${norm.toFixed(3)} · <span class="verdict ${accepted ? 'ok' : 'err'}">${accepted ? 'ACCEPT' : 'BLOCK'}</span></span>
+    </div>`;
+  // Replace empty state on first entry
+  const emp = ledgerEl.querySelector('.empty');
+  if (emp) emp.remove();
+  ledgerEl.insertBefore(entry, ledgerEl.firstChild);
+
+  lastClosure = { P, L, R, W: [...W], C, norm, accepted, text, id };
+  submitBtn.disabled = false;
+});
+
+// 4-state commit handlers — drift W only on Yes / Yes-Allow (rolling history advances)
+commitBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const action = btn.dataset.action;
+    if (!lastClosure) return;
+    if (action === 'yes' || action === 'yes-allow') {
+      // Drift W toward latest R (rolling history update)
+      const newR = lastClosure.R;
+      W = W.map((w, i) => w * 0.85 + newR[i] * 0.15);
+    }
+    // Append commit-decision to ledger
+    closureN++;
+    closureCountEl.textContent = `closures · ${closureN}`;
+    const entry = document.createElement('div');
+    entry.className = 'ledger-entry accepted';
+    entry.style.borderLeftColor = action === 'no-wait' ? 'var(--warning)' : action === 'insert' ? 'var(--otto)' : 'var(--success)';
+    const id = lastClosure.id + '·' + action.toUpperCase().replace('-', '');
+    const ts = new Date().toTimeString().slice(0, 8);
+    entry.innerHTML = `
+      <div class="top"><span class="id">${id}</span><span class="ts">${ts}</span></div>
+      <div class="body">commit · ${action.replace('-', ' ')}</div>
+      <div class="footer"><span>operator decision</span><span class="norm">W drifted</span></div>`;
+    ledgerEl.insertBefore(entry, ledgerEl.firstChild);
+    commitBtns.forEach(b => b.disabled = true);
+    setStatus('idle', 'idle · awaiting next intent');
+    intentEl.value = '';
+    charCountEl.textContent = '0';
+    clearArms();
+  });
+});
+
+// Initial threshold render
+threshEl.dispatchEvent(new Event('input'));
+</script>
+
+</body>
+</html>

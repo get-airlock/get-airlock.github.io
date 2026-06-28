@@ -1,0 +1,7 @@
+Criteria,Self-Hosted Plaintext,TEE (e.g., SGX/Confidential VMs),Hybrid MPC (KV-focused),Pure FHE/MPC
+Latency (TTFT <1s?),Excellent (baseline),Good (<20% overhead),Poor (10-100x),Fantasy (>1M x)
+Privacy Guarantee,None (your infra),Strong (hardware isolation),Very strong (distributed),Theoretical max
+Cost/M Tokens,$0.001-0.04 (on-prem),+10-50% cloud,High comms (unquantified),Prohibitive
+Scale (QPS),High (GPU clusters),Medium,Low,None
+Moat Fit,Sovereignty/low ops,Regulated (HIPAA/GDPR),Research/partners,2028+ hype
+Score Example (High-scale product; med privacy),22/25,19/25,12/25,5/25

@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meta Open-Sourced the Blueprint to Mind Control — Airlock Labs</title>
+<meta name="description" content="Meta's TRIBE v2 predicts human brain activity from any video, audio, or text stimulus. It's open-source. It trained on 720 brains. We ran the DAG from MKUltra (1953) to the model you can download right now.">
+<meta property="og:title" content="Meta Open-Sourced the Blueprint to Mind Control">
+<meta property="og:description" content="They called it the TRImodal Brain Encoder. 720 human brains. Open weights on HuggingFace. No ethics review. Here's every documented edge in the lineage — from MKUltra to your laptop.">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Meta Open-Sourced the Blueprint to Mind Control">
+<meta name="twitter:description" content="The TRImodal Brain Encoder. Open weights. 720 brains. Nobody is making the connection. We ran the DAG.">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --otto: #7C5CFC;
+  --accent: #00D1FF;
+  --base: #0B0E14;
+  --raised: #0F1219;
+  --overlay: #151923;
+  --border: #1E2330;
+  --text: #E2E8F0;
+  --text2: #94A3B8;
+  --text3: #64748B;
+  --success: #22C55E;
+  --warning: #EAB308;
+  --error: #EF4444;
+  --proven: #22C55E;
+  --documented: #EAB308;
+  --circumstantial: #94A3B8;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--base); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 16px; line-height: 1.8; overflow-x: hidden; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Nav */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(11, 14, 20, 0.92); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border); padding: 14px 0;
+}
+nav .container { display: flex; align-items: center; justify-content: space-between; }
+.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo { width: 28px; height: 28px; background: linear-gradient(135deg, var(--otto), var(--accent)); border-radius: 6px; }
+.nav-title { font-weight: 800; font-size: 15px; letter-spacing: -0.5px; color: var(--text); }
+.nav-links { display: flex; gap: 20px; }
+.nav-links a { color: var(--text2); font-size: 13px; font-weight: 500; text-decoration: none; }
+.nav-links a:hover { color: var(--text); }
+
+/* Layout */
+.container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+.article-container { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Article header */
+.article-header {
+  padding: 140px 0 60px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 48px;
+}
+.article-kicker {
+  display: inline-block; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--error); margin-bottom: 20px;
+}
+.article-header h1 {
+  font-size: 42px; font-weight: 900; letter-spacing: -2px; line-height: 1.08;
+  color: var(--text); margin-bottom: 20px;
+}
+.article-header .subtitle {
+  font-size: 18px; color: var(--text2); line-height: 1.6; max-width: 640px;
+}
+.article-meta {
+  margin-top: 24px; font-size: 13px; color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Article body */
+.article-body h2 {
+  font-size: 26px; font-weight: 800; letter-spacing: -1px;
+  margin: 56px 0 18px; color: var(--text);
+}
+.article-body h3 {
+  font-size: 18px; font-weight: 700; letter-spacing: -0.5px;
+  margin: 36px 0 12px; color: var(--text);
+}
+.article-body p {
+  margin-bottom: 20px; color: var(--text2); font-size: 16px; line-height: 1.8;
+}
+.article-body strong { color: var(--text); font-weight: 600; }
+.article-body em { color: var(--text2); }
+.article-body ul, .article-body ol { margin: 0 0 24px 24px; }
+.article-body li { margin-bottom: 8px; color: var(--text2); line-height: 1.7; }
+.article-body li strong { color: var(--text); }
+
+/* The Rule box (Argus-style) */
+.rule-box {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--raised);
+  padding: 28px 32px;
+  margin: 36px 0 48px;
+}
+.rule-box .rule-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 14px;
+}
+.rule-box p {
+  font-size: 15px; color: var(--text); margin-bottom: 14px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.rule-box p:last-child { margin-bottom: 0; }
+.rule-box .rule-tags {
+  margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  color: var(--text2); line-height: 1.9;
+}
+
+/* Confidence tags */
+.tag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 3px 8px; border-radius: 4px;
+  margin-right: 6px; vertical-align: middle;
+}
+.tag-proven { background: rgba(34,197,94,0.12); color: var(--proven); border: 1px solid rgba(34,197,94,0.3); }
+.tag-documented { background: rgba(234,179,8,0.12); color: var(--documented); border: 1px solid rgba(234,179,8,0.3); }
+.tag-circumstantial { background: rgba(148,163,184,0.12); color: var(--circumstantial); border: 1px solid rgba(148,163,184,0.3); }
+.tag-negative { background: rgba(239,68,68,0.08); color: var(--error); border: 1px solid rgba(239,68,68,0.25); }
+
+/* Blockquote */
+.article-body blockquote {
+  border-left: 3px solid var(--otto);
+  padding: 18px 26px;
+  margin: 28px 0;
+  background: rgba(124, 92, 252, 0.04);
+  border-radius: 0 8px 8px 0;
+}
+.article-body blockquote p {
+  color: var(--text); font-size: 15px; line-height: 1.7;
+  margin-bottom: 8px;
+}
+.article-body blockquote p:last-child { margin-bottom: 0; }
+
+/* DAG Timeline */
+.dag-wrapper {
+  margin: 40px 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.dag-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 120px;
+  gap: 16px;
+  padding: 18px 24px;
+  border-bottom: 1px solid rgba(30,35,48,0.5);
+  align-items: start;
+}
+.dag-row:last-child { border-bottom: none; }
+.dag-row:nth-child(odd) { background: rgba(15,18,25,0.5); }
+.dag-year {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 700; color: var(--accent);
+  letter-spacing: 0.5px;
+}
+.dag-event {
+  color: var(--text); font-size: 14px; line-height: 1.6;
+}
+.dag-event strong { color: var(--text); font-weight: 700; }
+.dag-event em { color: var(--text2); font-size: 13px; display: block; margin-top: 4px; }
+.dag-tag {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+}
+
+/* Fact table */
+.fact-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 28px 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 14px;
+}
+.fact-table th {
+  background: var(--raised);
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border);
+}
+.fact-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(30,35,48,0.5);
+  color: var(--text2);
+  vertical-align: top;
+}
+.fact-table td strong { color: var(--text); }
+.fact-table tr:last-child td { border-bottom: none; }
+.fact-table tr:nth-child(even) { background: rgba(15,18,25,0.4); }
+
+/* Separator */
+.section-break {
+  border: none; border-top: 1px solid var(--border);
+  margin: 56px 0;
+}
+
+/* Method box */
+.method-box {
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin: 36px 0;
+}
+.method-box .method-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--otto); margin-bottom: 16px;
+}
+.method-box p { font-size: 14px; margin-bottom: 12px; }
+.method-box ul { padding-left: 20px; margin-bottom: 12px; }
+.method-box li { font-size: 14px; color: var(--text2); margin-bottom: 6px; }
+.method-box li strong { color: var(--text); }
+
+/* Citation */
+.cite {
+  display: inline;
+  font-size: 12px;
+  color: var(--text3);
+  font-family: 'JetBrains Mono', monospace;
+}
+.cite a { color: var(--text3); }
+.cite a:hover { color: var(--accent); }
+
+/* Hero callout — for thesis lines that need to land */
+.hero-callout {
+  margin: 64px -40px;
+  padding: 56px 48px;
+  background: linear-gradient(135deg, rgba(124,92,252,0.08), rgba(0,209,255,0.04));
+  border-top: 1px solid rgba(124,92,252,0.3);
+  border-bottom: 1px solid rgba(124,92,252,0.3);
+  text-align: center;
+}
+.hero-callout p {
+  font-size: 32px; font-weight: 800; letter-spacing: -1px; line-height: 1.25;
+  color: var(--text); margin: 0; max-width: 720px; margin-left: auto; margin-right: auto;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.hero-callout p em { color: var(--accent); font-style: normal; font-weight: 900; }
+@media (max-width: 768px) {
+  .hero-callout { margin: 40px -16px; padding: 36px 24px; }
+  .hero-callout p { font-size: 22px; }
+}
+
+/* Opening hook — the "you didn't hear about this" lead */
+.hook-lead {
+  margin: 0 0 40px;
+  padding: 0;
+}
+.hook-lead p {
+  font-size: 20px; font-weight: 500; line-height: 1.55;
+  color: var(--text); margin-bottom: 16px;
+}
+.hook-lead p:first-child {
+  font-size: 24px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.35;
+  color: var(--text);
+}
+.hook-lead p strong { color: var(--text); font-weight: 800; }
+@media (max-width: 768px) {
+  .hook-lead p:first-child { font-size: 20px; }
+  .hook-lead p { font-size: 17px; }
+}
+
+/* CTA */
+.article-cta {
+  background: linear-gradient(135deg, rgba(124,92,252,0.08), rgba(0,209,255,0.04));
+  border: 1px solid rgba(124,92,252,0.2);
+  border-radius: 16px;
+  padding: 44px; text-align: center;
+  margin: 56px 0;
+}
+.article-cta h3 {
+  font-size: 24px; font-weight: 800; letter-spacing: -1px; margin-bottom: 14px; color: var(--text);
+}
+.article-cta p { font-size: 15px; color: var(--text2); max-width: 560px; margin: 0 auto 24px; line-height: 1.7; }
+.article-cta .cta-btn {
+  display: inline-block; background: var(--otto); color: #fff;
+  padding: 12px 28px; border-radius: 8px;
+  font-weight: 700; font-size: 14px; text-decoration: none; margin: 0 8px;
+}
+.article-cta .cta-btn:hover { background: #6B4FE0; text-decoration: none; }
+.article-cta .cta-btn-outline {
+  display: inline-block; background: transparent; color: var(--otto);
+  border: 1px solid var(--otto);
+  padding: 12px 28px; border-radius: 8px;
+  font-weight: 700; font-size: 14px; text-decoration: none; margin: 0 8px;
+}
+.article-cta .cta-btn-outline:hover { background: rgba(124,92,252,0.08); text-decoration: none; }
+
+/* Footer */
+footer {
+  padding: 40px 0; border-top: 1px solid var(--border); text-align: center;
+}
+.footer-line { font-size: 12px; color: var(--text3); }
+
+@media (max-width: 768px) {
+  .article-header h1 { font-size: 28px; }
+  .article-container { padding: 0 16px; }
+  .dag-row { grid-template-columns: 80px 1fr; }
+  .dag-tag { grid-column: 1 / -1; text-align: left; margin-top: 4px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-logo"></div>
+      <span class="nav-title">Airlock Labs</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="blog-manipulation-scorecard.html">Manipulation Scorecard</a>
+      <a href="index.html#papers">Research</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<article>
+  <header class="article-header">
+    <div class="article-container">
+      <div class="article-kicker">Behavioral Lineage · Part 1</div>
+      <h1>Meta Open-Sourced the Blueprint to Mind Control. They Called It the TRImodal Brain Encoder.</h1>
+      <p class="subtitle">720 human brains. Tri-modal stack. Open weights on HuggingFace. Zero regulatory oversight. We ran the DAG from MKUltra (1953) to the model you can download on your laptop right now — and wrote down every documented edge the public record allows.</p>
+      <div class="article-meta">Zachary Holwerda &middot; Airlock Labs &middot; April 21, 2026 &middot; 20 min read</div>
+    </div>
+  </header>
+
+  <div class="article-body article-container">
+
+    <div class="hook-lead">
+      <p>On March 25, 2026, Meta's research lab in Paris open-sourced a foundation model that predicts human brain activity from any video, audio, or text stimulus. They trained it on 720 human brains. The weights are public on HuggingFace. You can download them on your laptop right now.</p>
+      <p>Four weeks later, you still have not heard about this. Not on cable news. Not in the New York Times tech section. Not on your feed.</p>
+      <p>That is the first fact. The rest of this post is about why.</p>
+    </div>
+
+    <div class="rule-box">
+      <div class="rule-label">The Rule</div>
+      <p>None of this proves a conspiracy. All of it is documented fact.</p>
+      <p>Every claim below is tagged with a confidence tier. Verify everything. Trust nothing on faith — including us. The sources are linked. Check them.</p>
+      <div class="rule-tags">
+        <span class="tag tag-proven">Proven</span> Court records, declassified documents, SEC filings, official government reports<br>
+        <span class="tag tag-documented">Documented</span> Credible journalism, FOIA releases, congressional testimony, corporate disclosures<br>
+        <span class="tag tag-circumstantial">Circumstantial</span> Pattern-based inference from documented facts; not proven as coordinated
+      </div>
+    </div>
+
+    <h2>What Meta shipped</h2>
+
+    <p>On <strong>March 25, 2026</strong>, eight researchers at Meta's Fundamental AI Research lab (FAIR) in Paris — working alongside École Normale Supérieure (ENS-PSL) — published a paper titled <em>"A foundation model of vision, audition, and language for in-silico neuroscience."</em> They called the model <strong>TRIBE v2</strong>. The acronym stands for <strong>TRImodal Brain Encoder</strong>.</p>
+
+    <p>The model does one thing: given any video, audio, or text stimulus, it predicts which regions of a human brain will activate in response. Not a self-report. Not a behavioral survey. The actual fMRI signal.</p>
+
+    <p>They trained it on <strong>1,000+ hours of fMRI recordings across 720 human subjects</strong>, spanning eight datasets (4 training, 4 testing). The stack underneath: <strong>Llama 3.2 3B</strong> for language, <strong>Wav2Vec-Bert 2.0</strong> for audio, <strong>Video-JEPA 2 Giant</strong> for video. A 1-billion-parameter transformer encoder fuses the three modalities and projects them onto 20,484 cortical vertices plus 8,802 subcortical voxels.</p>
+
+    <p>It generalizes zero-shot to people it has never seen. Encoding accuracy scales log-linearly with training data — no ceiling reached. It recovers, <em>in silico</em>, dozens of canonical neuroscience findings: the fusiform face area for faces, the visual word form area for reading, Broca's area for syntax, the default-mode network, the multisensory integration topography of the temporal-parietal junction.</p>
+
+    <p><span class="tag tag-proven">Proven</span> Code is public at <a href="https://github.com/facebookresearch/tribev2">github.com/facebookresearch/tribev2</a>. Weights are public at <a href="https://huggingface.co/facebook/tribev2">huggingface.co/facebook/tribev2</a>. A demo runs at <a href="https://aidemos.atmeta.com/tribev2">aidemos.atmeta.com/tribev2</a>. Anyone with an internet connection can use it today.</p>
+
+    <p class="cite">Source: d'Ascoli, Rapin, Benchetrit, Brookes, Begany, Raugel, Banville, King. "A foundation model of vision, audition, and language for in-silico neuroscience." FAIR at Meta, March 25, 2026.</p>
+
+    <hr class="section-break">
+
+    <h2>What Meta says it does next</h2>
+
+    <p>The paper's Discussion section, Section 3, contains the following sentence in the authors' own words:</p>
+
+    <blockquote>
+      <p>"A more fundamental limitation is that the model currently treats the brain as a passive observer of naturalistic stimuli; it does not yet model the brain as an active agent producing behavior. Integrating neuro-developmental trajectories and clinical pathology remains a primary goal to move beyond a static, adult brain state and capture the full diversity of the global population."</p>
+    </blockquote>
+
+    <p>Translation: the current model predicts how your brain will <em>react</em> to a stimulus. The stated roadmap is extending it to predict what a brain will <em>do</em> — that is, forecast the behavior a given brain state produces.</p>
+
+    <p>Predicting behavioral response to external stimuli was the founding objective of MKUltra Subproject 10 in the 1950s. It is the stated future direction of TRIBE v2 in 2026. One was classified. The other is on HuggingFace.</p>
+
+    <hr class="section-break">
+
+    <h2>The DAG — every documented edge, 1953 to 2026</h2>
+
+    <p>The following is not a narrative. It is a graph. Nodes are dated events. Each carries a confidence tag. Sources are linked after the timeline. Read each node on its own merits. Draw your own connections.</p>
+
+    <div class="dag-wrapper">
+
+      <div class="dag-row">
+        <div class="dag-year">1953-04-13</div>
+        <div class="dag-event"><strong>MKUltra formally authorized.</strong> CIA Director Allen Dulles authorizes Project MKUltra, a behavioral-modification research program under Sidney Gottlieb's Technical Services Staff. <em>Objective: predict and control human behavioral response to external stimuli.</em></div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">1953-73</div>
+        <div class="dag-event"><strong>149+ MKUltra subprojects operate.</strong> ~25-30 subprojects focus on pure behavioral science: personality profiling, stress-dependent behavioral shifts, prediction of defection, group dynamics, non-verbal communication. <em>Subproject 10 (Robert Hyde) establishes that personality type determines behavioral response to identical stimuli.</em></div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">1973</div>
+        <div class="dag-event"><strong>Helms orders MKUltra files destroyed.</strong> CIA Director Richard Helms orders destruction of MKUltra records. Chief of Records Center formally protests on February 2, 1973. Small surviving cache filed under "budgetary/fiscal" resurfaces via FOIA in 1977.</div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">1975-77</div>
+        <div class="dag-event"><strong>Church Committee hearings.</strong> Church Committee (Senate) and Rockefeller Commission (Executive) expose MKUltra publicly in 1975. 1977 Kennedy subcommittee hearings use the recovered 20,000-document cache.</div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">1983</div>
+        <div class="dag-event"><strong>DARPA Strategic Computing Initiative.</strong> $1B, 10-year program under IPTO (Robert Kahn). Establishes the DARPA template for long-horizon dual-use machine-learning research.</div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">1988-96</div>
+        <div class="dag-event"><strong>Yann LeCun at Bell Labs.</strong> AT&amp;T Adaptive Systems Research, Holmdel NJ. Develops LeNet, early convolutional neural networks, backpropagation applications. Bell Labs is a major DARPA contractor throughout the period.</div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">1993-97</div>
+        <div class="dag-event"><strong>FERET program (DoD).</strong> Face Recognition Technology program builds the first large standardized face-recognition dataset and evaluation protocol.</div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">1994</div>
+        <div class="dag-event"><strong>Stanford Digital Library Project funded.</strong> NSF grant IIS-9411306 (multi-agency: NSF + NASA + DARPA). Sergey Brin (NSF Graduate Fellow) and Larry Page build PageRank / BackRub on this grant infrastructure through 1998. <em>Grant is proven; claims the CIA/NSA "created Google" are circumstantial — NSF was primary funder.</em></div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">1996</div>
+        <div class="dag-event"><strong>DARPA commissions Project Genoa.</strong> Intelligence-analysis software for "hypothesis testing over large data." Completed FY2002, folded directly into TIA.</div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">1999-09</div>
+        <div class="dag-event"><strong>In-Q-Tel founded.</strong> CIA venture arm, originally "Peleus." Architect: DCI George Tenet. First CEO Gilman Louie. Board chair Norm Augustine (ex-CEO Lockheed Martin). Original trustees include John N. McMahon (ex-Deputy Director, CIA) and William J. Perry (ex-Secretary of Defense 1994-97). ~$100M/year in taxpayer money via classified intelligence budget.</div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">1999-08</div>
+        <div class="dag-event"><strong>DARPA PAL program launches.</strong> Personalized Assistant that Learns. $150M, five-year contract, ~300 researchers, 22 institutions. SRI International wins the CALO (Cognitive Assistant that Learns and Organizes) component in 2003. <em>SRI spins out Siri Inc. 2007 → Apple acquires April 2010 → ships in iPhone 4S October 2011. The cleanest documented DARPA→consumer pipeline in modern AI.</em></div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">2000-09</div>
+        <div class="dag-event"><strong>DARPA Human ID at a Distance (HumanID).</strong> Biometric identification at up to 150m range, combining face, gait, body-part identification. Later absorbed into IAO/TIA.</div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">2002-01</div>
+        <div class="dag-event"><strong>Poindexter heads DARPA Information Awareness Office.</strong> John Poindexter — former Reagan NSA Advisor, convicted April 1990 of five Iran-Contra felonies (conspiracy, obstruction, false statements; overturned 1991 on use-immunity) — appointed IAO Director. Umbrella includes TIA, Genoa II, EELD, WAE, TIDES, HumanID, Bio-Surveillance.</div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">2003-02</div>
+        <div class="dag-event"><strong>In-Q-Tel invests in Keyhole Inc.</strong> 3D satellite mapping. Deployed in Pentagon within two weeks, used in Operation Iraqi Freedom. <em>October 2004: Google acquires Keyhole → becomes Google Earth (2005).</em></div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">2003-05</div>
+        <div class="dag-event"><strong>Palantir Technologies founded.</strong> Peter Thiel bankrolls prototype with Joe Lonsdale, Stephen Cohen, Nathan Gettings, Alex Karp (CEO). Core idea: PayPal anti-fraud tech adapted for counter-terrorism. <em>In-Q-Tel seed investment 2005 (~$2M). Market cap ~$370B as of March 2026.</em></div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">2003-09-30</div>
+        <div class="dag-event"><strong>Congress defunds IAO.</strong> Wyden/Dorgan amendment to DoD Appropriations Act 2004. IEEE Spectrum and 2012 NYT/Democracy Now reporting document that TIA components (code-name "Basketball") migrated to NSA.</div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">2003-2004</div>
+        <div class="dag-event"><strong>DARPA LifeLog solicited.</strong> IPTO program. Stated objective: "ontology-based (sub)system that captures, stores, and makes accessible the flow of one person's experience" — continuous logging of communications, location, media, purchases, biometrics. The stated analytic goal: identify "markers of intentionality" so AI could predict plans and goals.</div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">2004-02-04</div>
+        <div class="dag-event"><strong>DARPA cancels LifeLog.</strong> Official reason: "change in priorities" following TIA public-pressure blowback. <em>The same day, Mark Zuckerberg launches TheFacebook at Harvard.</em></div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">2004-12</div>
+        <div class="dag-event"><strong>Yann LeCun leads DARPA LAGR.</strong> Learning Applied to Ground Robots. Team leader at NYU Courant Institute / CBLL, December 2004 – May 2008. Autonomous off-road robot vision. <em>Direct, personal DARPA program leadership for 3.5 years.</em></div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">2013-12</div>
+        <div class="dag-event"><strong>Yann LeCun founds FAIR.</strong> Facebook AI Research. LeCun becomes Meta's Chief AI Scientist. FAIR becomes the institutional home of Meta's AI research, including the Brain &amp; AI team that will publish TRIBE v2.</div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">2018-23</div>
+        <div class="dag-event"><strong>Fondation Courtois donates CAD 6.3M.</strong> Donation to Pierre Bellec at Université de Montréal to fund Courtois NeuroMod — the primary fMRI dataset that will train TRIBE v2. <em>The foundation is named for Edmond Jacques Courtois, PC QC (1920-1996), whose documented career includes: Chair, Security Intelligence Review Committee (SIRC, 1992-1996) — civilian oversight body for CSIS, Canada's domestic intelligence service — and Director, CAE Industries Ltd., Canada's flagship defense/military-simulator contractor.</em></div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">2018+</div>
+        <div class="dag-event"><strong>EU Human Brain Project funds IBC dataset.</strong> Individual Brain Charting dataset (Thirion's Parietal team at Inria Saclay/NeuroSpin), used as a test set for TRIBE v2, funded by HBP Grant Agreements 604102, 720270, 785907, 945539. <em>HBP explicitly publishes its own "Opinion on Responsible Dual Use" acknowledging its research has political/security/intelligence/military applications.</em></div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">2025-07</div>
+        <div class="dag-event"><strong>Meta publishes TRIBE v1.</strong> TRImodal Brain Encoder for whole-brain fMRI response prediction (arXiv 2507.22229). 4 subjects, 80+ hours fMRI. Wins Algonauts 2025 competition (263 teams). Proves the architecture works.</div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+      <div class="dag-row">
+        <div class="dag-year">2026-03-25</div>
+        <div class="dag-event"><strong>Meta publishes TRIBE v2.</strong> Scales to 720 subjects, 1,000+ hours fMRI, zero-shot generalization to unseen humans, log-linear scaling with no ceiling. Open-sources code, weights, and demo. Stated next phase: extend from brain-as-passive-observer to brain-as-active-agent-producing-behavior.</div>
+        <div class="dag-tag"><span class="tag tag-proven">Proven</span></div>
+      </div>
+
+    </div>
+
+    <p>Seventy-three years. Twenty-four nodes. Every one of them PROVEN.</p>
+
+    <hr class="section-break">
+
+    <h2>The Courtois node — follow the actual money</h2>
+
+    <p>Meta's TRIBE v2 was trained primarily on the Courtois NeuroMod dataset — six healthy adults watching <em>Friends</em>, <em>The Bourne Supremacy</em>, <em>Hidden Figures</em>, <em>The Wolf of Wall Street</em>, and <em>Life</em> inside an MRI scanner for 80+ hours each. It is the single deepest human-neural-response dataset in the world.</p>
+
+    <p>The <strong>CAD 6.3M that funded it (2018–2023)</strong> came from the Fondation Courtois. The paper's acknowledgements section states this explicitly.</p>
+
+    <p>The foundation shares a name with <strong>Edmond Jacques Courtois Sr., PC QC (1920–1996)</strong> — a Montreal lawyer who chaired Canada's Security Intelligence Review Committee (SIRC) from 1992 to 1996 and ran the Montreal Canadiens 1972–1979 as the front man for Edward and Peter Bronfman's Carena-Bancorp/Brascan/Brookfield conglomerate. But Sr. died in 1996. Sr. did not write the check.</p>
+
+    <p>The check was written by his son.</p>
+
+    <h3>E. Jacques Courtois Jr. — the money trail</h3>
+
+    <p>Founder and president of the Fondation Courtois (est. 2011) is <strong>E. Jacques Courtois Jr.</strong> — Harvard MBA, ex-Morgan Stanley M&amp;A Vice-President. Here is the documented path the training-data money took before it reached Pierre Bellec's lab at Université de Montréal:</p>
+
+    <table class="fact-table">
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Event</th>
+          <th>Tag</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1975–1979</td>
+          <td>Courtois Jr. is VP in Morgan Stanley's M&amp;A group</td>
+          <td><span class="tag tag-proven">Proven</span></td>
+        </tr>
+        <tr>
+          <td>1975–1978</td>
+          <td><strong>Tipped eight planned takeovers</strong> from inside Morgan Stanley to an insider-trading ring including Adrian Antoniu (Kuhn Loeb) and James Newman (broker)</td>
+          <td><span class="tag tag-proven">Proven (federal court)</span></td>
+        </tr>
+        <tr>
+          <td>1979</td>
+          <td>Resigned from Morgan Stanley; <strong>fled to Colombia</strong> when extradition was ordered</td>
+          <td><span class="tag tag-proven">Proven</span></td>
+        </tr>
+        <tr>
+          <td>1980</td>
+          <td><strong>Co-founded Quala S.A. in Bogotá</strong> with Michael de Rhodes Dub — Latin-American consumer-goods company (personal care, food)</td>
+          <td><span class="tag tag-proven">Proven</span></td>
+        </tr>
+        <tr>
+          <td>1983</td>
+          <td>Found in Montreal, surrendered; pleaded guilty to insider trading</td>
+          <td><span class="tag tag-proven">Proven — <em>Moss v. Morgan Stanley</em>, 719 F.2d 5</span></td>
+        </tr>
+        <tr>
+          <td>1984</td>
+          <td><strong>Six months federal prison</strong>, $150,000 fine paid to victim fund</td>
+          <td><span class="tag tag-proven">Proven</span></td>
+        </tr>
+        <tr>
+          <td>1980–2017</td>
+          <td>Built Quala into a ten-country Latin-American empire (brands: Savital, eGo, Bio-Expert, Fortident, Aromatel)</td>
+          <td><span class="tag tag-proven">Proven</span></td>
+        </tr>
+        <tr>
+          <td>2017–2018</td>
+          <td><strong>Unilever acquires Quala's personal-care and home-care brands</strong> (~USD 400M combined turnover)</td>
+          <td><span class="tag tag-proven">Proven</span></td>
+        </tr>
+        <tr>
+          <td>2011</td>
+          <td>Founded the Fondation Courtois; became its president</td>
+          <td><span class="tag tag-proven">Proven</span></td>
+        </tr>
+        <tr>
+          <td>2018–2023</td>
+          <td><strong>Fondation Courtois donates CAD 6.3M to Pierre Bellec at UdeM for CNeuroMod</strong> — the dataset that becomes the primary training corpus for Meta's TRIBE v2</td>
+          <td><span class="tag tag-proven">Proven</span></td>
+        </tr>
+        <tr>
+          <td>2022</td>
+          <td>Fondation Courtois gives UdeM <strong>CAD 159M</strong> to found the Institut Courtois — reportedly the largest single science gift in Canadian university history</td>
+          <td><span class="tag tag-proven">Proven</span></td>
+        </tr>
+        <tr>
+          <td>2024</td>
+          <td>Courtois Jr. reported to have purchased Quebec's priciest condominium on record</td>
+          <td><span class="tag tag-documented">Documented</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Stated plainly: <strong>the capital that trained Meta's brain-response foundation model is, at one remove, proceeds from Morgan Stanley 1970s insider trading, laundered through forty years of Colombian consumer-goods manufacturing, sold to Unilever in 2017–2018, and administered today through a Quebec geriatric foundation.</strong></p>
+
+    <p>Every step is documented. Court records. SEC filings. Unilever acquisition announcements. Charity filings at charitydata.ca. Université de Montréal press releases. None of it is secret. None of it required a leak. The pieces were all sitting in the public record, never assembled.</p>
+
+    <h3>The academic corridor — how it reached Meta</h3>
+
+    <p><strong>Guillaume Lajoie</strong>, co-principal investigator on the Courtois NeuroMod project at UdeM, is also a principal investigator at <strong>Mila</strong> — the Montreal Institute for Learning Algorithms founded and directed by <strong>Yoshua Bengio</strong>. Mila has documented research partnerships with Meta FAIR. Bengio, <strong>Yann LeCun, and Geoffrey Hinton</strong> jointly won the 2018 Turing Award for their foundational work in deep learning.</p>
+
+    <p>The corridor that landed this training data inside Meta's TRIBE v2: <span class="mono">Fondation Courtois → Bellec / Lajoie (UdeM) → Mila (Bengio) → FAIR (LeCun) → TRIBE v2.</span> <span class="tag tag-proven">Proven</span></p>
+
+    <h3>The other Courtois children</h3>
+
+    <p>Jacques Sr. had three children. The check that funded TRIBE v2's training data came from one of them. The other two sit in equally documentable positions:</p>
+
+    <ul>
+      <li><strong>Marc A. Courtois</strong> — RBC Dominion Securities MD Quebec (1980–2001), Canada Post Chairman 2007–2014, and from February 2013 to January 2024 <strong>Chairman of NAV CANADA, the country's privatized air-traffic control monopoly</strong>. Simultaneously <strong>Chairman of Aireon LLC</strong> — the space-based ADS-B global aviation-surveillance network running on the Iridium NEXT 66-satellite constellation. Joint venture of NAV Canada, Iridium, NATS (UK), ENAV (Italy), IAA (Ireland), Naviair (Denmark). A Five-Eyes-adjacent, space-based global aircraft-tracking infrastructure role. <span class="tag tag-proven">Proven</span></li>
+
+      <li><strong>Nicole Eaton</strong> (née Courtois) — Conservative senator 2009–2020 (Stephen Harper appointee), Senate Speaker Pro Tempore 2015–2020, married to Thor Eaton of the Eaton's department-store dynasty. <strong>Named in the ICIJ Bahamas Leaks</strong> as a director of a Bahamas offshore corporation for twelve years, self-reported to the Senate ethics officer only after CBC inquiries in 2016. <span class="tag tag-proven">Proven</span></li>
+    </ul>
+
+    <p>One sibling owns an aviation-surveillance satellite constellation. One sibling had a Bahamas offshore directorship she didn't disclose for over a decade. One sibling funded the training data for a brain-prediction foundation model with money built on insider trading and Colombian consumer goods. That's the family tree behind six words in a Meta paper's acknowledgements.</p>
+
+    <hr class="section-break">
+
+    <h2>The LeCun edge</h2>
+
+    <p>Yann LeCun is Meta's Chief AI Scientist. He founded FAIR in December 2013. He is the institutional father of every neural-network research program that has come out of Meta since, including the Brain &amp; AI team at FAIR Paris that built TRIBE v2.</p>
+
+    <p>Before Meta, LeCun ran a DARPA program.</p>
+
+    <p><span class="tag tag-proven">Proven</span> From <strong>December 2004 to May 2008</strong>, Yann LeCun served as team leader for <strong>DARPA LAGR</strong> — Learning Applied to Ground Robots — at NYU's Courant Institute and its Center for Biological and Computational Learning (CBLL). LAGR was an autonomous off-road robot vision competition. LeCun's team competed directly for DARPA funding for 3.5 years, developing the convolutional-network and end-to-end-learning techniques that later became the backbone of modern computer vision.</p>
+
+    <p class="cite">Source: <a href="https://cs.nyu.edu/~yann/research/lagr/">cs.nyu.edu/~yann/research/lagr/</a>, Wikipedia biography, NYU Courant records.</p>
+
+    <p>This is the single, direct, personal, documented edge between Meta's AI leadership and DARPA. It is not a conspiracy. It is his CV.</p>
+
+    <p><span class="tag tag-negative">Not Found</span> We searched — explicitly, by name, across Google Scholar, ORCID, institutional bios, LinkedIn, and indexed paper acknowledgements — for any DARPA, IARPA, ONR, AFOSR, DTRA, DGA, or Unit 8200 grant personally attributed to Jean-Rémi King (TRIBE v2 senior author) or any of the other seven co-authors. <strong>None surfaced.</strong> Their declared funders are CNRS, Fyssen Foundation, Marie Curie, Bettencourt Schueller, ERC, and Meta/FAIR internal. We report this honestly. The DAG does not require personal defense funding on individual authors' CVs to hold.</p>
+
+    <hr class="section-break">
+
+    <h2>The ownership topology</h2>
+
+    <p>Meta is not a DARPA project. Meta is a publicly traded company. Its largest institutional shareholders are the three biggest passive index-fund managers in the world: Vanguard, BlackRock, and State Street.</p>
+
+    <p>Those same three institutions are also the top shareholders of every major US defense contractor. Here are the numbers, all pulled from SEC 13F filings:</p>
+
+    <table class="fact-table">
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>Sector</th>
+          <th>Vanguard</th>
+          <th>BlackRock</th>
+          <th>State Street</th>
+          <th>Combined</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Meta (Facebook)</strong></td>
+          <td>Tech — publishes TRIBE v2</td>
+          <td>~7.8%</td>
+          <td>~6.2%</td>
+          <td>~3.4%</td>
+          <td><strong>~17.4%</strong></td>
+        </tr>
+        <tr>
+          <td>Lockheed Martin</td>
+          <td>Defense</td>
+          <td>~8.5%</td>
+          <td>~7.2%</td>
+          <td>~4.1%</td>
+          <td><strong>~19.8%</strong></td>
+        </tr>
+        <tr>
+          <td>Raytheon (RTX)</td>
+          <td>Defense</td>
+          <td>~8.8%</td>
+          <td>~7.0%</td>
+          <td>~4.3%</td>
+          <td><strong>~20.1%</strong></td>
+        </tr>
+        <tr>
+          <td>Northrop Grumman</td>
+          <td>Defense</td>
+          <td>~9.2%</td>
+          <td>~7.5%</td>
+          <td>~4.7%</td>
+          <td><strong>~21.4%</strong></td>
+        </tr>
+        <tr>
+          <td>Boeing</td>
+          <td>Defense/Aerospace</td>
+          <td>~7.8%</td>
+          <td>~6.3%</td>
+          <td>~4.0%</td>
+          <td><strong>~18.1%</strong></td>
+        </tr>
+        <tr>
+          <td>General Dynamics</td>
+          <td>Defense</td>
+          <td>~9.0%</td>
+          <td>~7.2%</td>
+          <td>~4.5%</td>
+          <td><strong>~20.7%</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><span class="tag tag-proven">Proven</span> Source: SEC 13F filings and proxy statements (2024–2025). All percentages are from public quarterly disclosures.</p>
+
+    <p>No one at Vanguard picks up a phone and tells Meta what to research. No one at BlackRock calls FAIR Paris and orders TRIBE v2 written. The Big Three are passive index funds — they hold these stocks because the stocks are in the index. That is their defense and it is true.</p>
+
+    <p>But passive ownership still confers <strong>voting rights</strong>, <strong>board influence</strong>, and <strong>proxy power</strong>. And passive ownership still means that whatever is good for Meta's stock price is good for the same funds that also hold ~20% of every weapons manufacturer in America. Whatever capability Meta ships that has civilian-commercial <em>and</em> defense-relevant applications benefits the same shareholders twice.</p>
+
+    <p>The structural conflict exists regardless of intent. That is the architecture.</p>
+
+    <hr class="section-break">
+
+    <h2>The precedent the press won't remember: PAL → CALO → Siri</h2>
+
+    <p>People who hear "DARPA-funded research becomes a consumer product" usually dismiss it as speculation. That dismissal does not survive one concrete example.</p>
+
+    <p>From 1999 to 2008, DARPA ran a program called <strong>PAL — Personalized Assistant that Learns</strong>. $150 million of taxpayer money. ~300 researchers across 22 institutions. SRI International won the primary component in 2003 — called <strong>CALO</strong>, Cognitive Assistant that Learns and Organizes. $22M over five years. CALO's objective was an AI that could observe your communications, calendar, files, and habits, then autonomously help you.</p>
+
+    <p>In 2007, SRI spun out <strong>Siri Inc.</strong> In April 2010, <strong>Apple acquired Siri for a reported $200M</strong>. In October 2011, Siri shipped as the signature feature of the iPhone 4S. Millions of consumers now talk to it every day. They have no idea they are using the commercial descendant of a DARPA behavioral-AI program.</p>
+
+    <p class="cite">Source: SRI International official history; Wikipedia "CALO"; public DARPA program records.</p>
+
+    <p><span class="tag tag-proven">Proven</span> This is not a theory. This is a straight line: $150M of public defense money → consumer voice assistant → every iPhone. The lag was ~7 to 10 years from DARPA contract to iPhone 4S launch.</p>
+
+    <p>TRIBE v2 was published in March 2026. Do the math on the lag.</p>
+
+    <hr class="section-break">
+
+    <h2>What we could not confirm</h2>
+
+    <p>The rule of this document is that we do not overclaim. Here is what we could not verify, stated plainly.</p>
+
+    <ul>
+      <li><span class="tag tag-negative">Not Found</span> <strong>No personal DARPA / IARPA / ONR / AFOSR / DTRA / DGA grant</strong> attributable to Jean-Rémi King, Stéphane d'Ascoli, Jérémy Rapin, Yohann Benchetrit, Teon Brookes, Katelyn Begany, Joséphine Raugel, or Hubert Banville surfaced in any indexed public source. Their declared funders are civilian: CNRS, ERC, Marie Curie, Fyssen, Bettencourt Schueller, ANR, and Meta/FAIR internal. Absence of evidence is not evidence of absence, and public CVs are self-reported, but we state clearly that we found nothing.</li>
+
+      <li><span class="tag tag-negative">Not Found</span> <strong>No DoD or IARPA co-sponsor</strong> on NIH grant 1U54MH091657, which funded the Human Connectome Project data used as a test set for TRIBE v2. HCP's declared funding is 16 NIH Institutes under the NIH Blueprint for Neuroscience Research.</li>
+
+      <li><span class="tag tag-negative">Not Found</span> <strong>No SRI / CALO alumni</strong> at FAIR Brain &amp; AI. The documented CALO veterans (Adam Cheyer, Tom Gruber, C. Raymond Perrault) all went to Apple via Siri, not Meta.</li>
+
+      <li><span class="tag tag-circumstantial">Circumstantial</span> <strong>The original source of the Courtois family wealth</strong> is not in any public record we could locate. Charity filings show outflows only. Whether the Courtois funds that underwrote CNeuroMod originate from family capital, foundation endowment appreciation, or some other source, is a gap in the public record.</li>
+
+      <li><span class="tag tag-circumstantial">Circumstantial</span> <strong>HBP dual-use acknowledgement is self-declared.</strong> The EU Human Brain Project (which funds the IBC dataset used in TRIBE v2 testing) publicly acknowledges its research has political/security/intelligence/military applications — but this is their framing, not ours. We cite it as fact because it is fact, not because it proves HBP is a defense program.</li>
+    </ul>
+
+    <p>We list these gaps because gaps are part of the DAG. The document is a research index, not an indictment.</p>
+
+    <hr class="section-break">
+
+    <h2>So what is the connection?</h2>
+
+    <p>Every node above is documented. Every edge is sourced. What the reader does with the graph is up to the reader. We will state our read once, and only once.</p>
+
+    <p>We do not believe there is a single person at Meta picking up a phone and being given orders by a single person at DARPA. That claim is not supported by any evidence we found and we will not make it.</p>
+
+    <p>We believe the correct frame is <strong>capability continuity</strong>, not <strong>chain of command</strong>.</p>
+
+    <ul>
+      <li>MKUltra wanted a method for predicting human behavioral response to external stimuli. It failed, mostly, because the methods of 1953 could not do it.</li>
+      <li>DARPA LifeLog wanted a comprehensive digital archive of one person's lived experience, annotated with markers of intentionality, so AI could predict plans and goals. It was cancelled in 2004 because the public objected.</li>
+      <li>Facebook launched the same day LifeLog was cancelled. Instagram followed eight years later. Instagram Reels followed eight years after that. Each added a modality — text, image, video — to the commercial behavioral archive.</li>
+      <li>TRIBE v2 is the foundation model that reads human neural response to those exact three modalities (text + image + video). Meta trained it on 720 brains watching movies. The training data was funded by a Montreal foundation named for a Canadian intelligence-oversight chair and CAE defense-industry director. The lab that built it sits inside FAIR, whose founding Chief AI Scientist ran a DARPA robotics program for 3.5 years. Meta is ~17% owned by the same passive index funds that own ~20% of every defense contractor in America.</li>
+    </ul>
+
+    <p>No single node proves anything. The graph is the point. Every edge is documentable. The reader draws their own line.</p>
+
+    <hr class="section-break">
+
+    <h2>How we found all of this: the method is the inversion</h2>
+
+    <p>A reasonable reader is wondering by now: <em>how did one person assemble this?</em> The answer is the point of the whole series.</p>
+
+    <p>We used the same AI-assisted research stack the people in this story use to extract value from you. Embeddings. Semantic search. Cross-document retrieval. Multi-agent orchestration. Automated entity resolution across SEC filings, court records, charity data, academic acknowledgements, and leak archives. The same capability. The opposite direction.</p>
+
+    <p><strong>Meta uses your attention to extract value from you.</strong> The TRIBE v2 stack is literally that thesis taken to its endpoint — predict the brain's response to a stimulus so you can tune the stimulus until the response is the one that monetizes. Attention in, value out, you in the middle as the crop.</p>
+
+    <p><strong>We used engagement to extract method from them.</strong> Same AI tools. Aimed at the public record instead of at a user. We asked the model to hold twenty different primary sources in context at once and tell us which entities appeared in more than one cluster. We asked it to cross-reference SEC 13F filings against charity rolls against paper acknowledgements against court records. Every edge in the DAG above was produced by engagement. By sitting with a thread long enough to see where it led. By refusing to let the volume of the public record be the thing that keeps the public record from being read.</p>
+
+    <p>Fuck the attention economy. The attention economy is what happens when the capability is pointed at you. The engagement economy is what happens when you point the capability back. Same stack. Opposite verb. The difference between being farmed and doing the work.</p>
+
+    <p>This blog is that posture in practice. Every tool that built it is already available. Llama, the model Meta trained on 720 brains, will also happily help you read through a 31-page In-Q-Tel research dossier and tell you which trustees overlap with which portfolio companies. That is the whole trick.</p>
+
+    <hr class="section-break">
+
+    <h2>Verify everything — the tools we used, which you also have</h2>
+
+    <p>We expect you not to trust us. We expect you to verify. The research stack that built this investigation is open. Nothing below required a security clearance. Every tool listed is free.</p>
+
+    <table class="fact-table">
+      <thead>
+        <tr>
+          <th>Source</th>
+          <th>What it gives you</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="https://ai.meta.com/research/publications/a-foundation-model-of-vision-audition-and-language-for-in-silico-neuroscience/">ai.meta.com/research</a></td>
+          <td>The Meta TRIBE v2 paper (March 25, 2026). Read the acknowledgements section yourself.</td>
+        </tr>
+        <tr>
+          <td><a href="https://arxiv.org/abs/2507.22229">arxiv.org/abs/2507.22229</a></td>
+          <td>Meta TRIBE v1 preprint (July 29, 2025). The predecessor paper that wins the Algonauts 2025 competition.</td>
+        </tr>
+        <tr>
+          <td><a href="https://huggingface.co/facebook/tribev2">huggingface.co/facebook/tribev2</a> · <a href="https://github.com/facebookresearch/tribev2">github.com/facebookresearch/tribev2</a></td>
+          <td>The open weights and the code. Download them yourself.</td>
+        </tr>
+        <tr>
+          <td><a href="https://docs.cneuromod.ca/">docs.cneuromod.ca</a></td>
+          <td>The Courtois NeuroMod dataset documentation. Read who funded it and who administered the funding.</td>
+        </tr>
+        <tr>
+          <td><a href="https://www.charitydata.ca/charity/fondation-courtois/850271289RR0001/">charitydata.ca</a></td>
+          <td>The Fondation Courtois's Canadian charity filings. Outflows, directors, years active.</td>
+        </tr>
+        <tr>
+          <td><a href="https://law.justia.com/cases/federal/appellate-courts/F2/719/5/148829/">Moss v. Morgan Stanley, 719 F.2d 5</a></td>
+          <td>The federal appellate record of the 1970s Morgan Stanley insider-trading ring Courtois Jr. pleaded guilty to. Cite it. Read the opinion.</td>
+        </tr>
+        <tr>
+          <td><a href="https://offshoreleaks.icij.org/">ICIJ Offshore Leaks Database</a></td>
+          <td>Panama Papers, Paradise Papers, Pandora Papers, Bahamas Leaks. Search any name in this investigation. Nicole Eaton's Bahamas directorship is in here.</td>
+        </tr>
+        <tr>
+          <td><a href="https://www.sec.gov/edgar.shtml">SEC EDGAR</a></td>
+          <td>Every 13F, 10-K, proxy statement, and insider-trading filing. Verify the Big Three ownership table yourself in five minutes.</td>
+        </tr>
+        <tr>
+          <td><a href="https://reporter.nih.gov/">NIH RePORTER</a></td>
+          <td>Full grant detail for NIH 1U54MH091657 (Human Connectome Project) and every other NIH grant touching TRIBE v2's training data.</td>
+        </tr>
+        <tr>
+          <td><a href="https://www.fec.gov/data/receipts/individual-contributions/">FEC Individual Contributions</a> · <a href="https://www.opensecrets.org/">OpenSecrets</a></td>
+          <td>Every federal political donation by every person named above. Search by name, employer, or ZIP.</td>
+        </tr>
+        <tr>
+          <td><a href="https://wikileaks.org/">WikiLeaks</a> · <a href="https://cryptome.org/">Cryptome</a></td>
+          <td>The leak archives. Search any name, institution, or program. The 2015 Hacking Team leak, the State Department cables, the Sony emails, the DNC emails, the Syria Files — all text-searchable.</td>
+        </tr>
+        <tr>
+          <td><a href="http://www.sirc-csars.gc.ca/">sirc-csars.gc.ca</a></td>
+          <td>The Canadian Security Intelligence Review Committee archive. Courtois Sr. was chair 1992–1996.</td>
+        </tr>
+        <tr>
+          <td><a href="https://cs.nyu.edu/~yann/research/lagr/">cs.nyu.edu/~yann/research/lagr</a></td>
+          <td>Yann LeCun's own page documenting his DARPA LAGR program leadership.</td>
+        </tr>
+        <tr>
+          <td><a href="https://www.iqt.org/about">iqt.org/about</a></td>
+          <td>In-Q-Tel's public "about" page. Board of trustees. Annual report. Portfolio highlights.</td>
+        </tr>
+        <tr>
+          <td>Any frontier LLM with a long context window</td>
+          <td>Feed any of the above documents in and ask "which entities appear across more than one of these files and what connects them." That question is how this whole post got written.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>None of this is secret. None of it was leaked. None of it required a whistleblower. The architecture was built in plain sight.</p>
+
+    <p>The only thing that is new is that somebody finally sat with the public record long enough to write down every edge.</p>
+
+    <div class="hero-callout">
+      <p>That is engagement. <em>The thing the attention economy is designed to prevent you from doing.</em> Do it anyway.</p>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <div class="container">
+    <div class="footer-line">&copy; 2026 Airlock Labs &middot; None of this proves a conspiracy. All of it is documented fact. &middot; <a href="index.html" style="color: var(--text3);">airlocklabs.io</a></div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+\begin{thebibliography}{12}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Berners-Lee(1989)]{bernerslee1989}
+Tim Berners-Lee.
+\newblock Information management: A proposal.
+\newblock {CERN}, 1989.
+\newblock URL \url{https://www.w3.org/History/1989/proposal.html}.
+
+\bibitem[{Block Inc. (TBD)}(2022)]{tbd_web5}
+{Block Inc. (TBD)}.
+\newblock {Web5}: A decentralized web platform with self-sovereign identity.
+\newblock Technical Specification, 2022.
+\newblock URL \url{https://developer.tbd.website/projects/web5/}.
+
+\bibitem[{HiddenLayer Inc.}(2024)]{hiddenlayer}
+{HiddenLayer Inc.}
+\newblock {MLSec} platform: Adversarial-attack detection and behavioral anomaly
+  monitoring for production models.
+\newblock Commercial product documentation, 2024.
+\newblock URL \url{https://hiddenlayer.com}.
+
+\bibitem[Holwerda(2026{\natexlab{a}})]{pact_protocol_spec}
+Zac Holwerda.
+\newblock {PACT} protocol specification: A typed operator for operator-resident
+  {AI} substrates.
+\newblock Technical report, Airlock Labs, 2026{\natexlab{a}}.
+
+\bibitem[Holwerda(2026{\natexlab{b}})]{wp2_entanglement_safe_handshake}
+Zac Holwerda.
+\newblock {WP2}: Entanglement-safe handshake --- a behavioral commitment
+  primitive.
+\newblock Whitepaper series, Airlock Labs, 2026{\natexlab{b}}.
+
+\bibitem[Holwerda(2026{\natexlab{c}})]{wp3_sha256_layered_trust}
+Zac Holwerda.
+\newblock {WP3}: {SHA-256} as a layered trust object --- a five-layer frame for
+  behavioral commitments.
+\newblock Whitepaper series, Airlock Labs, 2026{\natexlab{c}}.
+
+\bibitem[Holwerda(2026{\natexlab{d}})]{constellationbench2026}
+Zachary Holwerda.
+\newblock {ConstellationBench}: Behavioral {AI} evaluation across 22 {LLM}
+  models.
+\newblock HuggingFace Datasets, 2026{\natexlab{d}}.
+\newblock
+  \url{https://huggingface.co/datasets/AirlockLabs/constellation-bench}.
+
+\bibitem[Katsarosgiannis(2026)]{katsarosgiannis2026}
+G.~Katsarosgiannis.
+\newblock {Stern-Brocot} reconstruction of {Anthropic}'s subscription credit
+  caps.
+\newblock Public disclosure (Threads post), April 2026.
+\newblock URL \url{https://threads.net/@katsarosgiannis}.
+
+\bibitem[M{\"u}hle et~al.(2018)M{\"u}hle, Gr{\"u}ner, Gayvoronskaya, and
+  Meinel]{ssi_survey}
+Alexander M{\"u}hle, Andreas Gr{\"u}ner, Tatiana Gayvoronskaya, and Christoph
+  Meinel.
+\newblock A survey on essential components of a self-sovereign identity.
+\newblock \emph{Computer Science Review}, 30:\penalty0 80--86, 2018.
+
+\bibitem[{O'Connor}(2023)]{oconnor2023web4}
+J.~{O'Connor}.
+\newblock Substrate-resident agents and the {Web4} compute layer.
+\newblock Survey of substrate-resident agentic literature, 2023.
+\newblock Placeholder citation; replace with primary source before final
+  submission.
+
+\bibitem[Sambra et~al.(2016)Sambra, Mansour, Hawke, Zereba, Greco, Ghanem,
+  Zagidulin, Aboulnaga, and Berners-Lee]{solid_pods}
+Andrei~Vlad Sambra, Essam Mansour, Sandro Hawke, Maged Zereba, Nicola Greco,
+  Abdurrahman Ghanem, Dmitri Zagidulin, Ashraf Aboulnaga, and Tim Berners-Lee.
+\newblock Solid: A platform for decentralized social applications based on
+  linked data.
+\newblock 2016.
+\newblock URL \url{https://solidproject.org/}.
+
+\bibitem[{W3C}(2022)]{w3c_did_core}
+{W3C}.
+\newblock Decentralized identifiers ({DIDs}) v1.0: Core architecture, data
+  model, and representations.
+\newblock {W3C} Recommendation, 2022.
+\newblock URL \url{https://www.w3.org/TR/did-core/}.
+
+\end{thebibliography}

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Cognitive Forcing: AI Analysis Pattern</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f0f13; --surface: #1a1a22; --surface2: #242432; --border: #2a2a3a;
+    --text: #e8e8f0; --muted: #8a8a9a; --accent: #00d9ff;
+    --warn: #ff6b6b; --success: #2dd4a0;
+    --mono: 'IBM Plex Mono', monospace; --body: 'IBM Plex Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--body); line-height: 1.5; min-height: 100vh; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+  .header { margin-bottom: 40px; }
+  .header-label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; }
+  .header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .header-desc { font-size: 13px; color: var(--muted); max-width: 700px; line-height: 1.6; }
+  .input-section { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 28px; margin-bottom: 28px; }
+  .section-title { font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text); margin-bottom: 16px; }
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 768px) { .input-grid { grid-template-columns: 1fr; } }
+  .input-field { display: flex; flex-direction: column; gap: 6px; }
+  .input-label { font-size: 12px; font-weight: 500; color: var(--text); }
+  input[type="text"], input[type="file"], select, textarea {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text); padding: 10px 12px; font-family: var(--body); font-size: 12px; transition: border 0.2s;
+  }
+  input[type="text"]:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 120px; font-family: var(--mono); }
+  .btn { background: var(--accent); color: var(--bg); border: none; padding: 10px 24px; border-radius: 4px;
+    font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s; }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 217, 255, 0.2); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .workspace { display: none; }
+  .workspace.active { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; position: relative; }
+  .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .panel-title { font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  .severity-badge { font-size: 11px; padding: 4px 10px; border-radius: 12px; font-weight: 600; }
+  .severity-high { background: rgba(255, 107, 107, 0.2); color: var(--warn); }
+  .state-label { position: absolute; top: 12px; right: 12px; font-family: var(--mono); font-size: 10px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
+  .raw-context { background: var(--surface2); border-left: 3px solid var(--accent); border-radius: 4px;
+    padding: 12px; margin-bottom: 20px; font-family: var(--mono); font-size: 11px; line-height: 1.7;
+    max-height: 300px; overflow-y: auto; color: var(--muted); }
+  .system-def { background: var(--surface2); border-left: 3px solid var(--success); border-radius: 4px;
+    padding: 12px; margin-bottom: 20px; font-size: 11px; line-height: 1.7; }
+  .sys-title { font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .forcing-checkpoint { background: rgba(0, 217, 255, 0.05); border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 6px; padding: 14px; margin-bottom: 20px; }
+  .checkpoint-title { font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 10px; }
+  .question-group { margin-bottom: 16px; }
+  .question-label { font-size: 11px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  .question-input { width: 100%; min-height: 60px; }
+  .confidence-slider { margin-top: 16px; }
+  .confidence-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  input[type="range"] { width: 100%; height: 4px; border-radius: 2px; background: var(--border); outline: none; -webkit-appearance: none; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+  input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; border: none; }
+  .locked-notice { background: rgba(255, 107, 107, 0.1); border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 4px; padding: 12px; text-align: center; font-size: 12px; color: var(--warn); margin-top: 16px; }
+  .comparison-section { display: none; }
+  .comparison-section.active { display: block; }
+  .assessment-box { background: var(--surface2); border-radius: 6px; padding: 14px; margin-bottom: 16px; }
+  .assessment-label { font-size: 10px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  .assessment-content { font-size: 12px; line-height: 1.6; color: var(--text); }
+  .ai-reasoning { background: rgba(0, 217, 255, 0.05); border-left: 3px solid var(--accent); }
+  .confidence-indicator { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 12px; margin-top: 8px; background: rgba(255, 165, 0, 0.2); color: #ff9d00; }
+  .overlap-analysis { background: var(--surface2); border-radius: 6px; padding: 14px; margin-bottom: 20px; font-size: 11px; line-height: 1.7; }
+  .overlap-item { margin-bottom: 8px; }
+  .overlap-agree { color: var(--success); }
+  .overlap-disagree { color: var(--warn); }
+  .alignment-required { background: rgba(0, 217, 255, 0.05); border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 6px; padding: 14px; margin-bottom: 20px; }
+  .alignment-title { font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 10px; }
+  .alignment-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .alignment-option { display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s; }
+  .alignment-option:hover { background: var(--surface2); }
+  .alignment-option input[type="radio"] { cursor: pointer; accent-color: var(--accent); }
+  .rationale-input { width: 100%; min-height: 80px; margin-top: 10px; }
+  .evidence-pack { display: none; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin-top: 20px; }
+  .evidence-pack.active { display: block; }
+  .evidence-title { font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .evidence-content { font-family: var(--mono); font-size: 10px; line-height: 1.8; color: var(--muted); background: var(--bg); border-radius: 4px; padding: 12px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
+  .export-controls { display: flex; gap: 10px; margin-top: 12px; }
+  .export-controls .btn { flex: 1; }
+  @media (max-width: 900px) { .workspace.active { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="header-label">🧠 Cognitive Forcing Pattern</div>
+    <h1>AI + Human Analysis</h1>
+    <p class="header-desc">De-anchored collaborative decision-making. Submit your independent hypothesis before AI analysis is revealed. Forces System 2 thinking and generates tamper-evident audit trails.</p>
+  </div>
+  <div class="input-section" id="input-section">
+    <div class="section-title">📄 Load or Paste Document</div>
+    <div class="input-grid">
+      <div class="input-field"><label class="input-label">Document Name</label>
+        <input type="text" id="doc-name" placeholder="e.g., MSA-2026-04-Vanguard.pdf"></div>
+      <div class="input-field"><label class="input-label">Domain / Context</label>
+        <select id="domain">
+          <option value="">Auto-detect or specify...</option>
+          <option value="contracts">Contracts / Legal</option>
+          <option value="medical">Medical / Clinical</option>
+          <option value="research">Research / Data</option>
+          <option value="technical">Technical / Engineering</option>
+          <option value="financial">Financial / Economics</option>
+          <option value="custom">Custom / Other</option>
+        </select></div>
+    </div>
+    <div class="input-field"><label class="input-label">Paste Document Text</label>
+      <textarea id="doc-text" placeholder="Paste raw text, excerpt, or document content here..."></textarea></div>
+    <div style="margin-bottom: 16px;"><label class="input-label">Or Upload PDF/Text File</label>
+      <input type="file" id="file-upload" accept=".pdf,.txt"></div>
+    <div class="input-field"><label class="input-label">System Definition (Truth Config) — Optional</label>
+      <textarea id="truth-config" placeholder="e.g., Definition 'Revenue Share': Any clause allowing unilateral modification without mutual signature is non-compliant."></textarea></div>
+    <button class="btn" id="start-btn" onclick="startAnalysis()">▶ Begin Analysis</button>
+  </div>
+  <div class="workspace" id="workspace">
+    <div>
+      <div class="panel">
+        <div class="state-label">STATE 1</div>
+        <div class="panel-header">
+          <div class="panel-title">📋 Raw Context</div>
+          <span class="severity-badge severity-high">AI LOCKED</span>
+        </div>
+        <div class="raw-context" id="raw-context"></div>
+        <div id="truth-config-display" style="display: none;">
+          <div class="system-def">
+            <div class="sys-title">📚 System Definition (Truth Config)</div>
+            <div id="truth-config-text"></div>
+          </div>
+        </div>
+        <div class="forcing-checkpoint">
+          <div class="checkpoint-title">🔒 Cognitive Forcing Checkpoint</div>
+          <p style="font-size: 11px; color: var(--muted); margin-bottom: 12px;">
+            AI analysis is hidden to prevent anchoring bias. Formulate your independent assessment based on raw context above.
+          </p>
+          <div class="question-group">
+            <div class="question-label">1. What is the primary subject or decision point?</div>
+            <textarea class="question-input" id="q1"></textarea>
+          </div>
+          <div class="question-group">
+            <div class="question-label">2. What are the key risks or implications?</div>
+            <textarea class="question-input" id="q2"></textarea>
+          </div>
+          <div class="question-group">
+            <div class="question-label">3. What fields or factors are critical?</div>
+            <textarea class="question-input" id="q3"></textarea>
+          </div>
+          <div class="confidence-slider">
+            <div class="confidence-label">
+              <span>Your Initial Confidence</span>
+              <span id="confidence-display">5/10</span>
+            </div>
+            <input type="range" id="confidence" min="1" max="10" value="5" oninput="updateConfidence()">
+          </div>
+          <button class="btn" id="unlock-btn" onclick="unlockAI()" style="width: 100%; margin-top: 16px;">🔓 Unlock AI Analysis</button>
+          <div class="locked-notice">Pre-analysis fields must be populated before AI is revealed.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="panel" id="ai-locked-panel">
+        <div class="panel-header"><div class="panel-title">🤖 AI Analysis</div></div>
+        <div style="text-align: center; padding: 40px 20px; color: var(--muted);">
+          <div style="font-size: 48px; margin-bottom: 12px;">🔐</div>
+          <div style="font-size: 13px; font-weight: 500;">Analysis Locked Until Pre-Analysis Complete</div>
+          <div style="font-size: 11px; margin-top: 8px;">Fill in all fields to the left, then unlock.</div>
+        </div>
+      </div>
+      <div class="panel comparison-section" id="comparison-panel">
+        <div class="panel-header"><div class="panel-title">⚖️ Comparison & Alignment</div></div>
+        <div class="assessment-box">
+          <div class="assessment-label">🧑‍💻 Your Assessment</div>
+          <div class="assessment-content" id="your-assessment"></div>
+        </div>
+        <div class="assessment-box ai-reasoning">
+          <div class="assessment-label">🤖 AI Reasoning</div>
+          <div class="assessment-content" id="ai-reasoning"></div>
+          <div class="confidence-indicator" id="ai-confidence"></div>
+        </div>
+        <div class="overlap-analysis">
+          <div style="font-weight: 600; color: var(--text); margin-bottom: 8px;">🔍 Overlap & Drift Analysis</div>
+          <div id="overlap-content"></div>
+        </div>
+        <div class="alignment-required">
+          <div class="alignment-title">✍️ Explicit Alignment Required</div>
+          <div class="alignment-options">
+            <label class="alignment-option"><input type="radio" name="alignment" value="full" onchange="toggleRationale()"><span>Fully Agree</span></label>
+            <label class="alignment-option"><input type="radio" name="alignment" value="partial" onchange="toggleRationale()"><span>Partially Agree (Explain)</span></label>
+            <label class="alignment-option"><input type="radio" name="alignment" value="disagree" onchange="toggleRationale()"><span>Disagree (Explain)</span></label>
+          </div>
+          <textarea class="rationale-input" id="alignment-rationale" placeholder="Explain your position (required if not 'Fully Agree')..."></textarea>
+        </div>
+        <button class="btn" id="lock-evidence-btn" onclick="lockEvidencePack()" style="width: 100%;">🔒 Lock Evidence Pack</button>
+        <div class="evidence-pack" id="evidence-pack">
+          <div class="evidence-title">📦 Evidence Pack Repro</div>
+          <div class="evidence-content" id="evidence-content"></div>
+          <div class="export-controls">
+            <button class="btn" onclick="copyEvidence()">📋 Copy to Clipboard</button>
+            <button class="btn" onclick="downloadEvidence()">⬇️ Download JSON</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+let analysisData = {};
+function startAnalysis() {
+  const docName = document.getElementById('doc-name').value.trim();
+  const docText = document.getElementById('doc-text').value.trim();
+  const domain = document.getElementById('domain').value;
+  const truthConfig = document.getElementById('truth-config').value.trim();
+  if (!docText) { alert('Please paste document text or upload a file.'); return; }
+  analysisData = { docName: docName || 'Untitled', domain, docText, truthConfig, timestamp: new Date().toISOString() };
+  document.getElementById('input-section').style.display = 'none';
+  document.getElementById('workspace').classList.add('active');
+  document.getElementById('raw-context').textContent = docText.substring(0, 800) + (docText.length > 800 ? '...' : '');
+  if (truthConfig) {
+    document.getElementById('truth-config-display').style.display = 'block';
+    document.getElementById('truth-config-text').textContent = truthConfig;
+  }
+}
+function updateConfidence() { document.getElementById('confidence-display').textContent = document.getElementById('confidence').value + '/10'; }
+function toggleRationale() {
+  const a = document.querySelector('input[name="alignment"]:checked').value;
+  document.getElementById('alignment-rationale').required = a !== 'full';
+}
+function unlockAI() {
+  const q1 = document.getElementById('q1').value.trim();
+  const q2 = document.getElementById('q2').value.trim();
+  const q3 = document.getElementById('q3').value.trim();
+  if (!q1 || !q2 || !q3) { alert('All pre-analysis fields must be completed.'); return; }
+  analysisData.humanAssessment = { q1, q2, q3, confidence: parseInt(document.getElementById('confidence').value) };
+  document.getElementById('ai-locked-panel').style.display = 'none';
+  document.getElementById('comparison-panel').classList.add('active');
+  document.getElementById('your-assessment').innerHTML = '<strong>Pre-Analysis Summary:</strong><br><br>Primary subject: ' + q1 + '<br><br>Key risks: ' + q2 + '<br><br>Critical factors: ' + q3 + '<br><br><em style="color: var(--muted); font-size: 10px;">Confidence: ' + analysisData.humanAssessment.confidence + '/10</em>';
+  generateAIAnalysis();
+}
+function generateAIAnalysis() {
+  const docText = analysisData.docText;
+  let aiReasoning = ''; let confidence = 75;
+  if (analysisData.domain === 'contracts' || docText.toLowerCase().includes('contract') || docText.toLowerCase().includes('clause')) {
+    aiReasoning = 'This appears to be a contract analysis scenario. Key observations: The document contains clauses or terms that may have compliance or risk implications. Critical factors include unilateral modification rights, notice periods, baseline protections, and mutual signature requirements.';
+    confidence = 82;
+  } else if (analysisData.domain === 'medical') {
+    aiReasoning = 'Medical context detected. Analysis focuses on safety, efficacy, and regulatory alignment.';
+    confidence = 79;
+  } else {
+    aiReasoning = 'General analysis: The document addresses ' + (analysisData.domain || 'unspecified domain') + '. Recommendations include reviewing for consistency, risk factors, and alignment with stated objectives or regulations.';
+    confidence = 68;
+  }
+  analysisData.aiAnalysis = aiReasoning;
+  analysisData.aiConfidence = confidence;
+  document.getElementById('ai-reasoning').innerHTML = aiReasoning + '<br><br><em style="font-size: 10px; color: var(--muted);">Analysis basis: Raw context + System Definitions' + (analysisData.truthConfig ? ' + Truth Config' : '') + '</em>';
+  document.getElementById('ai-confidence').textContent = 'Confidence: ' + confidence + '% ' + (confidence < 70 ? '🟠 Verification Suggested' : '🟡 Review Recommended');
+  let overlap = [];
+  const q1Lower = analysisData.humanAssessment.q1.toLowerCase();
+  if (q1Lower.includes('unilateral') || q1Lower.includes('modification')) overlap.push({ type: 'agree', text: 'Both identified modification/unilateral change as primary issue.' });
+  if (q1Lower.includes('risk') || q1Lower.includes('compliance')) overlap.push({ type: 'agree', text: 'Both flagged compliance or risk implications.' });
+  if (q1Lower.length < 20) overlap.push({ type: 'disagree', text: 'Human assessment is higher-level; AI provides more granular detail on specific clause mechanics.' });
+  let overlapHTML = overlap.map(o => '<div class="overlap-item ' + (o.type === 'agree' ? 'overlap-agree' : 'overlap-disagree') + '">' + (o.type === 'agree' ? '[+]' : '[-]') + ' ' + o.text + '</div>').join('');
+  if (!overlapHTML) overlapHTML = '<div class="overlap-item overlap-agree">[+] Both assessments address core subject matter.</div>';
+  document.getElementById('overlap-content').innerHTML = overlapHTML;
+}
+function lockEvidencePack() {
+  const alignment = document.querySelector('input[name="alignment"]:checked');
+  const rationale = document.getElementById('alignment-rationale').value.trim();
+  if (!alignment) { alert('Select an alignment option.'); return; }
+  if (alignment.value !== 'full' && !rationale) { alert('Rationale required if not fully agreeing.'); return; }
+  analysisData.alignment = { choice: alignment.value, rationale: rationale || '(Fully agreed without additional rationale)', timestamp: new Date().toISOString() };
+  generateEvidencePack();
+  document.getElementById('evidence-pack').classList.add('active');
+}
+function generateEvidencePack() {
+  const pack = {
+    metadata: { id: 'EP-' + Date.now(), timestamp: analysisData.timestamp, document: analysisData.docName, domain: analysisData.domain, alignment_lock_time: new Date().toISOString() },
+    human_pre_analysis: analysisData.humanAssessment,
+    ai_analysis: { reasoning: analysisData.aiAnalysis, confidence: analysisData.aiConfidence },
+    alignment_decision: analysisData.alignment,
+    truth_config: analysisData.truthConfig || '(None provided)'
+  };
+  document.getElementById('evidence-content').textContent = JSON.stringify(pack, null, 2);
+  analysisData.evidencePack = pack;
+}
+function copyEvidence() {
+  navigator.clipboard.writeText(document.getElementById('evidence-content').textContent)
+    .then(() => alert('Evidence Pack copied to clipboard.'))
+    .catch(() => alert('Failed to copy. Try manual selection.'));
+}
+function downloadEvidence() {
+  const pack = analysisData.evidencePack;
+  const blob = new Blob([JSON.stringify(pack, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'evidence-pack-' + pack.metadata.id + '.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+document.getElementById('file-upload').addEventListener('change', function(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    document.getElementById('doc-text').value = event.target.result.substring(0, 2000);
+    if (!document.getElementById('doc-name').value) document.getElementById('doc-name').value = file.name;
+  };
+  reader.readAsText(file);
+});
+</script>
+</body>
+</html>

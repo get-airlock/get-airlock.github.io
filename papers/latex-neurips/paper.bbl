@@ -1,0 +1,271 @@
+\begin{thebibliography}{36}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Arnsten et~al.(2012)Arnsten, Wang, and
+  Paspalas]{arnsten2012neuromodulation}
+Amy F.~T. Arnsten, Min Wang, and Constantinos~D. Paspalas.
+\newblock Neuromodulation of thought: Flexibilities and vulnerabilities in
+  prefrontal cortical network synapses.
+\newblock \emph{Neuron}, 76\penalty0 (1):\penalty0 223--239, 2012.
+
+\bibitem[Arrow(1950)]{arrow1950difficulty}
+Kenneth~J. Arrow.
+\newblock A difficulty in the concept of social welfare.
+\newblock \emph{Journal of Political Economy}, 58\penalty0 (4):\penalty0
+  328--346, 1950.
+
+\bibitem[Bai et~al.(2022)Bai, Kadavath, Kundu, Askell, Kernion, Jones, Chen,
+  Goldie, Mirhoseini, McKinnon, et~al.]{bai2022constitutional}
+Yuntao Bai, Saurav Kadavath, Sandipan Kundu, Amanda Askell, Jackson Kernion,
+  Andy Jones, Anna Chen, Anna Goldie, Azalia Mirhoseini, Cameron McKinnon,
+  et~al.
+\newblock Constitutional {AI}: Harmlessness from {AI} feedback.
+\newblock \emph{arXiv preprint arXiv:2212.08073}, 2022.
+
+\bibitem[Bakker et~al.(2022)Bakker, Chadwick, Sheahan, Tessler,
+  Campbell-Gillingham, Balaguer, McAleese, Glaese, Aslanides, Botvinick, and
+  Summerfield]{bakker2022finetuning}
+Michiel~A. Bakker, Martin~J. Chadwick, Hannah~R. Sheahan, Michael~Henry
+  Tessler, Lucy Campbell-Gillingham, Jan Balaguer, Nat McAleese, Amelia Glaese,
+  John Aslanides, Matthew~M. Botvinick, and Christopher Summerfield.
+\newblock Fine-tuning language models to find agreement among humans with
+  diverse preferences.
+\newblock 2022.
+
+\bibitem[Balestriero and LeCun(2025)]{balestriero2025lejepa}
+Randall Balestriero and Yann LeCun.
+\newblock {LeJEPA}: Provable and scalable self-supervised learning without the
+  heuristics.
+\newblock \emph{arXiv preprint arXiv:2511.08544}, 2025.
+\newblock Introduces SIGReg (Sketched-Isotropic-Gaussian Regularizer) via
+  Cram{\'e}r-Wold random-projection distribution matching.
+
+\bibitem[Brehmer et~al.(2023)Brehmer, de~Haan, Behrends, and
+  Cohen]{brehmer2023geometric}
+Johann Brehmer, Pim de~Haan, S{\"o}nke Behrends, and Taco Cohen.
+\newblock Geometric algebra transformer.
+\newblock \emph{arXiv preprint arXiv:2305.18415}, 2023.
+
+\bibitem[Casper et~al.(2023)Casper, Davies, Shi, Gilbert, Scheurer, Rando,
+  Freedman, Korbak, Lindner, Freire, et~al.]{casper2023open}
+Stephen Casper, Xander Davies, Claudia Shi, Thomas~Krendl Gilbert,
+  J{\'e}r{\'e}my Scheurer, Javier Rando, Rachel Freedman, Tomasz Korbak, David
+  Lindner, Pedro Freire, et~al.
+\newblock Open problems and fundamental limitations of reinforcement learning
+  from human feedback.
+\newblock \emph{Transactions on Machine Learning Research}, 2023.
+
+\bibitem[Chakraborty et~al.(2024)Chakraborty, Qiu, Yuan, Koppel, Huang,
+  Manocha, Bedi, and Wang]{chakraborty2024maxmin}
+Souradip Chakraborty, Jiahao Qiu, Hui Yuan, Alec Koppel, Furong Huang, Dinesh
+  Manocha, Amrit~Singh Bedi, and Mengdi Wang.
+\newblock {MaxMin-RLHF}: Towards equitable alignment of large language models
+  with diverse human preferences.
+\newblock 2024.
+\newblock arXiv:2402.08925.
+
+\bibitem[Chen et~al.(2021)Chen, Tworek, Jun, Yuan, Pinto, Kaplan, Edwards,
+  et~al.]{chen2021evaluating}
+Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde de~Oliveira
+  Pinto, Jared Kaplan, Harri Edwards, et~al.
+\newblock Evaluating large language models trained on code.
+\newblock \emph{arXiv preprint arXiv:2107.03374}, 2021.
+
+\bibitem[Christiano et~al.(2017)Christiano, Leike, Brown, Martic, Legg, and
+  Amodei]{christiano2017deep}
+Paul~F Christiano, Jan Leike, Tom~B Brown, Miljan Martic, Shane Legg, and Dario
+  Amodei.
+\newblock Deep reinforcement learning from human preferences.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~30, 2017.
+\newblock arXiv:1706.03741.
+
+\bibitem[Cools and D'Esposito(2011)]{cools2011invertedu}
+Roshan Cools and Mark D'Esposito.
+\newblock Inverted-u shaped dopamine actions on human working memory and
+  cognitive control.
+\newblock \emph{Biological Psychiatry}, 69\penalty0 (12):\penalty0 e113--e125,
+  2011.
+
+\bibitem[Dekoninck et~al.(2024)Dekoninck, Fischer, and
+  Vechev]{dekoninck2024cascade}
+Jasper Dekoninck, Marc Fischer, and Martin Vechev.
+\newblock A unified approach to routing and cascading for {LLMs}, 2024.
+\newblock TODO verify arXiv ID from lineage memo.
+
+\bibitem[Ding et~al.(2024)Ding, Mallick, Wang, Sim, Mukherjee, Ruhle,
+  Lakshmanan, and Awadallah]{ding2024hybrid}
+Dujian Ding, Ankur Mallick, Chi Wang, Robert Sim, Subhabrata Mukherjee, Victor
+  Ruhle, Laks V.~S. Lakshmanan, and Ahmed~Hassan Awadallah.
+\newblock Hybrid {LLM}: Cost-efficient and quality-aware query routing.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2024.
+
+\bibitem[Fanous and Goldberg(2025)]{fanous2025syceval}
+Aaron Fanous and Jacob Goldberg.
+\newblock {SycEval}: Evaluating {LLM} sycophancy.
+\newblock \emph{arXiv preprint arXiv:2502.08177}, 2025.
+
+\bibitem[Gardner et~al.(2018)Gardner, Schoenbaum, and
+  Gershman]{gardner2018dopamine}
+Matthew P.~H. Gardner, Geoffrey Schoenbaum, and Samuel~J. Gershman.
+\newblock Rethinking dopamine as generalized prediction error.
+\newblock \emph{Proceedings of the Royal Society B}, 285\penalty0
+  (1891):\penalty0 20181645, 2018.
+
+\bibitem[Giannitelli et~al.(2021)]{giannitelli2021dopamineiq}
+Marianna Giannitelli et~al.
+\newblock Dopamine, cognitive flexibility, and {IQ}: Epistatic
+  catechol-o-methyltransferase interactions.
+\newblock \emph{Journal of Cognitive Neuroscience}, 34\penalty0 (1):\penalty0
+  153--170, 2021.
+
+\bibitem[Hendrycks et~al.(2021)Hendrycks, Burns, Basart, Zou, Mazeika, Song,
+  and Steinhardt]{hendrycks2021measuring}
+Dan Hendrycks, Collin Burns, Steven Basart, Andy Zou, Mantas Mazeika, Dawn
+  Song, and Jacob Steinhardt.
+\newblock Measuring massive multitask language understanding.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2021.
+
+\bibitem[Kahneman and Tversky(1979)]{kahneman1979prospect}
+Daniel Kahneman and Amos Tversky.
+\newblock Prospect theory: An analysis of decision under risk.
+\newblock \emph{Econometrica}, 47\penalty0 (2):\penalty0 263--291, 1979.
+
+\bibitem[Kauffman(1993)]{kauffman1993origins}
+Stuart~A. Kauffman.
+\newblock \emph{The Origins of Order: Self-Organization and Selection in
+  Evolution}.
+\newblock Oxford University Press, 1993.
+\newblock Foundational edge-of-chaos / complex-systems work: emergence is a
+  graph-topology property, not a node-intrinsic one.
+
+\bibitem[Kirk et~al.(2024)Kirk, Mediratta, Nalmpantis, Luketina, Hambro,
+  Grefenstette, and Raileanu]{kirk2024understanding}
+Robert Kirk, Ishita Mediratta, Christoforos Nalmpantis, Jelena Luketina, Eric
+  Hambro, Edward Grefenstette, and Roberta Raileanu.
+\newblock Understanding the effects of {RLHF} on {LLM} generalisation and
+  diversity.
+\newblock 2024.
+
+\bibitem[Maes et~al.(2026)Maes, Le~Lidec, Scieur, LeCun, and
+  Balestriero]{maes2026leworldmodel}
+Lucas Maes, Quentin Le~Lidec, Damien Scieur, Yann LeCun, and Randall
+  Balestriero.
+\newblock {LeWorldModel}: Stable end-to-end joint-embedding predictive
+  architecture from pixels.
+\newblock \emph{arXiv preprint arXiv:2603.19312}, 2026.
+\newblock Applies SIGReg to world-model JEPA training; stable end-to-end from
+  raw pixels with two loss terms.
+
+\bibitem[Oizumi et~al.(2014)Oizumi, Albantakis, and
+  Tononi]{oizumi2014phenomenology}
+Masafumi Oizumi, Larissa Albantakis, and Giulio Tononi.
+\newblock From the phenomenology to the mechanisms of consciousness:
+  {Integrated Information Theory 3.0}.
+\newblock \emph{PLoS Computational Biology}, 10\penalty0 (5), 2014.
+
+\bibitem[Ong et~al.(2024)Ong, Almahairi, Wu, Chiang, Wu, Gonzalez, Kadous, and
+  Stoica]{ong2024routellm}
+Isaac Ong, Amjad Almahairi, Vincent Wu, Wei-Lin Chiang, Tianhao Wu, Joseph~E.
+  Gonzalez, M.~Waleed Kadous, and Ion Stoica.
+\newblock {RouteLLM}: Learning to route {LLMs} with preference data.
+\newblock \emph{arXiv preprint arXiv:2406.18665}, 2024.
+
+\bibitem[Ouyang et~al.(2022)Ouyang, Wu, Jiang, Almeida, Wainwright, Mishkin,
+  Zhang, Agarwal, Slama, Ray, et~al.]{ouyang2022training}
+Long Ouyang, Jeffrey Wu, Xu~Jiang, Diogo Almeida, Carroll~L. Wainwright, Pamela
+  Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et~al.
+\newblock Training language models to follow instructions with human feedback.
+\newblock \emph{Advances in Neural Information Processing Systems}, 35, 2022.
+\newblock InstructGPT paper.
+
+\bibitem[Perez et~al.(2022)Perez, Ringer, Lukošiūtė, Nguyen, Chen, Heiner,
+  Pettit, Olsson, Kundu, Kadavath, et~al.]{perez2022discovering}
+Ethan Perez, Sam Ringer, Kamilė Lukošiūtė, Karina Nguyen, Edwin Chen, Scott
+  Heiner, Craig Pettit, Catherine Olsson, Sandipan Kundu, Saurav Kadavath,
+  et~al.
+\newblock Discovering language model behaviors with model-written evaluations.
+\newblock \emph{arXiv preprint arXiv:2212.09251}, 2022.
+
+\bibitem[Rein et~al.(2023)Rein, Hou, Stickland, Petty, Pang, Dirani, Michael,
+  and Bowman]{rein2023gpqa}
+David Rein, Betty~Li Hou, Asa~Cooper Stickland, Jackson Petty, Richard~Yuanzhe
+  Pang, Julien Dirani, Julian Michael, and Samuel~R. Bowman.
+\newblock {GPQA}: A graduate-level google-proof {Q\&A} benchmark.
+\newblock \emph{arXiv preprint arXiv:2311.12022}, 2023.
+
+\bibitem[Santurkar et~al.(2023)Santurkar, Durmus, Ladhak, Lee, Liang, and
+  Hashimoto]{santurkar2023whose}
+Shibani Santurkar, Esin Durmus, Faisal Ladhak, Cinoo Lee, Percy Liang, and
+  Tatsunori Hashimoto.
+\newblock Whose opinions do language models reflect?
+\newblock 2023.
+
+\bibitem[Seeley et~al.(2012)Seeley, Visscher, Schlegel, Hogan, Franks, and
+  Marshall]{seeley2012stop}
+Thomas~D. Seeley, P.~Kirk Visscher, Thomas Schlegel, Patrick~M. Hogan, Nigel~R.
+  Franks, and James A.~R. Marshall.
+\newblock Stop signals provide cross inhibition in collective decision-making
+  by honeybee swarms.
+\newblock \emph{Science}, 335\penalty0 (6064):\penalty0 108--111, 2012.
+
+\bibitem[Sen(1970)]{sen1970collective}
+Amartya Sen.
+\newblock \emph{Collective Choice and Social Welfare}.
+\newblock Holden-Day, 1970.
+
+\bibitem[Shapira et~al.(2026)Shapira, Benade, and Procaccia]{shapira2026rlhf}
+Itay Shapira, Gerdus Benade, and Ariel~D. Procaccia.
+\newblock How {RLHF} amplifies sycophancy.
+\newblock \emph{arXiv preprint arXiv:2602.01002}, 2026.
+\newblock Formal covariance-based amplification mechanism. TODO verify arxiv
+  ID.
+
+\bibitem[Sharma et~al.(2024)Sharma, Tong, Korbak, Duvenaud, Askell, Bowman,
+  Cheng, Durmus, Hatfield-Dodds, Johnston, et~al.]{sharma2024sycophancy}
+Mrinank Sharma, Meg Tong, Tomasz Korbak, David Duvenaud, Amanda Askell,
+  Samuel~R Bowman, Newton Cheng, Esin Durmus, Zac Hatfield-Dodds, Scott~R
+  Johnston, et~al.
+\newblock Towards understanding sycophancy in language models.
+\newblock 2024.
+
+\bibitem[TBD(2023)]{natureneuro2023dopamine}
+TBD.
+\newblock Unique functional responses differentially map onto genetic subtypes
+  of dopamine neurons.
+\newblock \emph{Nature Neuroscience}, 26:\penalty0 1654--1667, 2023.
+\newblock TODO verify authors.
+
+\bibitem[TBD(2025)]{patchworkagi2025}
+TBD.
+\newblock Patchwork {AGI}: A distributional view of general intelligence.
+\newblock \emph{arXiv preprint arXiv:2512.16856}, 2025.
+\newblock TODO verify authors/title.
+
+\bibitem[TBD(2026{\natexlab{a}})]{acetylcholine2026demix}
+TBD.
+\newblock Acetylcholine demixes heterogeneous dopamine signals.
+\newblock \emph{Nature Neuroscience}, 2026{\natexlab{a}}.
+\newblock March 2026. Tightest biological analogue to RLHO inference-time
+  routing. TODO verify authors from lineage memo.
+
+\bibitem[TBD(2026{\natexlab{b}})]{wrp2026}
+TBD.
+\newblock Workload-router-pool: Joint optimization of inference serving.
+\newblock \emph{arXiv preprint arXiv:2603.21354}, 2026{\natexlab{b}}.
+\newblock TODO verify authors/title from lineage memo.
+
+\bibitem[Weber et~al.(2022)]{weber2022quantifying}
+Sabrina~C. Weber et~al.
+\newblock Quantifying the inverted {U}: A meta-analysis of prefrontal dopamine,
+  {D1}-receptors, and working memory.
+\newblock \emph{Behavioral Neuroscience}, 136\penalty0 (3):\penalty0 207--218,
+  2022.
+
+\end{thebibliography}

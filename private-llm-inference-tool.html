@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Private LLM Inference Decision Tool</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a22;
+    --surface2: #242432;
+    --border: #2a2a3a;
+    --text: #e8e8f0;
+    --muted: #8a8a9a;
+    --accent: #00d9ff;
+    --warn: #ff6b6b;
+    --success: #2dd4a0;
+    --mono: 'IBM Plex Mono', monospace;
+    --body: 'IBM Plex Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  /* HEADER */
+  .header {
+    margin-bottom: 48px;
+  }
+  .header-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .header h1 {
+    font-size: 36px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .header-desc {
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  /* GRID LAYOUT */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 32px;
+    margin-bottom: 40px;
+  }
+  @media (max-width: 1024px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  /* INPUT PANEL */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px;
+  }
+
+  .panel-title {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel-title::before {
+    content: '▸';
+    color: var(--accent);
+    font-size: 12px;
+  }
+
+  /* SLIDER GROUP */
+  .slider-group {
+    margin-bottom: 24px;
+  }
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .slider-label-name {
+    font-weight: 500;
+  }
+  .slider-label-val {
+    font-family: var(--mono);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .slider {
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    outline: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+  }
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 8px rgba(0, 217, 255, 0.4);
+  }
+  .slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+  }
+
+  /* CHECKBOX GROUP */
+  .checkbox-group {
+    margin-bottom: 8px;
+  }
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    margin: 0 -8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .checkbox-item:hover {
+    background: var(--surface2);
+  }
+  .checkbox-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--accent);
+  }
+  .checkbox-label {
+    cursor: pointer;
+  }
+
+  /* MATRIX SECTION */
+  .matrix-panel {
+    overflow-x: auto;
+  }
+  .matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .matrix-th {
+    text-align: left;
+    padding: 12px 8px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    color: var(--text);
+  }
+  .matrix-th-approach {
+    width: 140px;
+  }
+  .matrix-th-score {
+    width: 70px;
+    text-align: right;
+  }
+  .matrix-td {
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .matrix-td-approach {
+    font-family: var(--mono);
+    font-weight: 500;
+    color: var(--text);
+    width: 140px;
+  }
+  .matrix-td-score {
+    text-align: right;
+    font-family: var(--mono);
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .matrix-row:hover {
+    background: var(--surface2);
+  }
+
+  /* RESULTS */
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .result-card.rank-1 {
+    border-color: var(--success);
+    background: rgba(45, 212, 160, 0.05);
+  }
+  .result-card.rank-2 {
+    border-color: var(--accent);
+    background: rgba(0, 217, 255, 0.05);
+  }
+  .result-rank {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .result-rank.rank-1 { color: var(--success); }
+  .result-rank.rank-2 { color: var(--accent); }
+  .result-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  .result-score {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .result-score.rank-1 { color: var(--success); }
+  .result-score.rank-2 { color: var(--accent); }
+  .result-metrics {
+    font-size: 11px;
+    line-height: 1.8;
+  }
+  .result-metric {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+  }
+  .result-metric-val {
+    font-family: var(--mono);
+    color: var(--text);
+  }
+
+  /* RECOMMENDATION */
+  .recommendation {
+    background: var(--surface2);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+  }
+  .rec-title {
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .rec-text {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  /* EXPORT */
+  .export-btn {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 10px 24px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .export-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 217, 255, 0.2);
+  }
+  .export-btn:active {
+    transform: translateY(0);
+  }
+
+  /* DETAILS TABLE */
+  .details-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .details-th {
+    background: var(--surface2);
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .details-td {
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .details-td.approach {
+    font-family: var(--mono);
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* SCORE BAR */
+  .score-bar {
+    display: flex;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .score-fill {
+    background: var(--accent);
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .score-fill.rank-1 { background: var(--success); }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="header-label">Decision Framework</div>
+    <h1>Private LLM Inference</h1>
+    <p class="header-desc">Score 4 deployment approaches (Self-Hosted, TEE, Hybrid MPC, Pure FHE) against your product priorities and constraints.</p>
+  </div>
+
+  <div class="grid">
+    <!-- INPUT PANEL -->
+    <div class="panel">
+      <div class="panel-title">Your Priorities</div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span class="slider-label-name">Latency (TTFT &lt;1s)</span>
+          <span class="slider-label-val" id="latency-val">5</span>
+        </div>
+        <input type="range" min="1" max="10" value="5" class="slider" id="latency-slider" oninput="updateScores()">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span class="slider-label-name">Privacy Guarantee</span>
+          <span class="slider-label-val" id="privacy-val">5</span>
+        </div>
+        <input type="range" min="1" max="10" value="5" class="slider" id="privacy-slider" oninput="updateScores()">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span class="slider-label-name">Cost Efficiency</span>
+          <span class="slider-label-val" id="cost-val">5</span>
+        </div>
+        <input type="range" min="1" max="10" value="5" class="slider" id="cost-slider" oninput="updateScores()">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span class="slider-label-name">Scale / QPS</span>
+          <span class="slider-label-val" id="scale-val">5</span>
+        </div>
+        <input type="range" min="1" max="10" value="5" class="slider" id="scale-slider" oninput="updateScores()">
+      </div>
+
+      <hr style="border: none; border-top: 1px solid var(--border); margin: 24px 0;">
+
+      <div class="panel-title">Constraints</div>
+
+      <div class="checkbox-group">
+        <div class="checkbox-item">
+          <input type="checkbox" id="regulated" onchange="updateScores()">
+          <label class="checkbox-label" for="regulated">Regulated Industry (HIPAA/GDPR)</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="highsecurity" onchange="updateScores()">
+          <label class="checkbox-label" for="highsecurity">High Security Requirement</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="sovereign" onchange="updateScores()">
+          <label class="checkbox-label" for="sovereign">Data Sovereignty (On-prem)</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="startupbudget" onchange="updateScores()">
+          <label class="checkbox-label" for="startupbudget">Startup Budget (&lt;$500k)</label>
+        </div>
+        <div class="checkbox-item">
+          <input type="checkbox" id="enterprise" onchange="updateScores()">
+          <label class="checkbox-label" for="enterprise">Enterprise Scale (&gt;1k QPS)</label>
+        </div>
+      </div>
+
+      <button class="export-btn" onclick="exportResults()" style="margin-top: 24px; width: 100%;">📋 Export Results</button>
+    </div>
+
+    <!-- MATRIX PANEL -->
+    <div class="panel">
+      <div class="panel-title">Scoring Matrix</div>
+      <div class="matrix-panel">
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th class="matrix-th matrix-th-approach">Approach</th>
+              <th class="matrix-th matrix-th-score">Latency</th>
+              <th class="matrix-th matrix-th-score">Privacy</th>
+              <th class="matrix-th matrix-th-score">Cost</th>
+              <th class="matrix-th matrix-th-score">Scale</th>
+              <th class="matrix-th matrix-th-score">Score</th>
+            </tr>
+          </thead>
+          <tbody id="matrix-body">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results-section"></div>
+
+  <!-- DETAILS -->
+  <div class="panel">
+    <div class="panel-title">Detailed Comparison</div>
+    <table class="details-table">
+      <thead>
+        <tr>
+          <th class="details-th">Approach</th>
+          <th class="details-th">Latency</th>
+          <th class="details-th">Privacy</th>
+          <th class="details-th">Cost/M Tokens</th>
+          <th class="details-th">Scale Fit</th>
+          <th class="details-th">Best For</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="details-td approach">Self-Hosted Plaintext</td>
+          <td class="details-td">✓ Excellent</td>
+          <td class="details-td">✗ None (your infra)</td>
+          <td class="details-td">$0.001-0.04</td>
+          <td class="details-td">✓ High (GPU clusters)</td>
+          <td class="details-td">Sovereignty, low ops</td>
+        </tr>
+        <tr>
+          <td class="details-td approach">TEE (SGX/Conf. VMs)</td>
+          <td class="details-td">✓ Good (&lt;20%)</td>
+          <td class="details-td">✓ Strong (HW isolate)</td>
+          <td class="details-td">+10-50% cloud</td>
+          <td class="details-td">~ Medium</td>
+          <td class="details-td">Regulated (HIPAA/GDPR)</td>
+        </tr>
+        <tr>
+          <td class="details-td approach">Hybrid MPC (KV-focused)</td>
+          <td class="details-td">✗ Poor (10-100x)</td>
+          <td class="details-td">✓✓ Very strong</td>
+          <td class="details-td">High comms (unquantified)</td>
+          <td class="details-td">✗ Low</td>
+          <td class="details-td">Research, partners</td>
+        </tr>
+        <tr>
+          <td class="details-td approach">Pure FHE/MPC</td>
+          <td class="details-td">✗ Fantasy (&gt;1M x)</td>
+          <td class="details-td">✓✓ Theoretical max</td>
+          <td class="details-td">Prohibitive</td>
+          <td class="details-td">✗ None</td>
+          <td class="details-td">2028+ hype only</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+const approaches = [
+  { name: 'Self-Hosted Plaintext', id: 'selfhosted' },
+  { name: 'TEE (SGX/Confidential VMs)', id: 'tee' },
+  { name: 'Hybrid MPC (KV-focused)', id: 'mpc' },
+  { name: 'Pure FHE/MPC', id: 'fhe' }
+];
+
+// Base scores (0-10) for each approach on each dimension
+const baseScores = {
+  selfhosted: { latency: 10, privacy: 2, cost: 10, scale: 9 },
+  tee: { latency: 8, privacy: 8, cost: 6, scale: 6 },
+  mpc: { latency: 3, privacy: 9, cost: 4, scale: 3 },
+  fhe: { latency: 1, privacy: 10, cost: 1, scale: 1 }
+};
+
+// Constraint boosts/penalties
+const constraintMods = {
+  selfhosted: { regulated: -3, highsecurity: -2, sovereign: +3, startupbudget: +2, enterprise: +2 },
+  tee: { regulated: +3, highsecurity: +2, sovereign: +1, startupbudget: 0, enterprise: +1 },
+  mpc: { regulated: +2, highsecurity: +2, sovereign: -1, startupbudget: -2, enterprise: -3 },
+  fhe: { regulated: +1, highsecurity: +1, sovereign: -1, startupbudget: -3, enterprise: -3 }
+};
+
+function getSliderValue(id) {
+  return parseInt(document.getElementById(id).value);
+}
+
+function isChecked(id) {
+  return document.getElementById(id).checked;
+}
+
+function updateScores() {
+  const latency = getSliderValue('latency-slider');
+  const privacy = getSliderValue('privacy-slider');
+  const cost = getSliderValue('cost-slider');
+  const scale = getSliderValue('scale-slider');
+
+  document.getElementById('latency-val').textContent = latency;
+  document.getElementById('privacy-val').textContent = privacy;
+  document.getElementById('cost-val').textContent = cost;
+  document.getElementById('scale-val').textContent = scale;
+
+  const scores = {};
+  const details = {};
+
+  approaches.forEach(app => {
+    const base = baseScores[app.id];
+
+    // Weighted score
+    const weighted = (
+      (base.latency / 10) * latency +
+      (base.privacy / 10) * privacy +
+      (base.cost / 10) * cost +
+      (base.scale / 10) * scale
+    ) / 4 * 10;
+
+    // Apply constraints
+    let constraintBonus = 0;
+    ['regulated', 'highsecurity', 'sovereign', 'startupbudget', 'enterprise'].forEach(c => {
+      if (isChecked(c)) {
+        constraintBonus += constraintMods[app.id][c];
+      }
+    });
+
+    const final = Math.max(1, Math.min(25, weighted + constraintBonus * 0.3));
+    scores[app.id] = Math.round(final * 10) / 10;
+    details[app.id] = { base, weighted: Math.round(weighted * 10) / 10, bonus: Math.round(constraintBonus * 10) / 10 };
+  });
+
+  renderMatrix(scores, details, { latency, privacy, cost, scale });
+  renderResults(scores);
+}
+
+function renderMatrix(scores, details, weights) {
+  const tbody = document.getElementById('matrix-body');
+  tbody.innerHTML = '';
+
+  approaches.forEach(app => {
+    const base = baseScores[app.id];
+    const score = scores[app.id];
+
+    const scoreWidth = (score / 25) * 100;
+    const row = `
+      <tr class="matrix-row">
+        <td class="matrix-td matrix-td-approach">${app.name}</td>
+        <td class="matrix-td matrix-td-score">${base.latency}</td>
+        <td class="matrix-td matrix-td-score">${base.privacy}</td>
+        <td class="matrix-td matrix-td-score">${base.cost}</td>
+        <td class="matrix-td matrix-td-score">${base.scale}</td>
+        <td class="matrix-td matrix-td-score">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="score-bar" style="flex:1; width: 40px;"><div class="score-fill" style="width: ${scoreWidth}%;"></div></div>
+            <span>${score}</span>
+          </div>
+        </td>
+      </tr>
+    `;
+    tbody.innerHTML += row;
+  });
+}
+
+function renderResults(scores) {
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+
+  const recMap = {
+    selfhosted: '✓ Strong fit for cost-sensitive, sovereign deployments. Break-even in 3-6 months vs. APIs if QPS >10. No compliance guarantee — requires your own infra governance.',
+    tee: '✓ Best for regulated workflows needing verifiable privacy. <20% latency overhead. Build in ~$100k-500k; scales to enterprise without crypto penalties.',
+    mpc: '~ Research-stage for product use. Viable only if privacy > latency and you have partners. Monitor 2027 if comms drop 10x.',
+    fhe: '✗ Fantasy for production today. >1M x cost penalty. Revisit 2028+ if quantum threat changes threat model.'
+  };
+
+  let html = '<div class="results-grid">';
+  sorted.forEach(([appId, score], idx) => {
+    const app = approaches.find(a => a.id === appId);
+    const rank = idx + 1;
+    const rankClass = rank <= 2 ? `rank-${rank}` : '';
+    const scoreClass = rank <= 2 ? `rank-${rank}` : '';
+
+    html += `
+      <div class="result-card ${rankClass}">
+        <div class="result-rank ${rankClass}">#${rank}</div>
+        <div class="result-name">${app.name}</div>
+        <div class="result-score ${scoreClass}">${score}</div>
+        <div class="result-metrics">
+          <div class="result-metric">
+            <span>Latency</span>
+            <span class="result-metric-val">${baseScores[appId].latency}/10</span>
+          </div>
+          <div class="result-metric">
+            <span>Privacy</span>
+            <span class="result-metric-val">${baseScores[appId].privacy}/10</span>
+          </div>
+          <div class="result-metric">
+            <span>Cost</span>
+            <span class="result-metric-val">${baseScores[appId].cost}/10</span>
+          </div>
+          <div class="result-metric">
+            <span>Scale</span>
+            <span class="result-metric-val">${baseScores[appId].scale}/10</span>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  html += '</div>';
+
+  html += `
+    <div class="recommendation">
+      <div class="rec-title">📌 Recommendation</div>
+      <div class="rec-text">
+        <strong>${approaches.find(a => a.id === sorted[0][0]).name}:</strong> ${recMap[sorted[0][0]]}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('results-section').innerHTML = html;
+}
+
+function exportResults() {
+  const latency = getSliderValue('latency-slider');
+  const privacy = getSliderValue('privacy-slider');
+  const cost = getSliderValue('cost-slider');
+  const scale = getSliderValue('scale-slider');
+
+  const constraints = [];
+  ['regulated', 'highsecurity', 'sovereign', 'startupbudget', 'enterprise'].forEach(c => {
+    if (isChecked(c)) {
+      constraints.push(document.querySelector(`label[for="${c}"]`).textContent.trim());
+    }
+  });
+
+  const scores = {};
+  approaches.forEach(app => {
+    const base = baseScores[app.id];
+    const weighted = ((base.latency / 10) * latency + (base.privacy / 10) * privacy + (base.cost / 10) * cost + (base.scale / 10) * scale) / 4 * 10;
+    scores[app.id] = Math.round(weighted * 10) / 10;
+  });
+
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const appNames = { selfhosted: 'Self-Hosted', tee: 'TEE', mpc: 'Hybrid MPC', fhe: 'Pure FHE' };
+
+  let text = `PRIVATE LLM INFERENCE DECISION
+Generated: ${new Date().toLocaleString()}
+
+INPUT WEIGHTS
+Latency Priority: ${latency}/10
+Privacy Priority: ${privacy}/10
+Cost Priority: ${cost}/10
+Scale Priority: ${scale}/10
+
+CONSTRAINTS
+${constraints.length > 0 ? constraints.join('\n') : '(None selected)'}
+
+RANKINGS
+`;
+
+  sorted.forEach(([appId, score], idx) => {
+    text += `\n#${idx + 1}: ${appNames[appId]} (${score}/25)`;
+  });
+
+  text += `\n\nTOP RECOMMENDATION: ${appNames[sorted[0][0]]}`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Results copied to clipboard!');
+  }).catch(err => {
+    console.error('Failed to copy:', err);
+  });
+}
+
+// Initialize
+updateScores();
+</script>
+</body>
+</html>

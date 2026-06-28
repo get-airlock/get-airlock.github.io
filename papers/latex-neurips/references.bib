@@ -1,0 +1,535 @@
+% ConstellationBench + NSI --- NeurIPS 2026 Evaluations & Datasets Track
+% Starter BibTeX. Expand as the lineage memo lands.
+
+% ============================================================================
+% RLHF lineage (Christiano 2017 is the anchor; Bai 2022 softens the Dario angle)
+% ============================================================================
+
+@inproceedings{christiano2017deep,
+  title        = {Deep Reinforcement Learning from Human Preferences},
+  author       = {Christiano, Paul F and Leike, Jan and Brown, Tom B and Martic, Miljan and Legg, Shane and Amodei, Dario},
+  booktitle    = {Advances in Neural Information Processing Systems},
+  volume       = {30},
+  year         = {2017},
+  note         = {arXiv:1706.03741}
+}
+
+@article{bai2022constitutional,
+  title        = {Constitutional {AI}: Harmlessness from {AI} Feedback},
+  author       = {Bai, Yuntao and Kadavath, Saurav and Kundu, Sandipan and Askell, Amanda and Kernion, Jackson and Jones, Andy and Chen, Anna and Goldie, Anna and Mirhoseini, Azalia and McKinnon, Cameron and others},
+  journal      = {arXiv preprint arXiv:2212.08073},
+  year         = {2022}
+}
+
+@article{ouyang2022training,
+  title        = {Training Language Models to Follow Instructions with Human Feedback},
+  author       = {Ouyang, Long and Wu, Jeffrey and Jiang, Xu and Almeida, Diogo and Wainwright, Carroll L. and Mishkin, Pamela and Zhang, Chong and Agarwal, Sandhini and Slama, Katarina and Ray, Alex and others},
+  journal      = {Advances in Neural Information Processing Systems},
+  volume       = {35},
+  year         = {2022},
+  note         = {InstructGPT paper}
+}
+
+@article{shapira2026rlhf,
+  title        = {How {RLHF} Amplifies Sycophancy},
+  author       = {Shapira, Itay and Benade, Gerdus and Procaccia, Ariel D.},
+  journal      = {arXiv preprint arXiv:2602.01002},
+  year         = {2026},
+  note         = {Formal covariance-based amplification mechanism. TODO verify arxiv ID.}
+}
+
+@article{chakraborty2024maxmin,
+  title        = {{MaxMin-RLHF}: Towards Equitable Alignment of Large Language Models with Diverse Human Preferences},
+  author       = {Chakraborty, Souradip and Qiu, Jiahao and Yuan, Hui and Koppel, Alec and Huang, Furong and Manocha, Dinesh and Bedi, Amrit Singh and Wang, Mengdi},
+  booktitle    = {International Conference on Machine Learning},
+  year         = {2024},
+  note         = {arXiv:2402.08925}
+}
+
+@book{sen1970collective,
+  title        = {Collective Choice and Social Welfare},
+  author       = {Sen, Amartya},
+  publisher    = {Holden-Day},
+  year         = {1970}
+}
+
+@article{kirk2024understanding,
+  title        = {Understanding the Effects of {RLHF} on {LLM} Generalisation and Diversity},
+  author       = {Kirk, Robert and Mediratta, Ishita and Nalmpantis, Christoforos and Luketina, Jelena and Hambro, Eric and Grefenstette, Edward and Raileanu, Roberta},
+  booktitle    = {The Twelfth International Conference on Learning Representations},
+  year         = {2024}
+}
+
+@article{benade2026rlhf,
+  title        = {How {RLHF} Amplifies Sycophancy},
+  author       = {Benade, Gerdus and others},
+  year         = {2026},
+  note         = {Preprint. TODO verify citation metadata from lineage memo.}
+}
+
+@article{warmthreliability2025,
+  title        = {Training Language Models to be Warm and Empathetic Makes Them Less Reliable},
+  author       = {TBD},
+  journal      = {arXiv preprint arXiv:2507.21919},
+  year         = {2025}
+}
+
+% ============================================================================
+% Sycophancy measurement and decomposition
+% ============================================================================
+
+@article{sharma2024sycophancy,
+  title        = {Towards Understanding Sycophancy in Language Models},
+  author       = {Sharma, Mrinank and Tong, Meg and Korbak, Tomasz and Duvenaud, David and Askell, Amanda and Bowman, Samuel R and Cheng, Newton and Durmus, Esin and Hatfield-Dodds, Zac and Johnston, Scott R and others},
+  booktitle    = {The Twelfth International Conference on Learning Representations (ICLR)},
+  year         = {2024}
+}
+
+@article{fanous2025syceval,
+  title        = {{SycEval}: Evaluating {LLM} Sycophancy},
+  author       = {Fanous, Aaron and Goldberg, Jacob},
+  journal      = {arXiv preprint arXiv:2502.08177},
+  year         = {2025}
+}
+
+@article{overalignment2026,
+  title        = {Overalignment in Frontier {LLMs}},
+  author       = {TBD},
+  journal      = {arXiv preprint arXiv:2601.18334},
+  year         = {2026}
+}
+
+@misc{sycophancynotonething2025,
+  title        = {Sycophancy Is Not One Thing: Causal Separation of Sycophantic Behaviors in {LLMs}},
+  author       = {TBD},
+  year         = {2025},
+  note         = {OpenReview d24zTCznJu. TODO verify from lineage memo.}
+}
+
+@article{perez2022discovering,
+  title        = {Discovering Language Model Behaviors with Model-Written Evaluations},
+  author       = {Perez, Ethan and Ringer, Sam and Lukošiūtė, Kamilė and Nguyen, Karina and Chen, Edwin and Heiner, Scott and Pettit, Craig and Olsson, Catherine and Kundu, Sandipan and Kadavath, Saurav and others},
+  journal      = {arXiv preprint arXiv:2212.09251},
+  year         = {2022}
+}
+
+% ============================================================================
+% Preference aggregation and social choice (Arrow touchpoint in \S 2)
+% ============================================================================
+
+@article{arrow1950difficulty,
+  title        = {A Difficulty in the Concept of Social Welfare},
+  author       = {Arrow, Kenneth J.},
+  journal      = {Journal of Political Economy},
+  volume       = {58},
+  number       = {4},
+  pages        = {328--346},
+  year         = {1950}
+}
+
+@article{bakker2022finetuning,
+  title        = {Fine-tuning Language Models to Find Agreement Among Humans with Diverse Preferences},
+  author       = {Bakker, Michiel A. and Chadwick, Martin J. and Sheahan, Hannah R. and Tessler, Michael Henry and Campbell-Gillingham, Lucy and Balaguer, Jan and McAleese, Nat and Glaese, Amelia and Aslanides, John and Botvinick, Matthew M. and Summerfield, Christopher},
+  booktitle    = {Advances in Neural Information Processing Systems},
+  year         = {2022}
+}
+
+@article{santurkar2023whose,
+  title        = {Whose Opinions Do Language Models Reflect?},
+  author       = {Santurkar, Shibani and Durmus, Esin and Ladhak, Faisal and Lee, Cinoo and Liang, Percy and Hashimoto, Tatsunori},
+  booktitle    = {International Conference on Machine Learning},
+  year         = {2023}
+}
+
+@article{casper2023open,
+  title        = {Open Problems and Fundamental Limitations of Reinforcement Learning from Human Feedback},
+  author       = {Casper, Stephen and Davies, Xander and Shi, Claudia and Gilbert, Thomas Krendl and Scheurer, J{\'e}r{\'e}my and Rando, Javier and Freedman, Rachel and Korbak, Tomasz and Lindner, David and Freire, Pedro and others},
+  journal      = {Transactions on Machine Learning Research},
+  year         = {2023}
+}
+
+% ============================================================================
+% Routing and cascading literature (Table 1 positioning)
+% ============================================================================
+
+@article{ong2024routellm,
+  title        = {{RouteLLM}: Learning to Route {LLMs} with Preference Data},
+  author       = {Ong, Isaac and Almahairi, Amjad and Wu, Vincent and Chiang, Wei-Lin and Wu, Tianhao and Gonzalez, Joseph E. and Kadous, M. Waleed and Stoica, Ion},
+  journal      = {arXiv preprint arXiv:2406.18665},
+  year         = {2024}
+}
+
+@inproceedings{ding2024hybrid,
+  title        = {Hybrid {LLM}: Cost-Efficient and Quality-Aware Query Routing},
+  author       = {Ding, Dujian and Mallick, Ankur and Wang, Chi and Sim, Robert and Mukherjee, Subhabrata and Ruhle, Victor and Lakshmanan, Laks V. S. and Awadallah, Ahmed Hassan},
+  booktitle    = {International Conference on Learning Representations (ICLR)},
+  year         = {2024}
+}
+
+@misc{dekoninck2024cascade,
+  title        = {A Unified Approach to Routing and Cascading for {LLMs}},
+  author       = {Dekoninck, Jasper and Fischer, Marc and Vechev, Martin},
+  year         = {2024},
+  note         = {TODO verify arXiv ID from lineage memo}
+}
+
+% ============================================================================
+% Geometric algebra and IIT framing precedents
+% ============================================================================
+
+@article{brehmer2023geometric,
+  title        = {Geometric Algebra Transformer},
+  author       = {Brehmer, Johann and de Haan, Pim and Behrends, S{\"o}nke and Cohen, Taco},
+  journal      = {arXiv preprint arXiv:2305.18415},
+  year         = {2023}
+}
+
+@article{balestriero2025lejepa,
+  title        = {{LeJEPA}: Provable and Scalable Self-Supervised Learning Without the Heuristics},
+  author       = {Balestriero, Randall and LeCun, Yann},
+  journal      = {arXiv preprint arXiv:2511.08544},
+  year         = {2025},
+  note         = {Introduces SIGReg (Sketched-Isotropic-Gaussian Regularizer) via Cram{\'e}r-Wold random-projection distribution matching.}
+}
+
+@article{maes2026leworldmodel,
+  title        = {{LeWorldModel}: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels},
+  author       = {Maes, Lucas and Le Lidec, Quentin and Scieur, Damien and LeCun, Yann and Balestriero, Randall},
+  journal      = {arXiv preprint arXiv:2603.19312},
+  year         = {2026},
+  note         = {Applies SIGReg to world-model JEPA training; stable end-to-end from raw pixels with two loss terms.}
+}
+
+@article{hochreiter1997lstm,
+  title        = {Long Short-Term Memory},
+  author       = {Hochreiter, Sepp and Schmidhuber, J{\"u}rgen},
+  journal      = {Neural Computation},
+  volume       = {9},
+  number       = {8},
+  pages        = {1735--1780},
+  year         = {1997},
+  note         = {Foundational LSTM paper. Constant error carousel, input/output gates, solves vanishing gradient for long-range dependencies.}
+}
+
+@inproceedings{beck2024xlstm,
+  title        = {{xLSTM}: Extended Long Short-Term Memory},
+  author       = {Beck, Maximilian and P{\"o}ppel, Korbinian and Spanring, Markus and Auer, Andreas and Prudnikova, Oleksandra and Kopp, Michael and Klambauer, G{\"u}nter and Brandstetter, Johannes and Hochreiter, Sepp},
+  booktitle    = {Advances in Neural Information Processing Systems},
+  year         = {2024},
+  note         = {arXiv:2405.04517. Revival of LSTM with exponential gating and matrix (Hopfield) memory (sLSTM, mLSTM). Fixed-memory inference, chunk-wise Flash Attention, faster than Flash Attention in both training and inference.}
+}
+
+@book{kauffman1993origins,
+  title        = {The Origins of Order: Self-Organization and Selection in Evolution},
+  author       = {Kauffman, Stuart A.},
+  publisher    = {Oxford University Press},
+  year         = {1993},
+  note         = {Foundational edge-of-chaos / complex-systems work: emergence is a graph-topology property, not a node-intrinsic one.}
+}
+
+@article{oizumi2014phenomenology,
+  title        = {From the Phenomenology to the Mechanisms of Consciousness: {Integrated Information Theory 3.0}},
+  author       = {Oizumi, Masafumi and Albantakis, Larissa and Tononi, Giulio},
+  journal      = {PLoS Computational Biology},
+  volume       = {10},
+  number       = {5},
+  year         = {2014}
+}
+
+@article{weller2025theoretical,
+  title        = {On the Theoretical Limitations of Embedding-Based Retrieval},
+  author       = {Weller, Orion and others},
+  journal      = {arXiv preprint arXiv:2508.21038},
+  year         = {2025}
+}
+
+% ============================================================================
+% Capability benchmarks (Related Work \S 2.1)
+% ============================================================================
+
+@inproceedings{hendrycks2021measuring,
+  title        = {Measuring Massive Multitask Language Understanding},
+  author       = {Hendrycks, Dan and Burns, Collin and Basart, Steven and Zou, Andy and Mazeika, Mantas and Song, Dawn and Steinhardt, Jacob},
+  booktitle    = {International Conference on Learning Representations (ICLR)},
+  year         = {2021}
+}
+
+@article{chen2021evaluating,
+  title        = {Evaluating Large Language Models Trained on Code},
+  author       = {Chen, Mark and Tworek, Jerry and Jun, Heewoo and Yuan, Qiming and Pinto, Henrique Ponde de Oliveira and Kaplan, Jared and Edwards, Harri and others},
+  journal      = {arXiv preprint arXiv:2107.03374},
+  year         = {2021}
+}
+
+@article{rein2023gpqa,
+  title        = {{GPQA}: A Graduate-Level Google-Proof {Q\&A} Benchmark},
+  author       = {Rein, David and Hou, Betty Li and Stickland, Asa Cooper and Petty, Jackson and Pang, Richard Yuanzhe and Dirani, Julien and Michael, Julian and Bowman, Samuel R.},
+  journal      = {arXiv preprint arXiv:2311.12022},
+  year         = {2023}
+}
+
+% ============================================================================
+% ConstellationBench self-reference (dataset paper companion)
+% ============================================================================
+
+@misc{constellationbench2026,
+  title        = {{ConstellationBench}: Behavioral {AI} Evaluation Across 22 {LLM} Models},
+  author       = {Holwerda, Zachary},
+  year         = {2026},
+  howpublished = {HuggingFace Datasets},
+  note         = {\url{https://huggingface.co/datasets/AirlockLabs/constellation-bench}}
+}
+
+% ============================================================================
+% Additional social choice / preference heterogeneity (Kahneman-Tversky + routing)
+% ============================================================================
+
+@article{kahneman1979prospect,
+  title        = {Prospect Theory: An Analysis of Decision Under Risk},
+  author       = {Kahneman, Daniel and Tversky, Amos},
+  journal      = {Econometrica},
+  volume       = {47},
+  number       = {2},
+  pages        = {263--291},
+  year         = {1979}
+}
+
+@inproceedings{park2024rlhfpersonalization,
+  title        = {Principled Personalization in {RLHF} Under Diverse Human Preferences},
+  author       = {Park, Chanwoo and others},
+  booktitle    = {ICML Workshop on Theoretical Foundations of Foundation Models (TF2M)},
+  year         = {2024},
+  note         = {Closest RLHO prior. TODO verify arxiv ID and author list from lineage memo.}
+}
+
+@article{sharma2024sycophancyshort,
+  title        = {Towards Understanding Sycophancy in Language Models (short)},
+  author       = {Sharma, Mrinank and Tong, Meg and Korbak, Tomasz and others},
+  journal      = {arXiv preprint arXiv:2310.13548},
+  year         = {2024},
+  note         = {Alternative arXiv version of sharma2024sycophancy, kept distinct in bib to avoid collision.}
+}
+
+@article{wrp2026,
+  title        = {Workload-Router-Pool: Joint Optimization of Inference Serving},
+  author       = {TBD},
+  journal      = {arXiv preprint arXiv:2603.21354},
+  year         = {2026},
+  note         = {TODO verify authors/title from lineage memo.}
+}
+
+@article{patchworkagi2025,
+  title        = {Patchwork {AGI}: A Distributional View of General Intelligence},
+  author       = {TBD},
+  journal      = {arXiv preprint arXiv:2512.16856},
+  year         = {2025},
+  note         = {TODO verify authors/title.}
+}
+
+% ============================================================================
+% Biology / neuroscience cluster (Appendix A --- "biology routes rather than averages")
+% ============================================================================
+
+@article{arnsten2012neuromodulation,
+  title        = {Neuromodulation of Thought: Flexibilities and Vulnerabilities in Prefrontal Cortical Network Synapses},
+  author       = {Arnsten, Amy F. T. and Wang, Min and Paspalas, Constantinos D.},
+  journal      = {Neuron},
+  volume       = {76},
+  number       = {1},
+  pages        = {223--239},
+  year         = {2012}
+}
+
+@article{cools2011invertedu,
+  title        = {Inverted-U Shaped Dopamine Actions on Human Working Memory and Cognitive Control},
+  author       = {Cools, Roshan and D'Esposito, Mark},
+  journal      = {Biological Psychiatry},
+  volume       = {69},
+  number       = {12},
+  pages        = {e113--e125},
+  year         = {2011}
+}
+
+@article{weber2022quantifying,
+  title        = {Quantifying the Inverted {U}: A Meta-analysis of Prefrontal Dopamine, {D1}-Receptors, and Working Memory},
+  author       = {Weber, Sabrina C. and others},
+  journal      = {Behavioral Neuroscience},
+  volume       = {136},
+  number       = {3},
+  pages        = {207--218},
+  year         = {2022}
+}
+
+@article{giannitelli2021dopamineiq,
+  title        = {Dopamine, Cognitive Flexibility, and {IQ}: Epistatic Catechol-O-methyltransferase Interactions},
+  author       = {Giannitelli, Marianna and others},
+  journal      = {Journal of Cognitive Neuroscience},
+  volume       = {34},
+  number       = {1},
+  pages        = {153--170},
+  year         = {2021}
+}
+
+@article{acetylcholine2026demix,
+  title        = {Acetylcholine Demixes Heterogeneous Dopamine Signals},
+  author       = {TBD},
+  journal      = {Nature Neuroscience},
+  year         = {2026},
+  note         = {March 2026. Tightest biological analogue to RLHO inference-time routing. TODO verify authors from lineage memo.}
+}
+
+@article{natureneuro2023dopamine,
+  title        = {Unique Functional Responses Differentially Map onto Genetic Subtypes of Dopamine Neurons},
+  author       = {TBD},
+  journal      = {Nature Neuroscience},
+  volume       = {26},
+  pages        = {1654--1667},
+  year         = {2023},
+  note         = {TODO verify authors.}
+}
+
+@article{seeley2012stop,
+  title        = {Stop Signals Provide Cross Inhibition in Collective Decision-Making by Honeybee Swarms},
+  author       = {Seeley, Thomas D. and Visscher, P. Kirk and Schlegel, Thomas and Hogan, Patrick M. and Franks, Nigel R. and Marshall, James A. R.},
+  journal      = {Science},
+  volume       = {335},
+  number       = {6064},
+  pages        = {108--111},
+  year         = {2012}
+}
+
+@article{gardner2018dopamine,
+  title        = {Rethinking Dopamine as Generalized Prediction Error},
+  author       = {Gardner, Matthew P. H. and Schoenbaum, Geoffrey and Gershman, Samuel J.},
+  journal      = {Proceedings of the Royal Society B},
+  volume       = {285},
+  number       = {1891},
+  pages        = {20181645},
+  year         = {2018}
+}
+
+% TODO (tracked in lineage memo from other chat):
+%  - Casper et al. 2023 --- verify TMLR citation page/equation hooks
+%  - Bakker et al. 2022 --- verify NeurIPS proceedings page for the diverse-preference
+%    problem statement (already cited via the bakker2022finetuning entry above)
+%  - Santurkar et al. 2023 --- ICML proceedings page + Opinion QA dataset metadata
+%  - Chakraborty et al. 2024 (multi-objective / MaxMin RLHF) --- arxiv 2402.08925
+%    confirmed; verify proceedings page and author list
+
+% ============================================================================
+% Beyond Web5: A Substrate Map (NeurIPS 2026 main track, supplemental cites)
+% Added 2026-04-29 — supports beyond-web5-substrate-map.md
+% ============================================================================
+
+@misc{bernerslee1989,
+  author       = {Berners-Lee, Tim},
+  title        = {Information Management: A Proposal},
+  howpublished = {{CERN}},
+  year         = {1989},
+  url          = {https://www.w3.org/History/1989/proposal.html}
+}
+
+@article{solid_pods,
+  author       = {Sambra, Andrei Vlad and Mansour, Essam and Hawke, Sandro and Zereba, Maged and Greco, Nicola and Ghanem, Abdurrahman and Zagidulin, Dmitri and Aboulnaga, Ashraf and Berners-Lee, Tim},
+  title        = {Solid: A Platform for Decentralized Social Applications Based on Linked Data},
+  institution  = {{MIT CSAIL}},
+  year         = {2016},
+  url          = {https://solidproject.org/}
+}
+
+@misc{tbd_web5,
+  author       = {{Block Inc. (TBD)}},
+  title        = {{Web5}: A Decentralized Web Platform with Self-Sovereign Identity},
+  howpublished = {Technical Specification},
+  year         = {2022},
+  url          = {https://developer.tbd.website/projects/web5/}
+}
+
+@techreport{pact_protocol_spec,
+  author       = {Holwerda, Zac},
+  title        = {{PACT} Protocol Specification: A Typed Operator for Operator-Resident {AI} Substrates},
+  institution  = {Airlock Labs},
+  year         = {2026}
+}
+
+@techreport{white_paper_v7_TI,
+  author       = {Holwerda, Zac},
+  title        = {Beyond {Web5}: Topological Intelligence and the Operator-Resident Substrate},
+  institution  = {Airlock Labs},
+  type         = {Public White Paper, v7},
+  year         = {2026}
+}
+
+@techreport{wp2_entanglement_safe_handshake,
+  author       = {Holwerda, Zac},
+  title        = {{WP2}: Entanglement-Safe Handshake --- A Behavioral Commitment Primitive},
+  institution  = {Airlock Labs},
+  type         = {Whitepaper Series},
+  year         = {2026}
+}
+
+@techreport{wp3_sha256_layered_trust,
+  author       = {Holwerda, Zac},
+  title        = {{WP3}: {SHA-256} as a Layered Trust Object --- A Five-Layer Frame for Behavioral Commitments},
+  institution  = {Airlock Labs},
+  type         = {Whitepaper Series},
+  year         = {2026}
+}
+
+@misc{oconnor2023web4,
+  author       = {{O'Connor}, J.},
+  title        = {Substrate-Resident Agents and the {Web4} Compute Layer},
+  howpublished = {Survey of substrate-resident agentic literature},
+  year         = {2023},
+  note         = {Placeholder citation; replace with primary source before final submission}
+}
+
+@misc{katsarosgiannis2026,
+  author       = {Katsarosgiannis, G.},
+  title        = {{Stern-Brocot} Reconstruction of {Anthropic}'s Subscription Credit Caps},
+  howpublished = {Public disclosure (Threads post)},
+  year         = {2026},
+  month        = apr,
+  url          = {https://threads.net/@katsarosgiannis}
+}
+
+@misc{hiddenlayer,
+  author       = {{HiddenLayer Inc.}},
+  title        = {{MLSec} Platform: Adversarial-Attack Detection and Behavioral Anomaly Monitoring for Production Models},
+  howpublished = {Commercial product documentation},
+  year         = {2024},
+  url          = {https://hiddenlayer.com}
+}
+
+@misc{mcp_anthropic,
+  author       = {Anthropic},
+  title        = {Model Context Protocol ({MCP}) Specification},
+  howpublished = {Open protocol specification},
+  year         = {2024},
+  url          = {https://modelcontextprotocol.io}
+}
+
+@book{d2l_book,
+  author       = {Zhang, Aston and Lipton, Zachary C. and Li, Mu and Smola, Alexander J.},
+  title        = {Dive into Deep Learning},
+  publisher    = {d2l.ai},
+  year         = {2024},
+  url          = {https://d2l.ai}
+}
+
+@article{ssi_survey,
+  author       = {M{\"u}hle, Alexander and Gr{\"u}ner, Andreas and Gayvoronskaya, Tatiana and Meinel, Christoph},
+  title        = {A Survey on Essential Components of a Self-Sovereign Identity},
+  journal      = {Computer Science Review},
+  volume       = {30},
+  pages        = {80--86},
+  year         = {2018}
+}
+
+@misc{w3c_did_core,
+  author       = {{W3C}},
+  title        = {Decentralized Identifiers ({DIDs}) v1.0: Core Architecture, Data Model, and Representations},
+  howpublished = {{W3C} Recommendation},
+  year         = {2022},
+  url          = {https://www.w3.org/TR/did-core/}
+}

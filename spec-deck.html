@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0a0a0a">
+<title>Airlock — Internal Spec Deck v0.1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --bg-deep: #050505;
+  --panel: #111;
+  --panel-edge: #1d1d1d;
+  --panel-edge-strong: #2a2a2a;
+  --ink: #e8e8e8;
+  --ink-soft: #c4c4c4;
+  --ink-dim: #888;
+  --ink-faint: #555;
+  --accent-substrate: #00d4ff;
+  --accent-loki: #b366ff;
+  --accent-spacebar: #00ff7f;
+  --accent-operator: #ff8c00;
+  --gold: #d4a574;
+  --gate-warn: #ffd23f;
+  --gate-bad: #ff4d4d;
+  --mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+  --display: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--display);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+  height: 100%;
+  overflow-x: hidden;
+}
+.deck {
+  scroll-snap-type: y mandatory;
+  height: 100vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+.slide {
+  scroll-snap-align: start;
+  min-height: 100vh;
+  width: 100vw;
+  padding: 4rem 4rem 5.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 1px solid var(--panel-edge);
+  position: relative;
+  background: var(--bg);
+}
+.slide.alt { background: var(--bg-deep); }
+@media (max-width: 768px) {
+  .slide { padding: 2.5rem 1.5rem 5rem; }
+}
+.slide-num {
+  position: absolute;
+  top: 1.25rem;
+  right: 2rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.15em;
+}
+.slide-tag {
+  position: absolute;
+  top: 1.25rem;
+  left: 2rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.slide-tag .accent { color: var(--accent-substrate); }
+@media (max-width: 768px) {
+  .slide-num, .slide-tag { left: 1rem; right: 1rem; top: 1rem; font-size: 0.65rem; }
+  .slide-num { left: auto; }
+}
+.slide-inner { max-width: 1100px; margin: 0 auto; width: 100%; }
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-substrate);
+  margin-bottom: 1rem;
+}
+h1.slide-title {
+  font-family: var(--mono);
+  font-size: clamp(1.8rem, 4.5vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+}
+h1.slide-title .accent { color: var(--accent-substrate); }
+h1.slide-title .gold { color: var(--gold); }
+h1.slide-title .purple { color: var(--accent-loki); }
+.lede {
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  color: var(--ink-soft);
+  max-width: 80ch;
+  margin-bottom: 2rem;
+  line-height: 1.55;
+}
+.cover {
+  background: linear-gradient(135deg, var(--bg-deep) 0%, var(--bg) 50%, #0a1015 100%);
+  text-align: center;
+}
+.cover h1 {
+  font-family: var(--mono);
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin-bottom: 1.5rem;
+}
+.cover h1 .accent { color: var(--accent-substrate); display: block; }
+.cover .subtitle {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  color: var(--ink-dim);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 2.5rem;
+}
+.cover .meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  border: 1px solid var(--panel-edge);
+  background: rgba(0, 212, 255, 0.03);
+}
+.cover .meta-item { text-align: left; }
+.cover .meta-item .label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin-bottom: 0.3rem;
+}
+.cover .meta-item .value {
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.cover .confidential {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--gate-warn);
+  margin-top: 2rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 1rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; margin-top: 1rem; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-left: 3px solid var(--accent-substrate);
+  padding: 1.25rem 1.5rem;
+}
+.card.purple { border-left-color: var(--accent-loki); }
+.card.green { border-left-color: var(--accent-spacebar); }
+.card.orange { border-left-color: var(--accent-operator); }
+.card.gold { border-left-color: var(--gold); }
+.card.warn { border-left-color: var(--gate-warn); }
+.card h3 {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.02em;
+}
+.card .meta {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.card p {
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+.card ul {
+  margin-top: 0.5rem;
+  padding-left: 1.1rem;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+.diagram {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  padding: 2rem 1.5rem;
+  margin: 1.5rem 0;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  white-space: pre;
+  overflow-x: auto;
+  line-height: 1.5;
+}
+.spec-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+}
+.spec-table th, .spec-table td {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--panel-edge);
+}
+.spec-table th {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  background: var(--bg-deep);
+}
+.spec-table td { color: var(--ink-soft); }
+.spec-table td.mono { font-family: var(--mono); font-size: 0.82rem; }
+.spec-table td .pill {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--panel-edge);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.spec-table td .pill.go { color: var(--accent-spacebar); border-color: rgba(0, 255, 127, 0.3); }
+.spec-table td .pill.no { color: var(--gate-bad); border-color: rgba(255, 77, 77, 0.3); }
+.spec-table td .pill.tbd { color: var(--gate-warn); border-color: rgba(255, 210, 63, 0.3); }
+.code-block {
+  background: var(--bg-deep);
+  border: 1px solid var(--panel-edge);
+  padding: 1rem 1.25rem;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--accent-substrate);
+  overflow-x: auto;
+  margin: 1rem 0;
+  white-space: pre;
+}
+.spec-list { list-style: none; padding: 0; margin: 1rem 0; }
+.spec-list li {
+  padding: 0.5rem 0 0.5rem 1.5rem;
+  position: relative;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  font-size: 0.95rem;
+  border-bottom: 1px solid var(--panel-edge);
+}
+.spec-list li:last-child { border-bottom: none; }
+.spec-list li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--accent-substrate);
+}
+.deck-nav {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 1.25rem;
+  background: rgba(17, 17, 17, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--panel-edge);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+  z-index: 100;
+}
+.deck-nav button {
+  background: transparent;
+  border: 1px solid var(--panel-edge);
+  color: var(--ink);
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  transition: all 0.15s;
+}
+.deck-nav button:hover {
+  border-color: var(--accent-substrate);
+  color: var(--accent-substrate);
+}
+.deck-nav .progress {
+  font-family: var(--mono);
+  letter-spacing: 0.1em;
+  min-width: 50px;
+  text-align: center;
+}
+.deck-nav .keys { font-size: 0.7rem; color: var(--ink-faint); letter-spacing: 0.1em; }
+@media (max-width: 640px) { .deck-nav .keys { display: none; } }
+@media print {
+  html, body { height: auto; overflow: visible; }
+  .deck { height: auto; overflow: visible; scroll-snap-type: none; }
+  .slide { page-break-after: always; min-height: 0; height: auto; padding: 2rem; }
+  .deck-nav { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+<!-- ──── Slide 1: Cover ──── -->
+<section class="slide cover" data-slide="1">
+  <span class="slide-tag"><span class="accent">●</span> AIRLOCK · INTERNAL</span>
+  <span class="slide-num">01 / 18</span>
+  <div class="slide-inner">
+    <h1>Airlock <span class="accent">Spec Deck</span></h1>
+    <div class="subtitle">Internal Reference · v0.1 · Substrate Architecture</div>
+    <div class="meta">
+      <div class="meta-item"><div class="label">Date</div><div class="value">2026-04-28</div></div>
+      <div class="meta-item"><div class="label">Audience</div><div class="value">Founders · Allies</div></div>
+      <div class="meta-item"><div class="label">Tier</div><div class="value">3 · Internal Team</div></div>
+      <div class="meta-item"><div class="label">Authored</div><div class="value">Coeus / Zac</div></div>
+    </div>
+    <div class="confidential">⚠ CONFIDENTIAL · NOT FOR EXTERNAL DISTRIBUTION</div>
+  </div>
+</section>
+
+<!-- ──── Slide 2: Three Entities ──── -->
+<section class="slide" data-slide="2">
+  <span class="slide-tag"><span class="accent">●</span> 02 · ENTITIES</span>
+  <span class="slide-num">02 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">Three Entities · Allied · Not Merged</div>
+    <h1 class="slide-title">The structure underneath everything.</h1>
+    <p class="lede">Three distinct legal entities with distinct balance sheets and distinct purposes. Joined by the Airlock Pass; not by ownership.</p>
+    <div class="grid-3">
+      <div class="card green">
+        <div class="meta">Non-Profit · No Bank Accounts</div>
+        <h3>Brain Brigade</h3>
+        <p>The mission-bound substrate. Holds no cash. Eventually formal 501(c)(3). Operator-serving by structural commitment.</p>
+      </div>
+      <div class="card">
+        <div class="meta">For-Profit · Detroit</div>
+        <h3>Airlock Labs</h3>
+        <p>Zac's company. Commercial side of architecture, tooling, product. Funds substrate work as mission. Pays salaries.</p>
+      </div>
+      <div class="card orange">
+        <div class="meta">For-Profit · Texas</div>
+        <h3>Maverick Industries</h3>
+        <p>Garrett's company. Independent for-profit ally. The Farm lives here. Zac is CAO. Independent balance sheet.</p>
+      </div>
+    </div>
+    <div class="diagram">     ┌──────────────────────┐
+     │  AIRLOCK PASS        │   ← single identity, three doors
+     └──────────────────────┘
+              │
+       ┌──────┴───────┐──────────────┐
+       ▼              ▼              ▼
+  [Brain Brigade] [Airlock Labs] [Maverick Industries]
+   non-profit      for-profit      for-profit (TX)
+   substrate       commercial      The Farm</div>
+  </div>
+</section>
+
+<!-- ──── Slide 3: Org Tree ──── -->
+<section class="slide alt" data-slide="3">
+  <span class="slide-tag"><span class="accent">●</span> 03 · ORG TREE</span>
+  <span class="slide-num">03 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">Five Founding Seats · One CTO · Allies · AI Archetypes</div>
+    <h1 class="slide-title">Who runs what.</h1>
+    <table class="spec-table">
+      <thead><tr><th>Tier</th><th>Seat</th><th>Holder</th><th>Type</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">FOUNDING</td><td>CAO · Architecture</td><td>Zac (Coeus)</td><td><span class="pill">human ⬢</span></td></tr>
+        <tr><td class="mono">FOUNDING</td><td>Operations · ?</td><td>Alex (Maverick) — open seat</td><td><span class="pill go">human ⬢ · OPEN</span></td></tr>
+        <tr><td class="mono">FOUNDING</td><td>Memory anchor</td><td>Otto</td><td><span class="pill">archetype ◇</span></td></tr>
+        <tr><td class="mono">C-SUITE</td><td>CTO · technical operations</td><td>Matt (Smartrick / "General Rick")</td><td><span class="pill">human ⬢</span></td></tr>
+        <tr><td class="mono">ALLIED</td><td>Founder · Maverick Industries</td><td>Garrett</td><td><span class="pill">human ⬢ · TX</span></td></tr>
+        <tr><td class="mono">ADVISORY</td><td>Moon-orbit advisor</td><td>Jim Robinson</td><td><span class="pill tbd">advisor</span></td></tr>
+        <tr><td class="mono">PARTNER</td><td>Inference / Tradverse</td><td>Sarim</td><td><span class="pill tbd">partner</span></td></tr>
+        <tr><td class="mono">STAFF ◇</td><td>OfficeCLI · Culture / Careers / Strategies</td><td>AI archetypes (3)</td><td><span class="pill">archetype ◇</span></td></tr>
+        <tr><td class="mono">PARTNERS ◇</td><td>Persona Constellation</td><td>22 archetypes (DECF-profiled)</td><td><span class="pill">archetype ◇</span></td></tr>
+        <tr><td class="mono">OFFICE MGR ◇</td><td>Operational shell</td><td>Brain Brigade Spacebar</td><td><span class="pill">archetype ◇</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ──── Slide 4: BCODE Closure ──── -->
+<section class="slide" data-slide="4">
+  <span class="slide-tag"><span class="accent">●</span> 04 · SUBSTRATE</span>
+  <span class="slide-num">04 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">BCODE · Bivector Closure Operator · AIRLOCK-2026-005</div>
+    <h1 class="slide-title">The <span class="accent">core math</span>.</h1>
+    <p class="lede">Every operator action signs a bivector closure. Magnitude inside band → ok. Outside → rejected. Patent claim covers the operator + closure-band check.</p>
+    <div class="code-block">C = (P ∧ L) ⊕ (R ∧ W)
+
+  P · operator DECF profile (4-vector)
+  L · model-id projection (4-vector, SHA-256)
+  R · output fidelity components (4-vector)
+  W · rolling closure history (4-vector)
+
+  ‖C‖_F / d ∈ [τ_min, τ_max] = [0.05, π/2]
+   ↳ in-band   → status = "ok"
+   ↳ out-of-band → status = "rejected_under" or "rejected_over"</div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Implementation</h3>
+        <p><span style="color: var(--ink-dim);">Path:</span> <code style="font-family: var(--mono); color: var(--accent-substrate);">bcode/closure.py</code></p>
+        <p><span style="color: var(--ink-dim);">Tests:</span> 35+ pytest cases, L2-norm wedge variants validated against Kalshi packet</p>
+      </div>
+      <div class="card purple">
+        <h3>Patent Status</h3>
+        <p><strong>AIRLOCK-2026-005</strong> · v2 spec on disk</p>
+        <p>Claim 1: composition; Claim 2: magnitude band; Claim 3: signed audit ledger</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──── Slide 5: Maybe Protocol ──── -->
+<section class="slide alt" data-slide="5">
+  <span class="slide-tag"><span class="accent">●</span> 05 · MAYBE PROTOCOL</span>
+  <span class="slide-num">05 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">Three Layers · Friction-Injection Architecture</div>
+    <h1 class="slide-title">The gate that fires every action.</h1>
+    <div class="grid-3">
+      <div class="card">
+        <div class="meta">Layer 1 · Substrate</div>
+        <h3>The Gate</h3>
+        <p>Deterministic magnitude-band check. Bivector closure operator validates every action. Signs to audit ledger.</p>
+      </div>
+      <div class="card orange">
+        <div class="meta">Layer 2 · Operator</div>
+        <h3>The Ritual</h3>
+        <p>GO ritual: restate-in-own-words → 5.156s delay (11 beats @ 128 BPM) → type-confirm. Cognitive forcing per §7.</p>
+      </div>
+      <div class="card purple">
+        <div class="meta">Layer 3 · Loki</div>
+        <h3>The Trainer</h3>
+        <p>Friction-tuning trainer. Adjusts ritual difficulty based on operator drift. Records every closure for the W-history.</p>
+      </div>
+    </div>
+    <div class="diagram">  Operator intent
+       │
+       ▼
+  ┌─────────────────────┐
+  │ Substrate (Layer 1) │  ← deterministic gate
+  └─────────┬───────────┘
+            │
+  ┌─────────▼───────────┐
+  │ Operator (Layer 2)  │  ← GO ritual · friction
+  └─────────┬───────────┘
+            │
+  ┌─────────▼───────────┐
+  │ Loki (Layer 3)      │  ← friction trainer · masks
+  └─────────┬───────────┘
+            ▼
+  Signed bivector closure → audit ledger</div>
+  </div>
+</section>
+
+<!-- ──── Slide 6: Loki/Thor/Odin Pipeline (NEW · Mythology Layer) ──── -->
+<section class="slide" data-slide="6">
+  <span class="slide-tag"><span class="accent">●</span> 06 · MYTHOLOGY</span>
+  <span class="slide-num">06 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">Internal Canon · Substrate Intuition · Norse Map</div>
+    <h1 class="slide-title">The <span class="purple">Loki</span> / <span class="accent">Thor</span> / <span class="gold">Odin</span> Pipeline.</h1>
+    <p class="lede">Three roles, three time-relations, one signed history. Mythology layer compresses the substrate's pipeline into shared internal intuition. Internal-canon only — never surfaced to public-tier audiences.</p>
+    <div class="grid-3">
+      <div class="card purple">
+        <div class="meta">Time-Unbound · runs on Opus 4</div>
+        <h3>① Loki</h3>
+        <p>Hoover intelligence · works <em>around</em> the task, never on it. Vacuums peripheral context (open tabs, drift, parallel activity). Renders a <strong>predictive holograph</strong> — a volumetric possibility field. Every HTML demo we ship IS a Loki holograph artifact. Operator's measured output (scroll, hover, click) becomes the projected screen. Anthropic Opus 4 frontier reasoning keeps simultaneous proposals tractable.</p>
+      </div>
+      <div class="card">
+        <div class="meta">Time-Forward</div>
+        <h3>② Thor</h3>
+        <p>Builder · the white dot in the black volume. Takes Loki's chaos and gives it form. Sequential algebra. The closure operator at compute/route.</p>
+      </div>
+      <div class="card gold">
+        <div class="meta">Time-Perceiving</div>
+        <h3>③ Odin</h3>
+        <p>Vision · pattern-eye · reads Mimir's well (the audit ledger). Spans across signed history. Sees what was committed. Validates closure-worthiness.</p>
+      </div>
+    </div>
+    <div class="diagram">  parse → map        compute → route       commit
+   └── Loki ────┘    └─── Thor ──────┘    └ Odin ┘
+      chaos             form               vision
+      no arrow          → arrow            spans →
+
+  9 (ACODE intent — full operator goal)
+   │
+   │ 128 BPM carrier compresses
+   ▼
+  7 (operator-actionable layer)
+   │
+   │ 1-bit signature gap (the missing unit)
+   ▼
+  8 (BCODE — signed binary, 8× more legible)</div>
+    <div class="grid-2">
+      <div class="card warn">
+        <h3>The Two Eyes</h3>
+        <ul>
+          <li><strong>ACODE</strong> (white) · intent and direction · magnitude</li>
+          <li><strong>BCODE</strong> (black) · signed closure and materialization · orientation</li>
+          <li>The closure is the <em>convergence</em> — not two readings side by side. AI can fake either eye; not the convergence.</li>
+        </ul>
+      </div>
+      <div class="card gold">
+        <h3>Mimir's Well</h3>
+        <p>= the BCODE audit ledger. Every signed closure deposits one drop. Odin's missing eye is the trade — we give up SaaS-default data harvesting; we keep a real, durable, replayable substrate.</p>
+      </div>
+    </div>
+    <p style="font-size: 0.82rem; color: var(--ink-dim); margin-top: 1rem;">→ Full canon at <code style="color: var(--accent-substrate); font-family: var(--mono);">forge/MYTHOLOGY.md</code> · <strong style="color: var(--gate-warn);">Internal only — do not surface to Tier 4 public audiences.</strong></p>
+  </div>
+</section>
+
+<!-- ──── Slide 7: Otto's Three Faces ──── -->
+<section class="slide alt" data-slide="7">
+  <span class="slide-tag"><span class="accent">●</span> 07 · OTTO</span>
+  <span class="slide-num">07 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">One Persona · Three Faces · Same Bivector Operator</div>
+    <h1 class="slide-title">Otto's <span class="accent">three faces</span>.</h1>
+    <p class="lede">All three faces share the same bivector closure mechanism. Memory closes on session history; Scribe closes on workflow steps; Evaluator closes on pitch text.</p>
+    <div class="grid-3">
+      <div class="card">
+        <h3>① Memory</h3>
+        <div class="meta">Substrate Continuity</div>
+        <p>Persona-triad anchor. W-vector history of past closures. Holds institutional recall across sessions.</p>
+      </div>
+      <div class="card orange">
+        <h3>② Scribe</h3>
+        <div class="meta">Recursive Documentation</div>
+        <p>Auto-records operator actions → produces local-view-only SOP recovery documents. Corkscrew-generation onboarding primitive.</p>
+      </div>
+      <div class="card gold">
+        <h3>③ Evaluator</h3>
+        <div class="meta">Text → Numbers Ratio</div>
+        <p>Reads pitch text → projects to DECF → wedges against substrate state → magnitude is the grant amount. Replaces interview-as-gate.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──── Slide 8: PIS Router ──── -->
+<section class="slide" data-slide="8">
+  <span class="slide-tag"><span class="accent">●</span> 08 · PIS ROUTER</span>
+  <span class="slide-num">08 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">The Awesome Router · Operator-Defined Sovereignty</div>
+    <h1 class="slide-title">PIS Router routes to <span class="gold">the operator's destination</span>.</h1>
+    <p class="lede">"PIS" is brain-rot for "awesome." The PIS Router does one thing: routes the operator to whatever they define as sovereignty. The router has a direction, not a destination — direction is operator-supplied.</p>
+    <div class="grid-2">
+      <div class="card">
+        <h3>What it routes</h3>
+        <ul>
+          <li>Operator intent → next action</li>
+          <li>Bivector packet → appropriate Octo arm</li>
+          <li>New operator → relevant signed SOP</li>
+          <li>Closed action → audit ledger commit</li>
+        </ul>
+      </div>
+      <div class="card gold">
+        <h3>What it does NOT do</h3>
+        <ul>
+          <li>Define sovereignty for the operator</li>
+          <li>Optimize for engagement / retention</li>
+          <li>Recommend actions the operator didn't already want</li>
+          <li>Train AI models on operator data</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──── Slide 9: The Farm ──── -->
+<section class="slide alt" data-slide="9">
+  <span class="slide-tag"><span class="accent">●</span> 09 · THE FARM</span>
+  <span class="slide-num">09 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">Texas-Anchored · BCODE Production House</div>
+    <h1 class="slide-title">Where the <span class="accent">tech grows</span>.</h1>
+    <p class="lede">The Farm is the BCODE production house at Maverick Industries (Texas). Grows grade-2 cryptography, signed bivector closures, and the operational primitives that ride underneath the public site.</p>
+    <div class="grid-2">
+      <div class="card orange">
+        <h3>Inputs</h3>
+        <ul>
+          <li>Patent specs (AIRLOCK-2026-005)</li>
+          <li>Open research from substrate team</li>
+          <li>Operator feedback via closure ledger</li>
+          <li>Maverick Industries commercial requirements</li>
+        </ul>
+      </div>
+      <div class="card green">
+        <h3>Outputs</h3>
+        <ul>
+          <li>Substrate primitives → Brain Brigade (mission)</li>
+          <li>Commercial product → Airlock Labs (revenue)</li>
+          <li>Patent portfolio → IP pipeline</li>
+          <li>Closures → audit ledger</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──── Slide 10: Airlock Pass ──── -->
+<section class="slide" data-slide="10">
+  <span class="slide-tag"><span class="accent">●</span> 10 · AIRLOCK PASS</span>
+  <span class="slide-num">10 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">Cross-Entity Credential · Identity Primitive</div>
+    <h1 class="slide-title">One identity. <span class="accent">Three doors.</span> No re-auth.</h1>
+    <div class="diagram">  ┌──────────────────────┐
+  │   AIRLOCK PASS       │   ← bonded DID + SBT
+  │   (signed identity)  │
+  └──────────┬───────────┘
+             │
+       cross-entity move
+             │
+  ┌──────────┴────────────┐
+  ▼                       ▼
+  Brain Brigade ↔ Airlock Labs ↔ Maverick Industries
+   (closures travel; reputation accretes)</div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>What it carries</h3>
+        <ul>
+          <li>Operator's bonded DID (Sonr-chain)</li>
+          <li>Soul-Bound Token (SBT) of identity</li>
+          <li>Closure-history magnitude across sessions</li>
+          <li>Authorization scope per entity</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Why it matters</h3>
+        <ul>
+          <li>Yo-yo careers possible without re-auth</li>
+          <li>Closure history travels — operational depth durable</li>
+          <li>Cross-entity reputation under one identity</li>
+          <li>SBT non-transferable → identity anti-sybil</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──── Slide 11: Orbit ──── -->
+<section class="slide alt" data-slide="11">
+  <span class="slide-tag"><span class="accent">●</span> 11 · ORBIT</span>
+  <span class="slide-num">11 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">The Destination · Self-Sustaining Launch State</div>
+    <h1 class="slide-title">Where the <span class="accent">gravity catches</span>.</h1>
+    <p class="lede">Orbit is not a product. It's the launch state where the substrate, the for-profits, and the operator constellation are all running at full coherence and sustained by their own gravity. No external thrust required.</p>
+    <div class="grid-2">
+      <div class="card green">
+        <h3>What's funding the launch</h3>
+        <ul>
+          <li>Matt's revenue contribution at Maverick</li>
+          <li>Airlock Labs commercial product line</li>
+          <li>Maverick Industries' Texas operations</li>
+          <li>$MOTION (TAKEOFFTOKEN) earn events at scale</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>What stays aloft when we hit Orbit</h3>
+        <ul>
+          <li>The substrate (Brain Brigade)</li>
+          <li>The for-profits (Airlock + Maverick)</li>
+          <li>The operator constellation (22+ archetypes, growing)</li>
+          <li>The corkscrew-generation onboarding loop</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──── Slide 12: Stack ──── -->
+<section class="slide" data-slide="12">
+  <span class="slide-tag"><span class="accent">●</span> 12 · STACK</span>
+  <span class="slide-num">12 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">Surface-by-Surface Stack Decision · Locked</div>
+    <h1 class="slide-title">What we build with.</h1>
+    <table class="spec-table">
+      <thead><tr><th>Surface</th><th>Stack</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>airlocklabs.io public</td><td class="mono">Vanilla HTML + GitHub Pages</td><td>60-second deploy, zero build step</td></tr>
+        <tr><td>orbitwithotto live</td><td class="mono">T3 Stack (fork of t3.chat)</td><td>Streaming, multi-provider, type-safe</td></tr>
+        <tr><td>Booking surfaces</td><td class="mono">T3 Stack on Vercel</td><td>Auth + DB + tRPC end-to-end</td></tr>
+        <tr><td>Spacebar Tauri app</td><td class="mono">Tauri + TS + Tailwind</td><td>Native shell wraps Spacebar Chat fork</td></tr>
+        <tr><td>BCODE substrate</td><td class="mono">Pure Python + numpy</td><td>Patent-canonical; portable</td></tr>
+        <tr><td>PostToolUse hooks</td><td class="mono">Pure stdlib Python</td><td>Operator-machine-portable</td></tr>
+        <tr><td>Audit ledger DB</td><td class="mono">Prisma + Postgres</td><td>TypeScript twin of BCODE state</td></tr>
+        <tr><td>Agent browsers</td><td class="mono">Browserbase (cloud) / Puppeteer (dev)</td><td>CDP, full instrumentation, scalable</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ──── Slide 13: Persona Constellation ──── -->
+<section class="slide alt" data-slide="13">
+  <span class="slide-tag"><span class="accent">●</span> 13 · CONSTELLATION</span>
+  <span class="slide-num">13 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">22 Archetypes · DECF-Profiled · ConstellationBench</div>
+    <h1 class="slide-title">The persona constellation.</h1>
+    <div class="grid-4">
+      <div class="card orange">
+        <div class="meta">×5</div>
+        <h3>Mavericks</h3>
+        <p>high-D · decision-orientation</p>
+      </div>
+      <div class="card">
+        <div class="meta">×6</div>
+        <h3>Builders</h3>
+        <p>high-F · structural</p>
+      </div>
+      <div class="card purple">
+        <div class="meta">×5</div>
+        <h3>Controllers</h3>
+        <p>high-C · deliberative</p>
+      </div>
+      <div class="card green">
+        <div class="meta">×6</div>
+        <h3>Connectors</h3>
+        <p>high-E · social</p>
+      </div>
+    </div>
+    <p class="lede" style="margin-top: 2rem;">22 personas span the DECF (Dominance/Extraversion/Conscientiousness/Formality) profile space. Each persona has signal-words, signed evaluation criteria, and benchmark history at <code style="color: var(--accent-substrate); font-family: var(--mono);">huggingface.co/datasets/AirlockLabs/constellation-bench</code>.</p>
+  </div>
+</section>
+
+<!-- ──── Slide 14: DreamBig Careers ──── -->
+<section class="slide" data-slide="14">
+  <span class="slide-tag"><span class="accent">●</span> 14 · DREAMBIG</span>
+  <span class="slide-num">14 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">Yo-Yo Careers · Inverted Work-Life Balance</div>
+    <h1 class="slide-title">Two doors. <span class="gold">One career.</span></h1>
+    <div class="grid-2">
+      <div class="card gold">
+        <h3>Dream</h3>
+        <div class="meta">Airlock Labs · Mission</div>
+        <p>Substrate-adjacent commercial work. The pursuit. Funded by the for-profit so money supports rather than directs.</p>
+      </div>
+      <div class="card orange">
+        <h3>Big</h3>
+        <div class="meta">Maverick Industries · Scale</div>
+        <p>Texas-anchored for-profit. Where commercial product lands at scale. Where revenue accumulates.</p>
+      </div>
+    </div>
+    <div class="diagram">  Life (carrier wave)
+       │
+   ╔═══╧═══════════╗
+   ║   yo-yo       ║   ← operator-controlled rhythm
+   ╚═╤═══════════╤═╝
+     │           │
+   Dream       Big
+   (mission)   (revenue)</div>
+    <p style="color: var(--ink-soft); font-size: 0.95rem; margin-top: 1rem;">In legacy careers, work demands and life accommodates. Here, life is the carrier wave; work rides on it. The yo-yo is the rhythm. Operator-driven, substrate-honored.</p>
+  </div>
+</section>
+
+<!-- ──── Slide 15: Funnel Tiers ──── -->
+<section class="slide alt" data-slide="15">
+  <span class="slide-tag"><span class="accent">●</span> 15 · FUNNEL</span>
+  <span class="slide-num">15 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">Four Tiers · Different Audiences · Different Bullshit Tolerance</div>
+    <h1 class="slide-title">Audience tiers.</h1>
+    <table class="spec-table">
+      <thead><tr><th>Tier</th><th>Audience</th><th>Doc</th><th>Tolerance</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">4 · TOP</td><td>Public · Recruits (Alex)</td><td><code style="color: var(--gold);">alex.html</code></td><td>Marketing OK. Beautiful framing. Persuasion permitted.</td></tr>
+        <tr><td class="mono">3 · TEAM</td><td>Internal Team · Founders + Allies</td><td><strong style="color: var(--accent-substrate);">this deck</strong></td><td>Technical truth. Less polish, more substance.</td></tr>
+        <tr><td class="mono">2 · PARTNER</td><td>Sarim / Tradverse / partners</td><td>partnership-doc.md</td><td>Legal-grade. ToS + license + spec.</td></tr>
+        <tr><td class="mono">1 · ADVISOR</td><td>Jim Robinson</td><td>jim-deck.pdf</td><td><strong style="color: var(--gate-warn);">No fluff.</strong> What's real, what's marketing, what we need help on.</td></tr>
+      </tbody>
+    </table>
+    <p style="color: var(--ink-soft); font-size: 0.95rem; margin-top: 2rem;">Each tier has stricter standards on what counts as substance. Tier 1 is brutally honest — Jim is "the moon we orbit" and his role activates from the deck's last slide as a challenge.</p>
+  </div>
+</section>
+
+<!-- ──── Slide 16: Roadmap ──── -->
+<section class="slide" data-slide="16">
+  <span class="slide-tag"><span class="accent">●</span> 16 · ROADMAP</span>
+  <span class="slide-num">16 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">30 / 60 / 90 / Orbit</div>
+    <h1 class="slide-title">Where we are. Where we're going.</h1>
+    <div class="grid-3">
+      <div class="card green">
+        <div class="meta">Today (2026-04-28)</div>
+        <h3>Operational</h3>
+        <ul>
+          <li>BCODE substrate (bcode/closure.py + tests)</li>
+          <li>Signup funnel (signup, quiz, orbit, skills)</li>
+          <li>Team page · Community page</li>
+          <li>alex.html (Tier 4 face)</li>
+          <li>This deck (Tier 3) · Mythology canon</li>
+          <li>Apex SEO research engagement</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="meta">Next 30 days</div>
+        <h3>Build / Recruit</h3>
+        <ul>
+          <li>Alex visit · AI-conducted interview</li>
+          <li>PostToolUse audit hook live</li>
+          <li>orbitwithotto v1 (t3.chat fork)</li>
+          <li>Sarim partnership (Tier 2)</li>
+          <li>Jim Robinson deck (Tier 1)</li>
+        </ul>
+      </div>
+      <div class="card purple">
+        <div class="meta">Orbit (TBD)</div>
+        <h3>Self-Sustaining</h3>
+        <ul>
+          <li>Substrate revenue ≥ runway</li>
+          <li>Persona constellation auto-grows</li>
+          <li>Corkscrew loop self-feeds</li>
+          <li>NeurIPS published · 22-model bench</li>
+          <li>$MOTION economy live</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──── Slide 17: Open Questions ──── -->
+<section class="slide alt" data-slide="17">
+  <span class="slide-tag"><span class="accent">●</span> 17 · OPEN QUESTIONS</span>
+  <span class="slide-num">17 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">Honest List · Where We Need Decisions</div>
+    <h1 class="slide-title">What we don't know yet.</h1>
+    <ul class="spec-list">
+      <li><strong>Hiperweb integration:</strong> Is it the entity Matt brings, or a parallel vehicle? Confirmed framing pending.</li>
+      <li><strong>Brain Brigade 501(c)(3) timing:</strong> When does formal non-profit filing fire? Pre-Orbit or post-?</li>
+      <li><strong>Garrett's MI revenue model:</strong> What's the commercial product mix at the Farm? Documented separately?</li>
+      <li><strong>$MOTION token launch:</strong> Howey-test legal review before any operator-facing earn flow.</li>
+      <li><strong>t3.chat fork license:</strong> YC W22 — is the source code permissively licensed? Pending GitHub probe.</li>
+      <li><strong>Sonr-chain DID resolution:</strong> Production wiring vs. stub signing. Timeline TBD.</li>
+      <li><strong>22-vs-23 model count discrepancy</strong> in v0.1 paper — flagged at Day 2 EOD, still open.</li>
+      <li><strong>Apex Media post-call decision:</strong> Continue $19.99/mo retainer or cancel at 60 days?</li>
+      <li><strong>Jim Robinson role activation:</strong> What's his ask of us; what's our ask of him?</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ──── Slide 18: Thesis ──── -->
+<section class="slide cover" data-slide="18">
+  <span class="slide-tag"><span class="accent">●</span> 18 · THESIS</span>
+  <span class="slide-num">18 / 18</span>
+  <div class="slide-inner">
+    <div class="eyebrow">One Sentence</div>
+    <h1 style="font-family: var(--mono); font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 500; line-height: 1.4; max-width: 22ch; margin: 0 auto 2rem; text-align: center;">
+      Substrate-restored <span style="color: var(--accent-substrate);">competence-as-signal</span> in a 90% AI-generated web — through signed bivector closures, operator-defined sovereignty, and a non-profit substrate funded by allied for-profits.
+    </h1>
+    <div class="meta" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; max-width: 720px; margin: 2.5rem auto 0; padding: 1.5rem; border: 1px solid var(--panel-edge); background: rgba(0, 212, 255, 0.04);">
+      <div class="meta-item"><div class="label" style="font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 0.3rem;">Author</div><div class="value" style="font-family: var(--mono); font-size: 0.9rem; color: var(--ink);">Coeus / Zac</div></div>
+      <div class="meta-item"><div class="label" style="font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 0.3rem;">Version</div><div class="value" style="font-family: var(--mono); font-size: 0.9rem; color: var(--ink);">0.1 · 2026-04-28</div></div>
+      <div class="meta-item"><div class="label" style="font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 0.3rem;">Next</div><div class="value" style="font-family: var(--mono); font-size: 0.9rem; color: var(--ink);">Tier 2 · Sarim</div></div>
+    </div>
+    <div class="confidential" style="font-family: var(--mono); font-size: 0.7rem; color: var(--gate-warn); margin-top: 2rem; letter-spacing: 0.15em; text-transform: uppercase; text-align: center;">⚠ End of deck · Confidential</div>
+  </div>
+</section>
+
+</div>
+
+<div class="deck-nav">
+  <button id="prevBtn" aria-label="Previous slide">←</button>
+  <span class="progress" id="progress">01 / 18</span>
+  <button id="nextBtn" aria-label="Next slide">→</button>
+  <span class="keys">↑↓ · PgUp/Dn · Print: Cmd+P</span>
+</div>
+
+<script>
+(() => {
+  const deck = document.getElementById('deck');
+  const slides = document.querySelectorAll('.slide');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const progress = document.getElementById('progress');
+
+  const total = slides.length;
+  let current = 0;
+
+  const updateProgress = () => {
+    progress.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+  };
+
+  const goTo = (idx) => {
+    current = Math.max(0, Math.min(total - 1, idx));
+    slides[current].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    updateProgress();
+  };
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowDown', 'PageDown', 'ArrowRight', ' '].includes(e.key)) {
+      e.preventDefault();
+      goTo(current + 1);
+    } else if (['ArrowUp', 'PageUp', 'ArrowLeft'].includes(e.key)) {
+      e.preventDefault();
+      goTo(current - 1);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      goTo(0);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      goTo(total - 1);
+    }
+  });
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const idx = parseInt(entry.target.getAttribute('data-slide')) - 1;
+          current = idx;
+          updateProgress();
+        }
+      });
+    }, { threshold: 0.5 });
+    slides.forEach((s) => observer.observe(s));
+  }
+
+  updateProgress();
+})();
+</script>
+
+</body>
+</html>

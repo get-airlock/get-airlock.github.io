@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web1 → Web5 — The Substrate Map — Airlock</title>
+<meta name="description" content="Interactive timeline of the web's evolution and the substrate's 5 operator-facing domains. doyoulikedags emits signals. brainbrigade receives. Spacebar stores via Nerv OS. amerikana.store settles. amerikana.site markets. noconflict.dev — the broken page that proves the agent is done.">
+<meta property="og:title" content="The Substrate Map — Web1 → Web5">
+<meta property="og:description" content="One platform. Three demonstrated missions. Five operator-facing domains. The interactive timeline of the web's evolution, with the substrate's signal-flow overlaid.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Substrate Map — Web1 → Web5">
+<meta name="twitter:description" content="Five domains. One signal-flow. One timeline.">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --otto: #7C5CFC;
+  --accent: #00D1FF;
+  --maverick: #FF6B35;
+  --gold: #FFC857;
+  --base: #0B0E14;
+  --raised: #0F1219;
+  --overlay: #151923;
+  --border: #1E2330;
+  --text: #E2E8F0;
+  --text2: #94A3B8;
+  --text3: #64748B;
+  --success: #22C55E;
+  --warning: #EAB308;
+  --error: #EF4444;
+  /* Web layer accent palette — one per layer */
+  --web1: #64748B;   /* read — gray (legacy) */
+  --web2: #22C55E;   /* read+write — green (signals start) */
+  --web3: #FFC857;   /* own — gold (settlement) */
+  --web4: #00D1FF;   /* filter+express — accent cyan (Brain Brigade) */
+  --web5: #7C5CFC;   /* inhabit+identify — otto purple (Spacebar) */
+}
+html { scroll-behavior: smooth; }
+body {
+  background:
+    radial-gradient(1200px 700px at 15% -10%, rgba(124,92,252,0.18), transparent 60%),
+    radial-gradient(900px 600px at 100% 0%, rgba(0,209,255,0.10), transparent 55%),
+    radial-gradient(700px 500px at 50% 110%, rgba(255,107,53,0.08), transparent 60%),
+    var(--base);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Top nav */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(11, 14, 20, 0.78); backdrop-filter: blur(24px) saturate(140%);
+  border-bottom: 1px solid var(--border); padding: 12px 0;
+}
+nav .container { display: flex; align-items: center; justify-content: space-between; padding: 0 26px; max-width: 1280px; margin: 0 auto; }
+.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo { width: 26px; height: 26px; background: linear-gradient(135deg, var(--otto), var(--accent)); border-radius: 6px; }
+.nav-title { font-weight: 800; font-size: 14px; letter-spacing: -0.5px; color: var(--text); }
+.nav-kicker { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); margin-left: 12px; padding: 3px 8px; border: 1px solid var(--accent); border-radius: 4px; }
+.nav-links { display: flex; gap: 22px; }
+.nav-links a { color: var(--text2); font-size: 13px; font-weight: 500; text-decoration: none; }
+.nav-links a:hover { color: var(--text); }
+
+.container { max-width: 1180px; margin: 0 auto; padding: 0 26px; }
+
+/* Hero */
+.hero { padding: 140px 0 60px; }
+.hero-kicker {
+  display: inline-block; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--otto); margin-bottom: 22px;
+  padding: 6px 14px; border: 1px solid var(--otto); border-radius: 4px;
+}
+.hero h1 {
+  font-size: 64px; font-weight: 900; letter-spacing: -3px; line-height: 1.05;
+  color: var(--text); margin-bottom: 24px; max-width: 900px;
+}
+.hero h1 .grad { background: linear-gradient(135deg, var(--otto), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero .deck {
+  font-size: 18px; line-height: 1.7; color: var(--text2);
+  max-width: 720px; margin-bottom: 28px;
+}
+.hero .ladder {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: var(--text3); margin-top: 18px; letter-spacing: 1px;
+}
+.hero .ladder .step { padding: 5px 10px; border: 1px solid var(--border); border-radius: 4px; background: var(--raised); }
+.hero .ladder .step b { color: var(--text); font-weight: 700; }
+.hero .ladder .step.web1 { border-color: var(--web1); }
+.hero .ladder .step.web2 { border-color: var(--web2); }
+.hero .ladder .step.web3 { border-color: var(--web3); }
+.hero .ladder .step.web4 { border-color: var(--web4); }
+.hero .ladder .step.web5 { border-color: var(--web5); }
+.hero .ladder .arrow { color: var(--text3); }
+
+/* Timeline */
+.timeline-wrap { padding: 60px 0; position: relative; }
+.timeline-wrap::before {
+  content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
+  width: 2px; background: linear-gradient(180deg, var(--web1) 0%, var(--web2) 25%, var(--web3) 50%, var(--web4) 75%, var(--web5) 100%);
+  transform: translateX(-1px); opacity: 0.4;
+}
+.epoch {
+  display: grid; grid-template-columns: 1fr 80px 1fr; gap: 0;
+  margin-bottom: 70px;
+  align-items: center;
+}
+.epoch .anchor {
+  display: flex; flex-direction: column; align-items: center;
+  position: relative; z-index: 2;
+}
+.epoch .anchor .dot {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 3px solid var(--base);
+  box-shadow: 0 0 0 1px currentColor, 0 0 24px currentColor;
+}
+.epoch .anchor .label {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: currentColor; font-weight: 700;
+  margin-top: 10px; white-space: nowrap;
+}
+.epoch[data-layer="web1"] .anchor { color: var(--web1); }
+.epoch[data-layer="web2"] .anchor { color: var(--web2); }
+.epoch[data-layer="web3"] .anchor { color: var(--web3); }
+.epoch[data-layer="web4"] .anchor { color: var(--web4); }
+.epoch[data-layer="web5"] .anchor { color: var(--web5); }
+
+.epoch .card {
+  background: linear-gradient(180deg, rgba(15,18,25,0.92) 0%, rgba(11,14,20,0.92) 100%);
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 26px 28px;
+  backdrop-filter: blur(18px) saturate(140%);
+  position: relative;
+}
+.epoch .card .verbs {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: currentColor; letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.epoch[data-layer="web1"] .card .verbs { color: var(--web1); }
+.epoch[data-layer="web2"] .card .verbs { color: var(--web2); }
+.epoch[data-layer="web3"] .card .verbs { color: var(--web3); }
+.epoch[data-layer="web4"] .card .verbs { color: var(--web4); }
+.epoch[data-layer="web5"] .card .verbs { color: var(--web5); }
+
+.epoch .card h2 {
+  font-size: 26px; font-weight: 800; letter-spacing: -1px;
+  color: var(--text); margin-bottom: 6px;
+}
+.epoch .card .when {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--text3); letter-spacing: 1px; margin-bottom: 14px;
+}
+.epoch .card p {
+  font-size: 14px; color: var(--text2); line-height: 1.65;
+  margin-bottom: 12px;
+}
+.epoch .card .domain-line {
+  margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
+  display: flex; gap: 10px; align-items: center;
+}
+.epoch .card .domain-line .label {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3);
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+.epoch .card .domain-line a {
+  font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  color: var(--text); font-weight: 600; text-decoration: none;
+  padding: 4px 10px; border: 1px solid var(--border); border-radius: 4px;
+  background: var(--overlay); transition: all 0.2s;
+}
+.epoch[data-layer="web1"] .card .domain-line a { border-color: var(--web1); }
+.epoch[data-layer="web2"] .card .domain-line a { border-color: var(--web2); color: var(--web2); }
+.epoch[data-layer="web3"] .card .domain-line a { border-color: var(--web3); color: var(--web3); }
+.epoch[data-layer="web4"] .card .domain-line a { border-color: var(--web4); color: var(--web4); }
+.epoch[data-layer="web5"] .card .domain-line a { border-color: var(--web5); color: var(--web5); }
+.epoch .card .domain-line a:hover { background: var(--base); }
+.epoch .card .role {
+  display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--text3); padding: 2px 8px; border: 1px solid var(--border); border-radius: 3px;
+  letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px;
+}
+
+.epoch.left .card { margin-right: 30px; }
+.epoch.right .card { margin-left: 30px; grid-column: 3; }
+.epoch.left { grid-template-columns: 1fr 80px 1fr; }
+.epoch.left .card { grid-column: 1; text-align: right; }
+.epoch.left .card .domain-line { justify-content: flex-end; }
+.epoch.left .anchor { grid-column: 2; }
+.epoch.left .spacer { grid-column: 3; }
+.epoch.right .spacer { grid-column: 1; }
+.epoch.right .anchor { grid-column: 2; }
+
+/* Signal flow diagram */
+.signal-flow {
+  margin: 100px 0;
+  padding: 50px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(124,92,252,0.04) 0%, transparent 100%);
+}
+.signal-flow .label {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: var(--accent); letter-spacing: 4px; text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.signal-flow h2 {
+  font-size: 36px; font-weight: 800; letter-spacing: -1.5px;
+  margin-bottom: 12px; color: var(--text);
+}
+.signal-flow .deck {
+  font-size: 16px; color: var(--text2); max-width: 760px; margin-bottom: 36px;
+}
+
+.flow-diagram {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
+  margin-top: 30px; align-items: stretch;
+}
+.flow-node {
+  background: var(--raised); border: 1px solid var(--border); border-radius: 8px;
+  padding: 18px 16px; text-align: center;
+  position: relative;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.flow-node .step-num {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--text3); letter-spacing: 2px;
+}
+.flow-node .name {
+  font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  font-weight: 700; color: var(--text); margin-bottom: 4px;
+}
+.flow-node .verb {
+  font-size: 12px; color: var(--text2); line-height: 1.4;
+}
+.flow-node[data-layer="web2"] { border-left: 3px solid var(--web2); }
+.flow-node[data-layer="web4"] { border-left: 3px solid var(--web4); }
+.flow-node[data-layer="web5"] { border-left: 3px solid var(--web5); }
+.flow-node[data-layer="web3"] { border-left: 3px solid var(--web3); }
+.flow-node[data-layer="meta"] { border-left: 3px solid var(--maverick); }
+.flow-arrow {
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--text3);
+}
+
+/* Five-domain table */
+.domains-table {
+  margin: 80px 0;
+}
+.domains-table h2 {
+  font-size: 32px; font-weight: 800; letter-spacing: -1px;
+  margin-bottom: 12px; color: var(--text);
+}
+.domains-table .deck {
+  font-size: 16px; color: var(--text2); max-width: 720px; margin-bottom: 28px;
+}
+table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px; background: var(--raised);
+  border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+}
+th, td {
+  text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--border);
+  color: var(--text2); vertical-align: top;
+}
+th {
+  font-weight: 700; color: var(--text); background: var(--overlay);
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 1.5px;
+}
+td .domain-cell {
+  font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--text);
+}
+td.layer-cell {
+  font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 11px;
+  letter-spacing: 1px;
+}
+.layer-web2 { color: var(--web2); }
+.layer-web3 { color: var(--web3); }
+.layer-web4 { color: var(--web4); }
+.layer-web5 { color: var(--web5); }
+.layer-meta { color: var(--maverick); }
+td .status {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 8px;
+  border: 1px solid var(--border); border-radius: 3px; letter-spacing: 1px;
+  text-transform: uppercase; font-weight: 600;
+}
+td .status.shipped { color: var(--success); border-color: var(--success); }
+td .status.live { color: var(--accent); border-color: var(--accent); }
+td .status.queued { color: var(--otto); border-color: var(--otto); }
+td .status.facade { color: var(--maverick); border-color: var(--maverick); }
+td .status.aerosol { color: var(--text3); border-color: var(--text3); }
+
+/* OS section — Nerv OS that hosts everything */
+.nerv-os {
+  margin: 80px 0; padding: 50px 0;
+  border-top: 1px solid var(--border);
+  background: radial-gradient(800px 300px at 50% 50%, rgba(0,209,255,0.05), transparent);
+  text-align: center;
+}
+.nerv-os .label {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--accent); letter-spacing: 3px; text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.nerv-os h2 {
+  font-size: 36px; font-weight: 900; letter-spacing: -1.5px;
+  margin-bottom: 16px; color: var(--text);
+}
+.nerv-os h2 .grad { background: linear-gradient(135deg, var(--otto), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.nerv-os .deck {
+  font-size: 16px; color: var(--text2); max-width: 680px; margin: 0 auto 28px; line-height: 1.7;
+}
+.nerv-os .layers {
+  display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 28px;
+}
+.nerv-os .layers .l {
+  padding: 12px 18px; background: var(--raised); border: 1px solid var(--border);
+  border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  color: var(--text); font-weight: 600;
+}
+.nerv-os .layers .l.outer { border-color: var(--web5); color: var(--web5); }
+.nerv-os .layers .l.inner { border-color: var(--accent); color: var(--accent); }
+
+/* Facade section — noconflict.dev */
+.facade {
+  margin: 80px 0;
+  padding: 50px 36px;
+  background: linear-gradient(135deg, rgba(255,107,53,0.06), transparent);
+  border: 1px solid var(--border); border-radius: 12px; border-left: 3px solid var(--maverick);
+}
+.facade .kicker {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--maverick); letter-spacing: 3px; text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.facade h2 {
+  font-size: 32px; font-weight: 800; letter-spacing: -1px; color: var(--text); margin-bottom: 14px;
+}
+.facade p { font-size: 15px; color: var(--text2); line-height: 1.75; margin-bottom: 14px; max-width: 760px; }
+.facade .punch { color: var(--text); font-weight: 500; font-size: 16px; }
+.facade .closer {
+  margin-top: 22px; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  color: var(--maverick); letter-spacing: 1px;
+}
+
+/* Footer */
+footer { border-top: 1px solid var(--border); padding: 50px 0 40px; margin-top: 60px; color: var(--text3); font-size: 13px; }
+footer .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+footer .links { display: flex; gap: 22px; flex-wrap: wrap; }
+footer .links a { color: var(--text3); text-decoration: none; }
+footer .links a:hover { color: var(--text); }
+footer .built { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1px; }
+
+@media (max-width: 900px) {
+  .hero h1 { font-size: 38px; letter-spacing: -1.5px; }
+  .epoch { grid-template-columns: 50px 1fr; }
+  .epoch.left .card, .epoch.right .card { grid-column: 2; margin-left: 18px; margin-right: 0; text-align: left; }
+  .epoch.left .card .domain-line { justify-content: flex-start; }
+  .epoch .anchor { grid-column: 1; }
+  .epoch .spacer { display: none; }
+  .timeline-wrap::before { left: 25px; }
+  .flow-diagram { grid-template-columns: 1fr; gap: 8px; }
+  .flow-arrow { transform: rotate(90deg); padding: 4px 0; }
+  .nerv-os h2, .facade h2 { font-size: 26px; }
+  .signal-flow h2, .domains-table h2 { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="/" class="nav-brand">
+      <div class="nav-logo"></div>
+      <div class="nav-title">Airlock</div>
+      <span class="nav-kicker">The Substrate Map</span>
+    </a>
+    <div class="nav-links">
+      <a href="https://doyoulikedags.xyz">dags</a>
+      <a href="https://brainbrigade.xyz">brain brigade</a>
+      <a href="https://amerikana.space">spacebar</a>
+      <a href="https://amerikana.store">store</a>
+      <a href="https://amerikana.site">site</a>
+      <a href="https://noconflict.dev">noconflict</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <div class="hero-kicker">Web1 → Web5 · The Substrate Map</div>
+    <h1>The web evolved.<br>The <span class="grad">substrate</span> caught up.</h1>
+    <p class="deck">Web1 was reading. Web2 was writing. Web3 was owning. Web4 is filtering and expressing. Web5 is inhabiting and identifying. Five domains carry the substrate across all five layers — and one broken landing page proves the agent is done.</p>
+    <div class="ladder">
+      <span class="step web1"><b>Web1</b> read</span>
+      <span class="arrow">→</span>
+      <span class="step web2"><b>Web2</b> read · write</span>
+      <span class="arrow">→</span>
+      <span class="step web3"><b>Web3</b> own</span>
+      <span class="arrow">→</span>
+      <span class="step web4"><b>Web4</b> filter · express</span>
+      <span class="arrow">→</span>
+      <span class="step web5"><b>Web5</b> inhabit · identify</span>
+    </div>
+  </div>
+</header>
+
+<section class="timeline-wrap">
+  <div class="container">
+
+    <div class="epoch left" data-layer="web1">
+      <div class="card">
+        <div class="verbs">Web1 · read</div>
+        <h2>The static page</h2>
+        <div class="when">1991 · Tim Berners-Lee · CERN</div>
+        <p>HTTP, HTML, the URL. One-way information flow. The user reads what the publisher wrote. Nothing routes; nothing personalizes; nothing remembers. The page is the page.</p>
+        <p>The substrate's analog of Web1 is <em>aerosol-exempt static</em>: marketing surface that operators can read without authenticating. <code>airlocklabs.io</code> is the canonical aerosol layer. No gate, no ledger, no auth.</p>
+        <span class="role">Substrate role: marketing surface</span>
+        <div class="domain-line">
+          <span class="label">domain</span>
+          <a href="https://airlocklabs.io">airlocklabs.io</a>
+          <span class="status aerosol mono">aerosol</span>
+        </div>
+      </div>
+      <div class="anchor"><div class="dot"></div><div class="label">Web1 · 1991</div></div>
+      <div class="spacer"></div>
+    </div>
+
+    <div class="epoch right" data-layer="web2">
+      <div class="spacer"></div>
+      <div class="anchor"><div class="dot"></div><div class="label">Web2 · 2004</div></div>
+      <div class="card">
+        <div class="verbs">Web2 · read · write</div>
+        <h2>Public input layer</h2>
+        <div class="when">2004 onward · social platforms · UGC</div>
+        <p>Two-way. Users wrote back. Comments, posts, likes, shares. The platform aggregated and sorted. Most of Web2's value flowed to a small number of platforms; most of the user's data flowed there too.</p>
+        <p>The substrate's Web2 node is <strong>doyoulikedags.xyz</strong> — a DAG-based signal generation surface. Free tier onboarding. Persona Bot Atlas (the substrate's Tier-1 entry agent). Signals are produced here and routed upstream into the audited substrate layers.</p>
+        <span class="role">Substrate role: public input · free tier · entry agent</span>
+        <div class="domain-line">
+          <span class="label">domain</span>
+          <a href="https://doyoulikedags.xyz">doyoulikedags.xyz</a>
+          <span class="status queued mono">queued</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="epoch left" data-layer="web3">
+      <div class="card">
+        <div class="verbs">Web3 · own</div>
+        <h2>Settlement layer</h2>
+        <div class="when">2014 onward · Ethereum · DIDs · tokens</div>
+        <p>The user owned. Cryptographic identity, on-chain assets, decentralized wallets. Ownership decoupled from platform consent. The economic surface separated from the social surface.</p>
+        <p>The substrate's Web3 node is <strong>amerikana.store</strong> — a Grand Exchange order-book marketplace (RuneScape GE server model). Three-token economy on Cosmos SDK rails: <strong>$MOTTO</strong> (Quantum-Safe stable-coin foundation), <strong>$MOTION</strong> (incentive / participation), <strong>$DREAM</strong> (compute-and-creativity unit on WEFT). Constellation Credits remain off-chain. Skills paid via the .diy marketplace; avatars free at onboarding.</p>
+        <span class="role">Substrate role: token economy · marketplace · stable-coin rails</span>
+        <div class="domain-line">
+          <span class="label">domain</span>
+          <a href="https://amerikana.store">amerikana.store</a>
+          <span class="status queued mono">queued</span>
+        </div>
+      </div>
+      <div class="anchor"><div class="dot"></div><div class="label">Web3 · 2014</div></div>
+      <div class="spacer"></div>
+    </div>
+
+    <div class="epoch right" data-layer="web4">
+      <div class="spacer"></div>
+      <div class="anchor"><div class="dot"></div><div class="label">Web4 · 2024</div></div>
+      <div class="card">
+        <div class="verbs">Web4 · filter · express</div>
+        <h2>Provenance + filter layer</h2>
+        <div class="when">2024 onward · provenance · expression governance</div>
+        <p>Substrate-level routing between public input and audited storage. Provenance filters at the ACODE↔BCODE boundary; six rules govern what crosses. Anomalous outputs blocked inline at the compute layer. The Untangler enforces the closure-band acceptance rule; the Provenance Filter enforces the policy schema.</p>
+        <p>The substrate's Web4 node is <strong>brainbrigade.xyz</strong> — the cohort surface for independent practitioners federated through open-source contribution graphs. First node in the inbound routing chain. Inputs from doyoulikedags.xyz arrive here, are policy-checked, and route forward to the audited storage layer.</p>
+        <span class="role">Substrate role: cohort surface · provenance filter · routing chain entry</span>
+        <div class="domain-line">
+          <span class="label">domain</span>
+          <a href="https://brainbrigade.xyz">brainbrigade.xyz</a>
+          <span class="status shipped mono">landing shipped</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="epoch left" data-layer="web5">
+      <div class="card">
+        <div class="verbs">Web5 · inhabit · identify</div>
+        <h2>Spacebar — operator console + audited storage</h2>
+        <div class="when">2026 onward · operator-resident shells · DID-bonded sessions</div>
+        <p>The operator's authenticated console. Biometric-gated session start. Every interaction signs a BCODE closure; every closure is checked against the acceptance band before propagation. Operators run cryptographic-identity-bound sessions; outputs are auditable end-to-end.</p>
+        <p>The substrate's Web5 node is <strong>amerikana.space</strong> — Spacebar. The first surface that <em>stores</em> the routed signals after Brain Brigade's provenance check. Storage runs on Nerv OS (the production runtime layer hosting <code>nerv.rest</code>, the BCODE audit endpoint). The OS itself is Amerikana Online.</p>
+        <span class="role">Substrate role: operator console · audited storage · production runtime</span>
+        <div class="domain-line">
+          <span class="label">domain</span>
+          <a href="https://amerikana.space">amerikana.space</a>
+          <span class="status live mono">pilot live</span>
+        </div>
+      </div>
+      <div class="anchor"><div class="dot"></div><div class="label">Web5 · 2026</div></div>
+      <div class="spacer"></div>
+    </div>
+
+  </div>
+</section>
+
+<section class="signal-flow">
+  <div class="container">
+    <div class="label">Signal Flow · How the substrate routes itself</div>
+    <h2>One signal. Five hops. One audited closure.</h2>
+    <p class="deck">A signal originates at doyoulikedags.xyz, transits Brain Brigade as the first cohort node, settles into Spacebar (which stores via Nerv OS), routes through amerikana.store for the economic settlement, and is fronted by amerikana.site as the public meta-surface. Five hops; one closure-band check at every hop; one signed audit ledger at the end.</p>
+
+    <div class="flow-diagram">
+      <div class="flow-node" data-layer="web2">
+        <div class="step-num">1 · EMIT</div>
+        <div class="name">doyoulikedags.xyz</div>
+        <div class="verb">DAG signals leave here · free tier · Tutorial Island</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" data-layer="web4">
+        <div class="step-num">2 · RECEIVE</div>
+        <div class="name">brainbrigade.xyz</div>
+        <div class="verb">First cohort node · Provenance Filter · 6 rules</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" data-layer="web5">
+        <div class="step-num">3 · STORE</div>
+        <div class="name">amerikana.space</div>
+        <div class="verb">Spacebar · Nerv OS · BCODE closure ledger</div>
+      </div>
+    </div>
+
+    <div class="flow-diagram" style="margin-top: 18px;">
+      <div class="flow-node" data-layer="web3">
+        <div class="step-num">4 · SETTLE</div>
+        <div class="name">amerikana.store</div>
+        <div class="verb">$MOTION · Constellation Credits · .diy GE</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" data-layer="meta">
+        <div class="step-num">5 · MARKET</div>
+        <div class="name">amerikana.site</div>
+        <div class="verb">Public meta-surface · aerosol-exempt</div>
+      </div>
+      <div class="flow-arrow">↺</div>
+      <div class="flow-node" data-layer="meta">
+        <div class="step-num">∞ · COMPLETE</div>
+        <div class="name">noconflict.dev</div>
+        <div class="verb">The broken landing page · the agent is done</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="domains-table container">
+  <h2>The five facing domains</h2>
+  <p class="deck">The substrate exposes five operator-facing surfaces, plus one completion-facade. Each domain carries one Web layer's verb-pair. The signal-flow chains them together.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Domain</th>
+        <th>Web layer</th>
+        <th>Role</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><div class="domain-cell">airlocklabs.io</div></td>
+        <td class="layer-cell layer-web2">Web1 · read</td>
+        <td>Public marketing · paper · blog · pilot demos. Aerosol-exempt static surface.</td>
+        <td><span class="status aerosol mono">aerosol</span></td>
+      </tr>
+      <tr>
+        <td><div class="domain-cell">doyoulikedags.xyz</div></td>
+        <td class="layer-cell layer-web2">Web2 · read+write</td>
+        <td>Signal emitter. Tutorial Island. Free tier. Persona Bot Atlas. Where DAG signals originate.</td>
+        <td><span class="status queued mono">queued</span></td>
+      </tr>
+      <tr>
+        <td><div class="domain-cell">brainbrigade.xyz</div></td>
+        <td class="layer-cell layer-web4">Web4 · filter+express</td>
+        <td>Cohort signal receiver. First node in the inbound chain. Provenance Filter applies at the boundary.</td>
+        <td><span class="status shipped mono">shipped</span></td>
+      </tr>
+      <tr>
+        <td><div class="domain-cell">amerikana.space</div></td>
+        <td class="layer-cell layer-web5">Web5 · inhabit+identify</td>
+        <td>Spacebar. Operator console. <em>Stores</em> the DAG signals. Powered by Nerv OS · nerv.rest · BCODE.</td>
+        <td><span class="status live mono">pilot live</span></td>
+      </tr>
+      <tr>
+        <td><div class="domain-cell">amerikana.store</div></td>
+        <td class="layer-cell layer-web3">Web3 · own</td>
+        <td>Token economy · skills marketplace · .diy Grand Exchange · $MOTION · Constellation Credits.</td>
+        <td><span class="status queued mono">queued</span></td>
+      </tr>
+      <tr>
+        <td><div class="domain-cell">amerikana.site</div></td>
+        <td class="layer-cell layer-meta">meta · public</td>
+        <td>Public meta-surface for the whole stack. Aerosol-exempt. Markets the substrate without gating it.</td>
+        <td><span class="status queued mono">queued</span></td>
+      </tr>
+      <tr>
+        <td><div class="domain-cell">noconflict.dev</div></td>
+        <td class="layer-cell layer-meta">facade</td>
+        <td>The completion-facade. The NPM package landing page that doesn't sell. The broken page <em>is</em> the proof: the agent is done.</td>
+        <td><span class="status facade mono">facade</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="nerv-os">
+  <div class="container">
+    <div class="label">Nerv OS · Production runtime layer</div>
+    <h2>The runtime layer for <span class="grad">Amerikana Online</span></h2>
+    <p class="deck">Spacebar (amerikana.space) is the operator-facing surface; the storage and execution run on Nerv OS — the substrate's production runtime layer. Nerv OS hosts <code>nerv.rest</code>, the BCODE audit endpoint where signed closures land. The OS itself is named Amerikana Online and provides the runtime context for the entire substrate stack.</p>
+    <div class="layers">
+      <div class="l outer">amerikana.space — Spacebar (operator console)</div>
+      <div class="l outer">amerikana.online — Nerv OS (runtime layer)</div>
+      <div class="l inner">nerv.rest — BCODE audit endpoint</div>
+    </div>
+  </div>
+</section>
+
+<section class="facade container">
+  <div class="kicker">noconflict.dev · the completion-facade</div>
+  <h2>The broken page is the proof.</h2>
+  <p class="punch">noconflict.dev's landing page never sells. The NPM package is "broken." Visitors arrive, find nothing for sale, and leave.</p>
+  <p>That is the design. NoConflict's whole purpose is captured in two words: <em>nc push → done. no bodies.</em> The page is not broken because we forgot to finish it. The page is broken because the agent already finished. Selling would be a leak — there's nothing left to sell, because there are no merge conflicts to resolve, because the agent already resolved them.</p>
+  <p>The facade is operator-grade. It tells the visitor: this is what completion looks like. A page that doesn't ask for your email is a page that has already won.</p>
+  <div class="closer">$ nc push<br>✓ pushed. no bodies.</div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="links">
+      <a href="https://airlocklabs.io">airlocklabs.io</a>
+      <a href="https://doyoulikedags.xyz">doyoulikedags.xyz</a>
+      <a href="https://brainbrigade.xyz">brainbrigade.xyz</a>
+      <a href="https://amerikana.space">amerikana.space</a>
+      <a href="https://amerikana.store">amerikana.store</a>
+      <a href="https://amerikana.site">amerikana.site</a>
+      <a href="https://noconflict.dev">noconflict.dev</a>
+      <a href="https://github.com/get-airlock">github</a>
+    </div>
+    <div class="built">built by otto · 2026 · the substrate is happening</div>
+  </div>
+</footer>
+
+</body>
+</html>

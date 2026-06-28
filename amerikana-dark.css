@@ -1,0 +1,328 @@
+/* Amerikana Dark Mode Theme
+   Extracted from Dark-Reader-Settings.json
+   Brightness: 135, Contrast: 100
+   Dark bg: #181a1b, Dark text: #e8e6e3
+   Light bg: #dcdad7, Light text: #181a1b
+   Font: Segoe UI
+*/
+
+:root {
+  /* Light mode (default) */
+  --bg-light: #dcdad7;
+  --text-light: #181a1b;
+  --border-light: #c5c3c0;
+  --surface-light: #e8e6e3;
+  --accent-light: #6b7280;
+
+  /* Dark mode */
+  --bg-dark: #181a1b;
+  --text-dark: #e8e6e3;
+  --border-dark: #2d2f31;
+  --surface-dark: #242729;
+  --accent-dark: #9ca3af;
+
+  /* Dynamic: will be overridden by prefers-color-scheme */
+  --bg: var(--bg-light);
+  --text: var(--text-light);
+  --border: var(--border-light);
+  --surface: var(--surface-light);
+  --accent: var(--accent-light);
+}
+
+/* Respect system color scheme */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: var(--bg-dark);
+    --text: var(--text-dark);
+    --border: var(--border-dark);
+    --surface: var(--surface-dark);
+    --accent: var(--accent-dark);
+  }
+}
+
+/* Manual override: add .dark-mode class to html or body to force dark */
+html.dark-mode,
+body.dark-mode {
+  --bg: var(--bg-dark);
+  --text: var(--text-dark);
+  --border: var(--border-dark);
+  --surface: var(--surface-dark);
+  --accent: var(--accent-dark);
+}
+
+html.light-mode,
+body.light-mode {
+  --bg: var(--bg-light);
+  --text: var(--text-light);
+  --border: var(--border-light);
+  --surface: var(--surface-light);
+  --accent: var(--accent-light);
+}
+
+/* Global reset and application */
+html,
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text);
+  border-color: var(--border);
+}
+
+p, span, div, section, article {
+  color: var(--text);
+}
+
+/* Links */
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--text);
+  opacity: 0.8;
+}
+
+a:visited {
+  color: #b4a5ff;
+}
+
+@media (prefers-color-scheme: dark) {
+  a:visited {
+    color: #9ca3af;
+  }
+}
+
+/* Inputs and form elements */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="date"],
+textarea,
+select {
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: inherit;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background-color: var(--bg);
+}
+
+/* Buttons */
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+button:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover {
+  background-color: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+button:active,
+input[type="button"]:active,
+input[type="submit"]:active,
+input[type="reset"]:active {
+  opacity: 0.8;
+}
+
+/* Cards and containers */
+.card,
+section,
+article,
+.panel,
+.container {
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+/* Tables */
+table {
+  background-color: var(--surface);
+  color: var(--text);
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.75rem;
+  text-align: left;
+}
+
+th {
+  background-color: var(--bg);
+  font-weight: 600;
+}
+
+tr:nth-child(even) {
+  background-color: var(--bg);
+}
+
+/* Code blocks */
+code,
+pre {
+  background-color: var(--bg);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+}
+
+code {
+  padding: 0.2rem 0.4rem;
+}
+
+pre {
+  padding: 1rem;
+  overflow-x: auto;
+  line-height: 1.4;
+}
+
+pre code {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* Scrollbar styling (Chrome/Edge/Safari) */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Horizontal rule */
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1rem 0;
+}
+
+/* Blockquote */
+blockquote {
+  border-left: 4px solid var(--accent);
+  padding-left: 1rem;
+  margin-left: 0;
+  color: var(--accent);
+  font-style: italic;
+}
+
+/* Custom selection color */
+::selection {
+  background-color: var(--accent);
+  color: var(--bg);
+}
+
+::-moz-selection {
+  background-color: var(--accent);
+  color: var(--bg);
+}
+
+/* Utility classes for manual dark/light control */
+.dark-only {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dark-only {
+    display: block;
+  }
+
+  .light-only {
+    display: none;
+  }
+}
+
+html.dark-mode .dark-only,
+body.dark-mode .dark-only {
+  display: block;
+}
+
+html.dark-mode .light-only,
+body.dark-mode .light-only {
+  display: none;
+}
+
+html.light-mode .dark-only,
+body.light-mode .dark-only {
+  display: none;
+}
+
+html.light-mode .light-only,
+body.light-mode .light-only {
+  display: block;
+}
+
+/* Print styles */
+@media print {
+  :root {
+    --bg: white;
+    --text: black;
+    --border: #ccc;
+    --surface: #f9f9f9;
+    --accent: #333;
+  }
+
+  body {
+    background-color: white;
+    color: black;
+  }
+
+  a {
+    color: #0066cc;
+  }
+}
+
