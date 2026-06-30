@@ -39,11 +39,13 @@
         <div class="you-field">
           <div class="you-field-label"><span>Character</span></div>
           <div class="mascot-row" id="mascot-row">
-            <button class="mascot" data-m="cloud" title="Cloud">☁️</button>
-            <button class="mascot" data-m="drop" title="Drop">💧</button>
-            <button class="mascot" data-m="flame" title="Flame">🔥</button>
-            <button class="mascot" data-m="sprout" title="Sprout">🌱</button>
+            <button class="mascot" data-m="auto" title="Auto — match the moment">✨</button>
+            <button class="mascot" data-m="cloud" title="Chill · cloud">☁️</button>
+            <button class="mascot" data-m="drop" title="Direct · water">💧</button>
+            <button class="mascot" data-m="flame" title="Hype · fire">🔥</button>
+            <button class="mascot" data-m="sprout" title="Coach · sprout">🌱</button>
           </div>
+          <p class="faint" style="margin-top:8px;">Auto reads the moment and shifts — chill, direct, hype, or coach — and tints the reply that color.</p>
         </div>
 
         <div class="you-field">
@@ -69,9 +71,9 @@
         <div class="you-field">
           <div class="you-field-label"><span>Screen</span></div>
           <div class="seg-row" id="screen-row">
-            <button class="seg" data-v="note">Note space</button>
-            <button class="seg" data-v="draw">Drawing space</button>
-            <button class="seg" data-v="none">Not needed</button>
+            <button class="seg" data-v="none">Voice only</button>
+            <button class="seg" data-v="note" disabled title="Coming soon" style="opacity:.4;cursor:not-allowed;">Notes · soon</button>
+            <button class="seg" data-v="draw" disabled title="Coming soon" style="opacity:.4;cursor:not-allowed;">Drawing · soon</button>
           </div>
         </div>
       </div>
@@ -121,7 +123,7 @@
 
     wireSegments('model-row', () => (LifeOSStore.load().model || 'DEEP'), (v) => { const s=LifeOSStore.load(); s.model=v; LifeOSStore.save(s); localStorage.setItem('lifeos.model', v); });
     wireSegments('memory-row', () => LifeOSStore.getMode(), (v) => LifeOSStore.setMode(v));
-    wireSegments('screen-row', () => (localStorage.getItem('lifeos.screen') || 'note'), (v) => localStorage.setItem('lifeos.screen', v));
+    wireSegments('screen-row', () => (localStorage.getItem('lifeos.screen') || 'none'), (v) => localStorage.setItem('lifeos.screen', v));
   </script>
 </body>
 </html>

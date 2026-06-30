@@ -330,20 +330,37 @@
 
   // Streaming brain: speaks each sentence the MOMENT it lands (first audio ~0.5s instead of ~2s).
   // Falls back to the whole reply if the server didn't stream. Returns the full text.
-  function _memCtx(){
-    // Name: prefer this surface's store, but FALL BACK to what arrive.html captured
-    // (lifeos.name) — the two stores were separate, which is why Carrie started blank.
+  // The four vibes (cloud=chill, water=direct, fire=hype, sprout=coach) + Auto.
+  const VIBES = {
+    cloud:  {tone:'Take a soft, unhurried tone — drift gently, never push.',           color:'#7fb0d8'},
+    drop:   {tone:'Be clear and direct — clean and to the point, no filler.',           color:'#37a6c9'},
+    flame:  {tone:'Bring warm, high energy — spark and momentum, match their fire.',    color:'#f0922b'},
+    sprout: {tone:'Be a steady coach — grounding, encouraging, growth-minded.',         color:'#5fb87a'},
+  };
+  function _detectVibe(t){ t=(t||'').toLowerCase();
+    if(/(!|let'?s go|stoked|pumped|excited|amazing|hyped|can'?t wait|so good|yess+)/.test(t)) return 'flame';
+    if(/(help|stuck|should i|trying to|figure out|struggling|nervous|worried|plan|study|decide|hard)/.test(t)) return 'sprout';
+    if(/(tired|exhausted|chill|relax|whatever|meh|calm|quiet|rest|slow|sleepy)/.test(t)) return 'cloud';
+    if(/(what|when|where|which|\?|how much|how many|is it|are there|do i)/.test(t)) return 'drop';
+    return 'cloud'; }
+  function _activeVibe(lastText){ let c=store.char||''; if(!c){ try{ c=localStorage.getItem('lifeos.mascot')||''; }catch(_){} } c=c||'drop'; return (c==='auto') ? _detectVibe(lastText) : (VIBES[c]?c:'drop'); }
+
+  function _memCtx(lastText){
+    // Name: prefer this surface's store, FALL BACK to what arrive.html captured (lifeos.name).
     let nm = (store.name && store.name!=='friend') ? store.name : '';
     if(!nm){ try{ const a=localStorage.getItem('lifeos.name'); if(a && a!=='friend') nm=a; }catch(_){} }
-    const held = (store.memories||[]).slice(-12).map(m=>m.title+(m.timeLabel?(' ('+m.timeLabel+')'):'')).filter(Boolean);
-    // The SOUL — binds the companion to its owner. Editable via lifeos.soul (the soul file);
-    // otherwise a sensible default built from the owner's name. This is the pet-to-owner bind.
+    // Memory setting: "Nothing" → name + soul only (no held items). Else inject.
+    const memOff = /^no/i.test(store.memory||'');
+    const held = memOff ? [] : (store.memories||[]).slice(-12).map(m=>m.title+(m.timeLabel?(' ('+m.timeLabel+')'):'')).filter(Boolean);
+    // The SOUL — binds the companion to its owner. Editable via lifeos.soul; else default from the name.
     let soul=''; try{ soul=(localStorage.getItem('lifeos.soul')||'').trim(); }catch(_){}
+    const vibe = VIBES[_activeVibe(lastText)];
     const parts=[];
     if(nm) parts.push('Their name is '+nm+' — always use it naturally and never forget it.');
     if(held.length) parts.push('They have asked you to remember: '+held.join('; ')+'.');
     parts.push(soul || ((nm ? ('You are '+nm+"'s own companion, made just for them — you know "+nm+' and you belong to them. ') : "You are this person's own companion. ")
       + 'Be honest: if you do not know, say so, never make things up. Be genuinely useful.'));
+    if(vibe) parts.push('Right now, take this tone: '+vibe.tone);
     return parts.join(' ');
   }
   async function brainStream(text, onSentence){
@@ -356,7 +373,7 @@
       pending = parts.join(' '); };
     try{
       const r=await fetch(SHUTTLE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({messages:history.slice(-16), memory:_memCtx(), companion:'carrie', assist, stream:true})});
+        body:JSON.stringify({messages:history.slice(-16), memory:_memCtx(text), companion:'carrie', assist, stream:true})});
       const ct=r.headers.get('content-type')||'';
       if(r.ok && r.body && ct.includes('text/event-stream')){
         const reader=r.body.getReader(), dec=new TextDecoder(); let buf='';
@@ -665,6 +682,7 @@
       const rep=await brainStream(full, (s)=>{ if(!_spoke){ orbStatus.textContent='Speaking…'; _spoke=true; } enqueueSpeak(s); });
       applyResonance();
       orbLine.innerHTML='<b>'+esc(rep)+'</b>';
+      try{ const _v=VIBES[_activeVibe(full)]; if(_v) orbLine.style.color=_v.color; }catch(_){}  // tint reply to the active vibe
       await drainSpeech();
       doneTurn();
     }catch(err){
