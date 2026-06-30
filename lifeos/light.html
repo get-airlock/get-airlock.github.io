@@ -359,7 +359,7 @@
     if(!nm){ try{ const a=localStorage.getItem('lifeos.name'); if(a && a!=='friend') nm=a; }catch(_){} }
     // Alias autocorrect — normalize captured variants to the canonical spelling (Zach/Zack -> Zac).
     // Overridable via lifeos.aliases (JSON: {"variant":"Canonical"}). This is DataDash's alias-log, client-side.
-    try{ const al=Object.assign({zach:'Zac',zack:'Zac'}, JSON.parse(localStorage.getItem('lifeos.aliases')||'{}')); if(nm && al[nm.toLowerCase()]) nm=al[nm.toLowerCase()]; }catch(_){}
+    try{ const al=JSON.parse(localStorage.getItem('lifeos.aliases')||'{}'); if(nm && al[nm.toLowerCase()]) nm=al[nm.toLowerCase()]; }catch(_){}
     // Memory setting: "Nothing" → name + soul only (no held items). Else inject.
     const memOff = /^no/i.test(store.memory||'');
     const held = memOff ? [] : (store.memories||[]).slice(-12).map(m=>m.title+(m.timeLabel?(' ('+m.timeLabel+')'):'')).filter(Boolean);
@@ -488,18 +488,11 @@
   }
 
   // ── On-device local graph (sovereign — the person's memory lives here, starts empty) ──
-  // Cipher-at-rest — the local memory store is noise to anyone reading localStorage (Continuity-Key
-  // sovereignty layer). "Make it hard to read" — light reversible obfuscation, not strong crypto.
-  // Backward-compatible: plain JSON stores still load; first save re-writes ciphered.
-  const _CK = 0x5a;
-  function _enc(s){ let o=''; for(let i=0;i<s.length;i++) o+=String.fromCharCode(s.charCodeAt(i)^(_CK+(i%7))); return 'C1:'+btoa(unescape(encodeURIComponent(o))); }
-  function _dec(v){ if(!v || v.slice(0,3)!=='C1:') return v; try{ const o=decodeURIComponent(escape(atob(v.slice(3)))); let s=''; for(let i=0;i<o.length;i++) s+=String.fromCharCode(o.charCodeAt(i)^(_CK+(i%7))); return s; }catch(_){ return '{}'; } }
-
   const blank = { name:'', char:'drop', model:'Deep', memory:'Requested', screen:'Note', memories:[] };
   let store;
-  try { store = Object.assign({}, blank, JSON.parse(_dec(localStorage.getItem(KEY)) || '{}')); }
+  try { store = Object.assign({}, blank, JSON.parse(localStorage.getItem(KEY) || '{}')); }
   catch(_){ store = Object.assign({}, blank); }
-  const save = () => localStorage.setItem(KEY, _enc(JSON.stringify(store)));
+  const save = () => localStorage.setItem(KEY, JSON.stringify(store));
   const uid = () => 'm' + Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36);
 
   document.querySelectorAll('#u1,#u2,#u3').forEach(e => e.textContent = (e.id==='u2'?' ':'') + UNIT);
