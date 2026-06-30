@@ -331,10 +331,20 @@
   // Streaming brain: speaks each sentence the MOMENT it lands (first audio ~0.5s instead of ~2s).
   // Falls back to the whole reply if the server didn't stream. Returns the full text.
   function _memCtx(){
-    const nm = (store.name && store.name!=='friend') ? store.name : '';
+    // Name: prefer this surface's store, but FALL BACK to what arrive.html captured
+    // (lifeos.name) — the two stores were separate, which is why Carrie started blank.
+    let nm = (store.name && store.name!=='friend') ? store.name : '';
+    if(!nm){ try{ const a=localStorage.getItem('lifeos.name'); if(a && a!=='friend') nm=a; }catch(_){} }
     const held = (store.memories||[]).slice(-12).map(m=>m.title+(m.timeLabel?(' ('+m.timeLabel+')'):'')).filter(Boolean);
-    return (nm ? ('The person you are talking with is named '+nm+'. Always remember their name and use it naturally. ') : '')
-      + (held.length ? ('They have asked you to remember: '+held.join('; ')+'.') : '');
+    // The SOUL — binds the companion to its owner. Editable via lifeos.soul (the soul file);
+    // otherwise a sensible default built from the owner's name. This is the pet-to-owner bind.
+    let soul=''; try{ soul=(localStorage.getItem('lifeos.soul')||'').trim(); }catch(_){}
+    const parts=[];
+    if(nm) parts.push('Their name is '+nm+' — always use it naturally and never forget it.');
+    if(held.length) parts.push('They have asked you to remember: '+held.join('; ')+'.');
+    parts.push(soul || ((nm ? ('You are '+nm+"'s own companion, made just for them — you know "+nm+' and you belong to them. ') : "You are this person's own companion. ")
+      + 'Be honest: if you do not know, say so, never make things up. Be genuinely useful.'));
+    return parts.join(' ');
   }
   async function brainStream(text, onSentence){
     history.push({role:'user', content:text}); _convTurns++;
