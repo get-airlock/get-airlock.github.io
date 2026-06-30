@@ -263,7 +263,7 @@
       }catch(e){}
       var bye="That’s all I needed. Welcome to LifeOS, "+(answers.name||'friend')+". 🌿";
       hideEl(reply); setTimeout(function(){ replyBody.textContent=bye; showEl(reply); },220);
-      speak(bye).then(function(){ setTimeout(function(){ window.location.replace('home.html'); }, 900); });
+      speak(bye).then(function(){ setTimeout(function(){ window.location.replace('light.html'); }, 900); });
       // hard stop so it never re-loops the questions
       form.style.display='none';
     }

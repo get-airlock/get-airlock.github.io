@@ -314,11 +314,64 @@
     _convTurns++;                 // engagement feeds SPIRALL kinetic/contribution → orb brightens as you talk
     if(HELP_RE.test(text)) assist = true;
     let rep='';
-    try{ const r=await fetch(SHUTTLE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history.slice(-16), companion:'carrie', assist})}); if(r.ok){ const d=await r.json(); rep=d&&d.reply; } }catch(_){}
+    try{
+      // Inject the on-device memory so Carrie never forgets the name or the held items,
+      // even after the 16-message window slides. This is the fix for "she forgets my name".
+      const nm = (store.name && store.name!=='friend') ? store.name : '';
+      const held = (store.memories||[]).slice(-12).map(m=>m.title+(m.timeLabel?(' ('+m.timeLabel+')'):'')).filter(Boolean);
+      const memCtx = (nm ? ('The person you are talking with is named '+nm+'. Always remember their name and use it naturally. ') : '')
+        + (held.length ? ('They have asked you to remember: '+held.join('; ')+'.') : '');
+      const r=await fetch(SHUTTLE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history.slice(-16), memory:memCtx, companion:'carrie', assist})}); if(r.ok){ const d=await r.json(); rep=d&&d.reply; }
+    }catch(_){}
     rep = rep || 'I’m here with you.';
     history.push({role:'assistant', content:rep});
     return rep;
   }
+
+  // Streaming brain: speaks each sentence the MOMENT it lands (first audio ~0.5s instead of ~2s).
+  // Falls back to the whole reply if the server didn't stream. Returns the full text.
+  function _memCtx(){
+    const nm = (store.name && store.name!=='friend') ? store.name : '';
+    const held = (store.memories||[]).slice(-12).map(m=>m.title+(m.timeLabel?(' ('+m.timeLabel+')'):'')).filter(Boolean);
+    return (nm ? ('The person you are talking with is named '+nm+'. Always remember their name and use it naturally. ') : '')
+      + (held.length ? ('They have asked you to remember: '+held.join('; ')+'.') : '');
+  }
+  async function brainStream(text, onSentence){
+    history.push({role:'user', content:text}); _convTurns++;
+    if(HELP_RE.test(text)) assist = true;
+    let full='', pending='';
+    const flush=(end)=>{ const parts=pending.split(/(?<=[.!?])\s+/);
+      const keep = end ? 0 : 1;
+      while(parts.length>keep){ const s=parts.shift().trim(); if(s) onSentence(s); }
+      pending = parts.join(' '); };
+    try{
+      const r=await fetch(SHUTTLE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({messages:history.slice(-16), memory:_memCtx(), companion:'carrie', assist, stream:true})});
+      const ct=r.headers.get('content-type')||'';
+      if(r.ok && r.body && ct.includes('text/event-stream')){
+        const reader=r.body.getReader(), dec=new TextDecoder(); let buf='';
+        for(;;){ const {done,value}=await reader.read(); if(done) break;
+          buf+=dec.decode(value,{stream:true}); let nl;
+          while((nl=buf.indexOf('\n'))>=0){ const line=buf.slice(0,nl).trim(); buf=buf.slice(nl+1);
+            if(!line.startsWith('data:')) continue; const p=line.slice(5).trim();
+            if(p==='[DONE]'){ buf=''; break; }
+            try{ const tok=JSON.parse(p).choices?.[0]?.delta?.content||''; if(tok){ full+=tok; pending+=tok; flush(false); } }catch(_){}
+          }
+        }
+        flush(true);
+      } else if(r.ok){ const d=await r.json(); full=(d&&d.reply)||''; if(full.trim()) onSentence(full.trim()); }
+    }catch(_){}
+    full=full.trim()||'I’m here with you.';
+    history.push({role:'assistant', content:full});
+    return full;
+  }
+  // Sequential sentence player — plays queued sentences in order (ttsBlob cleans + prefetches).
+  let _spkQueue=[], _spkPumping=false;
+  async function enqueueSpeak(s){ _spkQueue.push(s); if(_spkPumping) return;
+    _spkPumping=true; speaking=true;
+    try{ while(_spkQueue.length){ const b=await ttsBlob(_spkQueue.shift()); if(b) await playBlob(b); } }
+    finally{ _spkPumping=false; speaking=false; } }
+  async function drainSpeech(){ while(_spkPumping||_spkQueue.length) await new Promise(r=>setTimeout(r,80)); }
   function splitChunks(t){ const parts=(''+t).match(/[^.!?\n]+[.!?]*\s*/g)||[t]; const out=[]; let cur=''; for(const p of parts){ cur+=p; const lim=out.length===0?0:140; if(cur.trim().length>lim){ out.push(cur.trim()); cur=''; } } if(cur.trim()) out.push(cur.trim()); return out; }
   // Keep Carrie's voice even: strip markdown emphasis and de-SHOUT long ALL-CAPS words before TTS,
   // so the engine stops randomly dramatizing words mid-sentence ("MUCH MORE…"). Keeps short acronyms (AI, US, CEO).
@@ -598,9 +651,11 @@
       if(looksMem){ addMemory(p); if(sheet.classList.contains('show')) closeSheet(); await speak('Held — '+p.title+(p.timeLabel?(' at '+p.timeLabel):'')+'.'); doneTurn(); return; }
       // otherwise it's a conversation — Carrie answers in voice
       orbLine.innerHTML='“'+esc(full)+'”'; orbStatus.textContent='Thinking…';
-      const rep=await brain(full); applyResonance();
-      orbLine.innerHTML='<b>'+esc(rep)+'</b>'; orbStatus.textContent='Speaking…';
-      await speak(rep);
+      let _spoke=false;
+      const rep=await brainStream(full, (s)=>{ if(!_spoke){ orbStatus.textContent='Speaking…'; _spoke=true; } enqueueSpeak(s); });
+      applyResonance();
+      orbLine.innerHTML='<b>'+esc(rep)+'</b>';
+      await drainSpeech();
       doneTurn();
     }catch(err){
       // Don't break a flow-state talker on a single STT hiccup — keep the ear open; fall back to typing only after repeated failures.

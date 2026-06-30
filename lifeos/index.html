@@ -56,9 +56,11 @@
     // to arrival the first time, then home). Memory + graph live on this device.
     document.getElementById('start').addEventListener('click', function(){
       try { localStorage.setItem('lifeos.started', '1'); } catch(e){}
-      // Light is the one true LifeOS now — it talks (Carrie) and remembers (local graph),
-      // and KYI rides under the conversation rather than a separate onboarding screen.
-      location.href = 'light.html';
+      // First crossing = arrive (the Carrie onboarding). Once onboarded, go straight to
+      // the sovereign app. Memory + graph live on this device either way.
+      var onboarded = false;
+      try { onboarded = localStorage.getItem('lifeos.onboarded') === '1'; } catch(e){}
+      location.href = onboarded ? 'light.html' : 'arrive.html';
     });
   </script>
 </body>
