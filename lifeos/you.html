@@ -76,6 +76,18 @@
             <button class="seg" data-v="draw" disabled title="Coming soon" style="opacity:.4;cursor:not-allowed;">Drawing · soon</button>
           </div>
         </div>
+
+        <div class="you-field">
+          <div class="you-field-label"><span>Name aliases</span></div>
+          <input class="you-name-input" id="alias-input" type="text" placeholder="Zach=Zac, Zack=Zac" aria-label="Name aliases">
+          <p class="faint" style="margin-top:8px;">Spellings the companion maps to your canonical name.</p>
+        </div>
+
+        <div class="you-field">
+          <div class="you-field-label"><span>Blacklist</span></div>
+          <input class="you-name-input" id="blacklist-input" type="text" placeholder="names or words to never store…" aria-label="Blacklist">
+          <p class="faint" style="margin-top:8px;">Scrubbed before anything is sent or saved — never seen, never kept.</p>
+        </div>
       </div>
     </main>
   </div>
@@ -124,6 +136,20 @@
     wireSegments('model-row', () => (LifeOSStore.load().model || 'DEEP'), (v) => { const s=LifeOSStore.load(); s.model=v; LifeOSStore.save(s); localStorage.setItem('lifeos.model', v); });
     wireSegments('memory-row', () => LifeOSStore.getMode(), (v) => LifeOSStore.setMode(v));
     wireSegments('screen-row', () => (localStorage.getItem('lifeos.screen') || 'none'), (v) => localStorage.setItem('lifeos.screen', v));
+
+    // Aliases (Zach=Zac, Zack=Zac) -> lifeos.aliases JSON
+    const aliasInput = document.getElementById('alias-input');
+    try { const a = JSON.parse(localStorage.getItem('lifeos.aliases') || '{}'); aliasInput.value = Object.entries(a).map(([k,v]) => k+'='+v).join(', '); } catch(e){}
+    aliasInput.addEventListener('input', () => {
+      const map = {}; aliasInput.value.split(',').forEach(p => { const [k,v] = p.split('='); if (k && v) map[k.trim().toLowerCase()] = v.trim(); });
+      localStorage.setItem('lifeos.aliases', JSON.stringify(map));
+    });
+    // Blacklist -> lifeos.blacklist JSON array (scrubbed at ingest by light.html)
+    const blInput = document.getElementById('blacklist-input');
+    try { blInput.value = (JSON.parse(localStorage.getItem('lifeos.blacklist') || '[]')).join(', '); } catch(e){}
+    blInput.addEventListener('input', () => {
+      localStorage.setItem('lifeos.blacklist', JSON.stringify(blInput.value.split(',').map(s => s.trim()).filter(Boolean)));
+    });
   </script>
 </body>
 </html>
