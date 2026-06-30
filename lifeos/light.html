@@ -349,6 +349,9 @@
     // Name: prefer this surface's store, FALL BACK to what arrive.html captured (lifeos.name).
     let nm = (store.name && store.name!=='friend') ? store.name : '';
     if(!nm){ try{ const a=localStorage.getItem('lifeos.name'); if(a && a!=='friend') nm=a; }catch(_){} }
+    // Alias autocorrect — normalize captured variants to the canonical spelling (Zach/Zack -> Zac).
+    // Overridable via lifeos.aliases (JSON: {"variant":"Canonical"}). This is DataDash's alias-log, client-side.
+    try{ const al=Object.assign({zach:'Zac',zack:'Zac'}, JSON.parse(localStorage.getItem('lifeos.aliases')||'{}')); if(nm && al[nm.toLowerCase()]) nm=al[nm.toLowerCase()]; }catch(_){}
     // Memory setting: "Nothing" → name + soul only (no held items). Else inject.
     const memOff = /^no/i.test(store.memory||'');
     const held = memOff ? [] : (store.memories||[]).slice(-12).map(m=>m.title+(m.timeLabel?(' ('+m.timeLabel+')'):'')).filter(Boolean);
@@ -356,7 +359,7 @@
     let soul=''; try{ soul=(localStorage.getItem('lifeos.soul')||'').trim(); }catch(_){}
     const vibe = VIBES[_activeVibe(lastText)];
     const parts=[];
-    if(nm) parts.push('Their name is '+nm+' — always use it naturally and never forget it.');
+    if(nm) parts.push('Their name is exactly "'+nm+'" — spell it precisely this way every single time, never a variant (e.g. never "Zach" if it is "Zac"). Use it naturally, never forget it.');
     if(held.length) parts.push('They have asked you to remember: '+held.join('; ')+'.');
     parts.push(soul || ((nm ? ('You are '+nm+"'s own companion, made just for them — you know "+nm+' and you belong to them. ') : "You are this person's own companion. ")
       + 'Be honest: if you do not know, say so, never make things up. Be genuinely useful.'));
