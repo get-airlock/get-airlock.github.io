@@ -345,6 +345,14 @@
     return 'cloud'; }
   function _activeVibe(lastText){ let c=store.char||''; if(!c){ try{ c=localStorage.getItem('lifeos.mascot')||''; }catch(_){} } c=c||'drop'; return (c==='auto') ? _detectVibe(lastText) : (VIBES[c]?c:'drop'); }
 
+  // Blacklist redaction at ingest — scrub forbidden names/terms BEFORE they reach the model or storage.
+  // Configurable via lifeos.blacklist (JSON array). This is the DataDash deny-list, client-side.
+  function _redact(t){ if(!t) return t;
+    let bl=[]; try{ bl=JSON.parse(localStorage.getItem('lifeos.blacklist')||'[]'); }catch(_){}
+    let out=String(t); for(const term of bl){ if(!term) continue;
+      out=out.replace(new RegExp('\\b'+String(term).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','gi'),'▒▒'); }
+    return out; }
+
   function _memCtx(lastText){
     // Name: prefer this surface's store, FALL BACK to what arrive.html captured (lifeos.name).
     let nm = (store.name && store.name!=='friend') ? store.name : '';
@@ -367,6 +375,7 @@
     return parts.join(' ');
   }
   async function brainStream(text, onSentence){
+    text = _redact(text);   // scrub blacklisted terms before they ever enter history, the model, or storage
     history.push({role:'user', content:text}); _convTurns++;
     if(HELP_RE.test(text)) assist = true;
     let full='', pending='';
@@ -376,7 +385,7 @@
       pending = parts.join(' '); };
     try{
       const r=await fetch(SHUTTLE+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({messages:history.slice(-16), memory:_memCtx(text), companion:'carrie', assist, stream:true})});
+        body:JSON.stringify({messages:history.slice(-16).map(m=>({role:m.role,content:_redact(m.content)})), memory:_redact(_memCtx(text)), companion:'carrie', assist, stream:true})});
       const ct=r.headers.get('content-type')||'';
       if(r.ok && r.body && ct.includes('text/event-stream')){
         const reader=r.body.getReader(), dec=new TextDecoder(); let buf='';
