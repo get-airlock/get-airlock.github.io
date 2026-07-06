@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>The Fixer — an Airlock Labs product</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0f16; --panel:#111826; --panel2:#0e141f; --line:#232c3d; --line2:#1a2233;
+    --ink:#e8edf5; --mid:#9aa7ba; --dim:#66748a;
+    --amber:#ef9f27; --amber2:#fac775; --green:#97c459; --green2:#c0dd97; --red:#e24b4a; --red2:#f7c1c1;
+    --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px}
+  section{padding:76px 0;border-bottom:.5px solid var(--line2)}
+  section:last-child{border-bottom:none}
+  .kick{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(34px,7vw,60px);line-height:1.04;letter-spacing:-.01em}
+  h2{font-family:var(--serif);font-weight:600;font-size:clamp(26px,5vw,40px);line-height:1.1;letter-spacing:-.01em;margin-bottom:20px}
+  p{font-size:clamp(15px,2.3vw,18px);color:var(--mid);margin-bottom:16px}
+  p b,li b{color:var(--ink);font-weight:600}
+  .lead{font-size:clamp(17px,2.6vw,21px);color:var(--ink)}
+  .mono{font-family:var(--mono)}
+  .amber{color:var(--amber2)} .green{color:var(--green2)} .red{color:var(--red2)}
+  .grid{display:grid;gap:14px;margin-top:8px}
+  .g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:600px){.g3,.g2{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:.5px solid var(--line);border-radius:14px;padding:20px}
+  .card .n{font-family:var(--mono);font-size:30px;color:var(--ink);line-height:1}
+  .card .l{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+  .card .s{font-size:13px;color:var(--mid);margin-top:8px}
+  ul{list-style:none;margin-top:6px}
+  li{font-size:clamp(15px,2.3vw,18px);color:var(--mid);padding-left:22px;position:relative;margin-bottom:12px}
+  li::before{content:"";position:absolute;left:2px;top:11px;width:7px;height:7px;border-radius:50%;background:var(--amber)}
+  .pill{display:inline-flex;align-items:center;gap:8px;border:.5px solid var(--line);border-radius:999px;padding:6px 14px;font-family:var(--mono);font-size:12px;color:var(--mid)}
+  .mark{display:flex;align-items:center;gap:12px;margin-bottom:34px}
+  .mark svg{flex:none}
+  .mark span{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--mid)}
+  .verdict{display:flex;align-items:center;gap:10px;background:rgba(151,196,89,.08);border:.5px solid rgba(151,196,89,.3);border-radius:10px;padding:12px 15px;margin-top:18px}
+  .verdict .dot{width:9px;height:9px;border-radius:50%;background:var(--green);flex:none}
+  .verdict.warn{background:rgba(239,159,39,.08);border-color:rgba(239,159,39,.35)} .verdict.warn .dot{background:var(--amber)}
+  .terms{background:var(--panel);border:.5px solid var(--line);border-radius:16px;padding:26px;margin-top:22px}
+  .trow{display:flex;gap:14px;padding:14px 0;border-top:.5px solid var(--line2);align-items:flex-start}
+  .trow:first-child{border-top:none}
+  .trow .k{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);width:110px;flex:none;padding-top:3px}
+  .trow .v{color:var(--ink);font-size:clamp(15px,2.3vw,17px)}
+  .big{font-family:var(--serif);font-size:clamp(40px,9vw,72px);color:var(--amber2);line-height:1;font-weight:600}
+  .foot{color:var(--dim);font-family:var(--mono);font-size:11px;text-align:center;padding:40px 0}
+  .disc{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:20px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- Cover -->
+<section style="padding-top:110px">
+  <div class="wrap">
+    <div class="mark">
+      <svg width="34" height="34" viewBox="0 0 30 30"><circle cx="15" cy="15" r="6.5" fill="none" stroke="#ef9f27" stroke-width="1.6"/><ellipse cx="15" cy="15" rx="12" ry="4.6" fill="none" stroke="#66748a" stroke-width="1" transform="rotate(-22 15 15)"/><circle cx="25.4" cy="10.6" r="1.8" fill="#ef9f27"/></svg>
+      <span>The Fixer · an Airlock Labs product</span>
+    </div>
+    <h1>The one thing in betting<br>that's actually on <em style="font-style:italic;color:var(--amber2)">your</em> side.</h1>
+    <p class="lead" style="margin-top:24px;max-width:560px">Every book, tout, and app is paid when you lose. The Fixer is the opposite: it's built to make you a <b>better</b> bettor — which almost always means <b>fewer</b> bets, not more.</p>
+    <div style="margin-top:26px" class="pill">Friends &amp; family · revenue now, ownership later</div>
+  </div>
+</section>
+
+<!-- Problem: scale -->
+<section><div class="wrap">
+  <div class="kick">The problem</div>
+  <h2>The whole funnel profits when you lose.</h2>
+  <p>The book, the boosts, the "expert" picks, the parlay ads — everyone between you and the game gets paid <b>because</b> you lose. In 2025, U.S. sportsbooks pulled <b>$17 billion</b> straight out of bettor losses.</p>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="card"><div class="n red">95–97<span style="font-size:15px;color:var(--dim)">%</span></div><div class="s">of bettors lose money long-term</div></div>
+    <div class="card"><div class="n">$17<span style="font-size:15px;color:var(--dim)">B</span></div><div class="s">2025 sportsbook revenue — all of it bettor losses</div></div>
+    <div class="card"><div class="n">52.4<span style="font-size:15px;color:var(--dim)">%</span></div><div class="s">needed just to break even — most hit 48–50%</div></div>
+  </div>
+</div></section>
+
+<!-- Problem: why they lose -->
+<section><div class="wrap">
+  <div class="kick">Why they lose</div>
+  <h2>It's not the picks. It's the heart.</h2>
+  <p>The losses aren't a knowledge problem — they're an <b>emotion</b> problem. The research is blunt about it:</p>
+  <ul>
+    <li><b>3 of 4</b> bettors placed an impulse bet last year — and <b>1 in 7</b> make <i>every</i> bet on impulse.</li>
+    <li><b>60%</b> admit to chasing losses — betting bigger to win it back.</li>
+    <li>Fans bet their own team <b>regardless of the numbers</b> — emotional attachment predicts the bet.</li>
+    <li>"Tilting" after a bad beat lines up with the <b>highest</b> problem-gambling severity.</li>
+  </ul>
+  <div class="verdict"><span class="dot"></span><span style="color:var(--green2);font-size:15px">Every one of these is the gap between what a bettor <b>feels</b> and what the numbers <b>say</b>. That gap is exactly where the Fixer lives — the honest number, and a nudge to sit down when your heart's running hot.</span></div>
+  <p class="disc">Sources: peer-reviewed gambling-studies research + national bettor surveys, 2017–2026.</p>
+</div></section>
+
+<!-- What it is -->
+<section><div class="wrap">
+  <div class="kick">What it is</div>
+  <h2>Three surfaces, one honest machine.</h2>
+  <div class="grid g3">
+    <div class="card"><div class="l">The board</div><div style="font-size:17px;color:var(--ink);font-weight:500">Tonight's slate</div><div class="s">Every game, our fair number vs. the live market, and a red / yellow / green verdict. Scannable in ten seconds.</div></div>
+    <div class="card"><div class="l">The conversation</div><div style="font-size:17px;color:var(--ink);font-weight:500">Ask the Fixer</div><div class="s">Talk to it — by voice. "What's the read on the Reds?" It answers in real time, off the real numbers, and remembers the thread.</div></div>
+    <div class="card"><div class="l">The slip</div><div style="font-size:17px;color:var(--ink);font-weight:500">Session slip</div><div class="s">It builds your slip as you go, flags the outlier legs, and shows the true odds vs. the payout. Paper only — no money moves through us.</div></div>
+  </div>
+</div></section>
+
+<!-- The ethic / moat -->
+<section><div class="wrap">
+  <div class="kick">The ethic — and the moat</div>
+  <h2>Most nights, the honest answer is<br><em style="font-style:italic;color:var(--amber2)">"sit down."</em></h2>
+  <p>Every other product sells more picks. Ours defaults to <b>pass</b> — because on a normal night, five of eight games are priced fair and there's no edge. Sitting out is a position.</p>
+  <div class="verdict"><span class="dot"></span><span style="color:var(--green2);font-size:15px">We win when you make <b>fewer bad bets</b>, not more picks. That's the trust nobody else can copy — because their business needs you to keep firing.</span></div>
+</div></section>
+
+<!-- The record -->
+<section><div class="wrap">
+  <div class="kick">The record — graded, itemized, public</div>
+  <h2>Receipts, not hype.</h2>
+  <p>Every pick is logged before first pitch and graded against the real final — <b>1,371 picks across 105 days</b>, the full history public. Here's where it stands:</p>
+  <div class="grid g3" style="margin-top:18px">
+    <div class="card"><div class="l">Overall</div><div class="n">53.2<span style="font-size:16px;color:var(--dim)">%</span></div><div class="s">730–641 · every graded pick</div></div>
+    <div class="card" style="border-color:rgba(151,196,89,.35)"><div class="l" style="color:var(--green2)">Top plays</div><div class="n green">60.9<span style="font-size:16px;color:var(--dim)">%</span></div><div class="s">95–61 · highest-conviction tier</div></div>
+    <div class="card"><div class="l">Break-even</div><div class="n">52.4<span style="font-size:16px;color:var(--dim)">%</span></div><div class="s">the line you must beat</div></div>
+  </div>
+  <div class="verdict warn"><span class="dot"></span><span style="color:var(--amber2);font-size:14px">Straight with you: this is <b>paper, forward-tracked</b> — promising and above break-even, not yet a proven bankroll. The next build is the receipt trail (closing-line value) that turns "promising" into "proven." We don't pretend it's more than it is. That honesty is the product.</span></div>
+</div></section>
+
+<!-- Why it works -->
+<section><div class="wrap">
+  <div class="kick">Why it works</div>
+  <h2>Our edge isn't being smarter.<br>It's being honest about what hits.</h2>
+  <p>Most models brag. They'll call a game 70% and hit 59%. Ours does the same raw — so we <b>calibrate every number down</b> to what actually lands across thousands of graded picks. The percent you see is the percent that hits.</p>
+  <p>Then we compare that honest number to the <b>live, de-vigged market</b>. The gap is the edge. When the model screams a huge gap, we don't chase it — we <b>fade our own outlier</b>, because a gap that wide usually means the model's missing something the market already knows.</p>
+</div></section>
+
+<!-- Business model -->
+<section><div class="wrap">
+  <div class="kick">How it makes money</div>
+  <h2>Free where it hooks. Paid where it's magic.</h2>
+  <div class="grid g2">
+    <div class="card"><div class="l">Free · the hook</div><div style="font-size:17px;color:var(--ink);font-weight:500">Picks in the community</div><div class="s">The daily board and scores run free in the Discord. It builds the audience and proves the record in public.</div></div>
+    <div class="card" style="border-color:rgba(239,159,39,.35)"><div class="l" style="color:var(--amber2)">Paid · the product</div><div style="font-size:17px;color:var(--ink);font-weight:500">The real-time app</div><div class="s">Talking to it live, the voice, the session slip built for you on the fly — that's the service. That's what people pay for.</div></div>
+  </div>
+</div></section>
+
+<!-- Unit economics -->
+<section><div class="wrap">
+  <div class="kick">What it costs to run</div>
+  <h2>The margin is in owning the voice.</h2>
+  <p>At <b>1,000 subscribers × $39.99</b>, that's about <b>$40,000/month</b> in. The main cost isn't idle servers — it's the voice itself (Otto talking), which scales with minutes used, not users signed up. So the whole game is <b>rent the voice, or own it</b>:</p>
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card"><div class="l">Rent it · off-the-shelf</div><div class="n">~35<span style="font-size:15px;color:var(--dim)">% margin</span></div><div class="s">~$25k/mo to run — most of it paying a 3rd-party voice API per word. Works, but thin.</div></div>
+    <div class="card" style="border-color:rgba(151,196,89,.35)"><div class="l" style="color:var(--green2)">Own it · our stack</div><div class="n green">~70<span style="font-size:15px;color:var(--dim)">% margin</span></div><div class="s">~$10–12k/mo, voice running on our own hardware — the M4 Ultra and a GPU node. Own-not-rent.</div></div>
+  </div>
+  <div class="verdict"><span class="dot"></span><span style="color:var(--green2);font-size:15px">This is why the hardware is in the budget, not the wish-list: bringing the voice in-house is what turns a thin business into a <b>real one</b> as it grows.</span></div>
+  <p class="disc">Estimates, not promises — real numbers move with usage and pricing. Text inference (the model reading the game) is cheap; voice is the lever. Adding the other real-time engines (the SSM stack) rides the same owned hardware.</p>
+</div></section>
+
+<!-- Structure -->
+<section><div class="wrap">
+  <div class="kick">Where it lives — and where it's going</div>
+  <h2>Starts at Airlock. Grows into its own company.</h2>
+  <p>Right now the Fixer is a product of <b>Airlock Labs</b> — my for-profit company that owns the AI and the patents. Your loan is to Airlock; that's who pays you back and shares the revenue.</p>
+  <p>When it's ready to scale, I'm standing up <b>Maverick Industries</b> as the operating company and raising into it — and the Fixer moves there. That's the moment your stake <b>converts from a revenue share into equity in Maverick</b>: you stop being a lender and become an owner.</p>
+  <p>Either way it's a <b>paid engine</b> from day one — real revenue, on your side — not a free app hoping to charge someday.</p>
+</div></section>
+
+<!-- The ask -->
+<section style="background:var(--panel2)"><div class="wrap">
+  <div class="kick" style="color:var(--amber2)">The friends &amp; family round</div>
+  <div class="big">5 × $5,000</div>
+  <p class="lead" style="margin-top:14px"><b>$25,000 total</b> to get the Fixer's real-time app to market — the server, the voice, and the first real users. Five spots, close only. No outsiders.</p>
+  <p>Not equity — a <b>loan to Airlock Labs</b>. You're not buying the company or the patents; you're backing <b>one product</b> and sharing in what it earns.</p>
+</div></section>
+
+<!-- Use of funds -->
+<section><div class="wrap">
+  <div class="kick">Where the $25k goes</div>
+  <h2>Runway to launch, and the hardware to own the voice.</h2>
+  <div class="terms">
+    <div class="trow"><div class="k" style="width:150px">Personal runway</div><div class="v"><b>$9,000</b> — three months of focus, heads-down, shipping.</div></div>
+    <div class="trow"><div class="k" style="width:150px">Mac Studio M4 Ultra</div><div class="v"><b>$4,000</b> — the local engine that offsets inference and runs the SSM voice work.</div></div>
+    <div class="trow"><div class="k" style="width:150px">Inference · GPU · API</div><div class="v"><b>$4,000</b> — to launch the real-time app and carry the first wave of users.</div></div>
+    <div class="trow"><div class="k" style="width:150px">Dev machine</div><div class="v"><b>$3,000</b> — a working laptop (the current one taps out under real load).</div></div>
+    <div class="trow"><div class="k" style="width:150px">Buffer</div><div class="v"><b>$5,000</b> — contingency, domains, Stripe, the unglamorous stuff.</div></div>
+  </div>
+  <p class="mono" style="font-size:12px;color:var(--dim);margin-top:14px">Total $25,000 · no salaries, no agencies, no fluff — runway + hardware to stand it up.</p>
+</div></section>
+
+<!-- Terms -->
+<section><div class="wrap">
+  <div class="kick">The terms — plain</div>
+  <h2>Your money back first. Then a share, forever.</h2>
+  <div class="terms">
+    <div class="trow"><div class="k">You give</div><div class="v"><b>$5,000</b> — one of five spots, a loan to Airlock Labs.</div></div>
+    <div class="trow"><div class="k">First</div><div class="v">The Fixer pays your <b>$5,000 back in full</b> from revenue, before you take a cent of profit.</div></div>
+    <div class="trow"><div class="k">Then · cash</div><div class="v"><b>1% of the Fixer's gross revenue</b> — real money in hand while it's an Airlock product. <span style="color:var(--dim)">(All five spots together = 5%.)</span></div></div>
+    <div class="trow"><div class="k">At the raise · ownership</div><div class="v">When <b>Maverick Industries</b> is set up and raises, the Fixer moves there and your revenue share <b>converts into equity in Maverick</b> — you become a real owner.</div></div>
+    <div class="trow"><div class="k">Scoped to</div><div class="v"><b>The Fixer</b> — its revenue now, its equity later. Not the rest of Airlock.</div></div>
+  </div>
+  <div class="verdict"><span class="dot"></span><span style="color:var(--green2);font-size:15px">Downside capped at $5,000. Upside: cash while it grows, then a real ownership stake when it becomes its own company. Exact conversion is papered plainly in writing.</span></div>
+</div></section>
+
+<!-- Close -->
+<section><div class="wrap">
+  <div class="kick">Straight up</div>
+  <h2>You're not buying a dream. You're backing a bet that already works.</h2>
+  <p>This isn't a moonshot and it isn't a partnership — it's a small, plain loan into a tool with a <b>public track record</b> and a clear reason people pay. You get every dollar back before I make a cent, then a permanent cut of what it earns.</p>
+  <p>I'm asking the handful of people who'd want to see me win — and make a fair return doing it. That's the whole thing.</p>
+  <div class="disc">The Fixer is an information tool, not betting advice · 21+ · paper only, no money is held or wagered through the product · all percentages are forecasts, graded against real results · loan terms above are the offer, to be papered simply in writing.</div>
+</div></section>
+
+<div class="foot">The Fixer · an Airlock Labs product</div>
+
+</body>
+</html>
